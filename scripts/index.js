@@ -24,7 +24,7 @@ import { Menu } from "./ui";
 const world = Minecraft.world;
 
 tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
-    for(let player of world.getPlayers()) {
+    for(const player of world.getPlayers()) {
         player.getTags().forEach((t) => {
             if (t.startsWith("rename:")) {
                 player.rename = t.replace("rename:", "");
@@ -35,7 +35,8 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
                 player.removeTag(t);
             }
             if (t.startsWith("setItem:")) {
-                player.setItemJson = t.replace("setItem:", "").replace(/'/g, '\"').replace(/`/g, "\"");
+                if (!player.setItemJson) player.setItemJson = [];
+                player.setItemJson.push(t.replace("setItem:", "").replace(/'/g, '\"').replace(/`/g, "\""));
                 player.removeTag(t);
             }
             if (t.startsWith("form:")) {
@@ -89,18 +90,15 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
         } catch {}
 
         // Set item
-        let container = player.getComponent('inventory').container;
-        if (player.setItemJson) {
-            const Data = JSON.parse(player.setItemJson);
+        const container = player.getComponent('inventory').container;
+        if (player.setItemJson) player.setItemJson.forEach(setItemJson => { 
+            const Data = JSON.parse(setItemJson);
             if (!Data.item) return;
-            let amount = 1;
-            let data = 0;
-            let slot = 0;
-            let itemName = Data.item.replace("minecraft:", "");
-            if (Data.amount) amount = Data.amount;
-            if (Data.data) data = Data.data;
-            if (Data.slot) slot = Data.slot;
-            let item = new Minecraft.ItemStack(Minecraft.MinecraftItemTypes[itemName], amount, data);
+            const amount = Data.amount ? Data.amount : 1;
+            const data = Data.data ? Data.data : 0;
+            const slot = Data.slot ? Data.slot : 0;
+            const itemName = Data.item.replace("minecraft:", "");
+            const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount, data);
             if (Data.name) item.nameTag = setVariable(player, Data.name);
             if (Data.lore) {
                 for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
@@ -120,8 +118,8 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
             
             if (typeof Data.slot == "number") container.setItem(Data.slot, item);
                 else container.addItem(item);
-            player.setItemJson = false;
-        }
+        });
+        player.setItemJson = [];
 
         // Show form
         if (player.formJson) {
@@ -167,15 +165,14 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
             player.setScore("set", "Capi:playerJoinY", player.location.y.toFixed(0));
             player.setScore("set", "Capi:playerJoinZ", player.location.z.toFixed(0));
             player.setScore("add", "Capi:joinCount", 1);
+            player.addTag("Capi:join");
             player.join = false;
         }
 
         // Set scoreboard
         // health
-        player.health = player.getComponent("minecraft:health").current;
-        try {
-            player.setScore("set", "Capi:health", player.health);
-        } catch {}
+        const health = Math.round(player.getComponent("health").current);
+        player.setScore("set", "Capi:health", health);
 
         // pos
         player.setScore("set", "Capi:x", player.location.x.toFixed(0));
@@ -324,9 +321,9 @@ world.events.effectAdd.subscribe(effectAdd => {
     player.addTag(`effectAddD:${JSON.stringify(details)}`);
 });
 
-world.events.playerJoin.subscribe(playerJoin => {
-    const player = playerJoin.player;
-    player.join = true;
+world.events.playerSpawn.subscribe(playerSpawn => {
+    const { player, initialSpawn } = playerSpawn;
+    if (initialSpawn) player.join = true;
 });
 
 world.events.projectileHit.subscribe(projectileHit => {

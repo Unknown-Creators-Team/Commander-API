@@ -51,3 +51,5 @@ scoreboard objectives add Capi:dimension dummy
 scoreboard objectives add Capi:attack dummy
 scoreboard objectives add Capi:damage dummy
 scoreboard objectives add Capi:hurt dummy
+gamerule sendcommandfeedback false
+gamerule commandblockoutput false
