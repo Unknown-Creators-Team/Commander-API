@@ -166,10 +166,10 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
 
         // Join
         if (player.join) {
-            player.setScore("set", "Capi:playerJoinX", Math.floor(player.location.x));
-            player.setScore("set", "Capi:playerJoinY", Math.floor(player.location.y));
-            player.setScore("set", "Capi:playerJoinZ", Math.floor(player.location.z));
-            player.setScore("add", "Capi:joinCount", 1);
+            player.setScore("Capi:playerJoinX", Math.floor(player.location.x));
+            player.setScore("Capi:playerJoinY", Math.floor(player.location.y));
+            player.setScore("Capi:playerJoinZ", Math.floor(player.location.z));
+            player.setScore("Capi:joinCount", 1, "add");
             player.addTag("Capi:join");
             player.join = false;
         }
@@ -177,28 +177,28 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
         // Set scoreboard
         // health
         const health = Math.round(player.getComponent("health").current);
-        player.setScore("set", "Capi:health", health);
+        player.setScore("Capi:health", health);
 
         // pos
-        player.setScore("set", "Capi:x", Math.floor(player.location.x));
-        player.setScore("set", "Capi:y", Math.floor(player.location.y));
-        player.setScore("set", "Capi:z", Math.floor(player.location.z));
+        player.setScore("Capi:x", Math.floor(player.location.x));
+        player.setScore("Capi:y", Math.floor(player.location.y));
+        player.setScore("Capi:z", Math.floor(player.location.z));
 
         // rotation
-        player.setScore("set", "Capi:rx", Math.floor(player.rotation.x));
-        player.setScore("set", "Capi:ry", Math.floor(player.rotation.y));
+        player.setScore("Capi:rx", Math.floor(player.rotation.x));
+        player.setScore("Capi:ry", Math.floor(player.rotation.y));
 
         // selected slot
-        player.setScore("set", "Capi:slot", player.selectedSlot);
+        player.setScore("Capi:slot", player.selectedSlot);
 
         // timestamp
-        player.setScore("set", "Capi:timestamp", Math.floor( Date.now() / 1000 ));
+        player.setScore("Capi:timestamp", Math.floor( Date.now() / 1000 ));
 
         // dimension
-        if (player.dimension.id === "minecraft:overworld") player.setScore("set", "Capi:dimension", "0");
-            else if (player.dimension.id === "minecraft:nether") player.setScore("set", "Capi:dimension", "-1");
-            else if (player.dimension.id === "minecraft:the_end") player.setScore("set", "Capi:dimension", "1");
-            else player.setScore("set", "Capi:dimension", "-2");
+        if (player.dimension.id === "minecraft:overworld") player.setScore("Capi:dimension", 0);
+            else if (player.dimension.id === "minecraft:nether") player.setScore("Capi:dimension", -1);
+            else if (player.dimension.id === "minecraft:the_end") player.setScore("Capi:dimension", 1);
+            else player.setScore("Capi:dimension", -2);
 
         if (!player.pushedTime > 0) player.pushedTime = 0;
         if (player.pushedTime >= 1) player.pushedTime++;
@@ -218,7 +218,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
 world.events.entityHit.subscribe(entityHit => {
     const { entity: player, hitEntity: entity, hitBlock: block } = entityHit;
     if (player.typeId !== "minecraft:player") return;
-    player.setScore("add", "Capi:attack", "1");
+    player.setScore("Capi:attack", 1, "add");
     player.addTag("Capi:attack");
     player.getTags().forEach(t => {if (t.startsWith("attacked:")) player.removeTag(t)});
     if (entity) player.addTag(`attacked:${entity.typeId}`);
@@ -228,12 +228,12 @@ world.events.entityHit.subscribe(entityHit => {
 world.events.entityHurt.subscribe(entityHurt => {
     const { cause, damage, damagingEntity: player, hurtEntity: entity } = entityHurt;
     if (entity && entity.typeId === "minecraft:player") {
-        entity.setScore("set", "Capi:hurt", damage);
+        entity.setScore("Capi:hurt", damage);
         entity.getTags().forEach(t => {if (t.startsWith("cause:")) entity.removeTag(t)});
         entity.addTag(`cause:${cause}`);
     }
     if (player && player.typeId === "minecraft:player") {
-        player.setScore("set", "Capi:damage", damage);
+        player.setScore("Capi:damage", damage);
     }
 });
 
@@ -247,10 +247,10 @@ world.events.beforeChat.subscribe(chat => {
         if (t.startsWith("mute")) mute = t.slice(5);
     });
     player.addTag(`chat:${msg.replace(/"/g, "")}`);
-    player.setScore("set", "Capi:chatLength", msg.length);
-    player.setScore("add", "Capi:chatCount", 1);
+    player.setScore("Capi:chatLength", msg.length);
+    player.setScore("Capi:chatCount", 1, "add");
     if (mute || player.hasTag("mute")) {
-        player.tell(mute.length > 0 ? mute : "§cYou have been muted.");
+        player.tell(mute.length ? mute : "§cYou have been muted.");
         return chat.cancel = true;
     }
     if (Config.get("ChatUIEnabled")) {
@@ -282,9 +282,9 @@ world.events.blockPlace.subscribe(blockPlace => {
         if (t.startsWith("blockPlace:")) player.removeTag(t);
     });
     player.addTag(`blockPlace:${block.typeId}`);
-    player.setScore("set", "Capi:blockPlaceX", block.location.x);
-    player.setScore("set", "Capi:blockPlaceY", block.location.y);
-    player.setScore("set", "Capi:blockPlaceZ", block.location.z);
+    player.setScore("Capi:blockPlaceX", block.location.x);
+    player.setScore("Capi:blockPlaceY", block.location.y);
+    player.setScore("Capi:blockPlaceZ", block.location.z);
 });
 
 // world.events.entityCreate.subscribe(entityCreate => {
@@ -312,9 +312,9 @@ world.events.effectAdd.subscribe(effectAdd => {
     const displayName = effectAdd.effect.displayName.split(" ")[0];
     if (player.typeId !== "minecraft:player") return;
 
-    player.setScore("set", "Capi:effAddTick", duration);
-    player.setScore("set", "Capi:effAddLevel", amplifier);
-    player.setScore("set", "Capi:effAddState", effectAdd.effectState);
+    player.setScore("Capi:effAddTick", duration);
+    player.setScore("Capi:effAddLevel", amplifier);
+    player.setScore("Capi:effAddState", effectAdd.effectState);
 
     const details = {
         effect: displayName,
@@ -338,25 +338,25 @@ world.events.projectileHit.subscribe(projectileHit => {
     if(blockHit) {
         const hitBlock = blockHit.block;
 
-        player.setScore("set", "Capi:PhitHbX", Math.floor(hitBlock.location.x));
-        player.setScore("set", "Capi:PhitHbY", Math.floor(hitBlock.location.y));
-        player.setScore("set", "Capi:PhitHbZ", Math.floor(hitBlock.location.z));
+        player.setScore("Capi:PhitHbX", Math.floor(hitBlock.location.x));
+        player.setScore("Capi:PhitHbY", Math.floor(hitBlock.location.y));
+        player.setScore("Capi:PhitHbZ", Math.floor(hitBlock.location.z));
 
-        player.setScore("set", "Capi:PhitPX", Math.floor(player.location.x));
-        player.setScore("set", "Capi:PhitPY", Math.floor(player.location.y));
-        player.setScore("set", "Capi:PhitPZ", Math.floor(player.location.z));
+        player.setScore("Capi:PhitPX", Math.floor(player.location.x));
+        player.setScore("Capi:PhitPY", Math.floor(player.location.y));
+        player.setScore("Capi:PhitPZ", Math.floor(player.location.z));
     }
 
     if(entityHit) {
-        player.setScore("set", "Capi:PhitHeX", Math.floor(entityHit.entity.location.x));
-        player.setScore("set", "Capi:PhitHeY", Math.floor(entityHit.entity.location.y));
-        player.setScore("set", "Capi:PhitHeZ", Math.floor(entityHit.entity.location.z));
+        player.setScore("Capi:PhitHeX", Math.floor(entityHit.entity.location.x));
+        player.setScore("Capi:PhitHeY", Math.floor(entityHit.entity.location.y));
+        player.setScore("Capi:PhitHeZ", Math.floor(entityHit.entity.location.z));
     }
 
     if(projectile) {
-        player.setScore("set", "Capi:PhitEX", Math.floor(projectile.location.x));
-        player.setScore("set", "Capi:PhitEY", Math.floor(projectile.location.y));
-        player.setScore("set", "Capi:PhitEZ", Math.floor(projectile.location.z));
+        player.setScore("Capi:PhitEX", Math.floor(projectile.location.x));
+        player.setScore("Capi:PhitEY", Math.floor(projectile.location.y));
+        player.setScore("Capi:PhitEZ", Math.floor(projectile.location.z));
     }
     
     let details = {}
@@ -375,9 +375,9 @@ world.events.blockBreak.subscribe(blockBreak => {
         if (t.startsWith("blockBreak:")) player.removeTag(t);
     });
     player.addTag(`blockBreak:${brokenBlockPermutation.type.id}`);
-    player.setScore("set", "Capi:blockBreakX", block.x);
-    player.setScore("set", "Capi:blockBreakY", block.y);
-    player.setScore("set", "Capi:blockBreakZ", block.z);
+    player.setScore("Capi:blockBreakX", block.x);
+    player.setScore("Capi:blockBreakY", block.y);
+    player.setScore("Capi:blockBreakZ", block.z);
 });
 
 world.events.playerLeave.subscribe(playerLeave => {
@@ -392,9 +392,9 @@ world.events.buttonPush.subscribe(buttonPush => {
     try {
         player.runCommandAsync(`tellraw @a[tag=buttonTracker] {"rawtext":[{"text":"[CAPI] pushed the button. §7(Player: ${player.name} , Pos: ${block.x} ${block.y} ${block.z} , Code: ${ButtonCode})"}]}`);
     } catch {}
-    player.setScore("set", "Capi:buttonXPos", block.x);
-    player.setScore("set", "Capi:buttonYPos", block.y);
-    player.setScore("set", "Capi:buttonZPos", block.z);
+    player.setScore("Capi:buttonXPos", block.x);
+    player.setScore("Capi:buttonYPos", block.y);
+    player.setScore("Capi:buttonZPos", block.z);
     player.addTag(`pushed`);
     player.addTag(`button:${ButtonCode}`);
 });
