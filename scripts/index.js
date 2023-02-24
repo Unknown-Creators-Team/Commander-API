@@ -14,12 +14,12 @@
 
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
-import tickEvent from "./lib/TickEvent";
-import getScore from "./lib/getScore";
-import { Database, ExtendedDatabase } from "./lib/Database";
-import { setVariable } from "./util";
-import Config from "./config";
-import { Menu } from "./ui";
+import tickEvent from "./lib/TickEvent.js";
+import getScore from "./lib/getScore.js";
+import { Database, ExtendedDatabase } from "./lib/Database.js";
+import { setVariable } from "./util.js";
+import Config from "./config.js";
+import { Menu } from "./ui.js";
 
 const world = Minecraft.world;
 
@@ -161,9 +161,9 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
 
         // Join
         if (player.join) {
-            player.setScore("set", "Capi:playerJoinX", player.location.x.toFixed(0));
-            player.setScore("set", "Capi:playerJoinY", player.location.y.toFixed(0));
-            player.setScore("set", "Capi:playerJoinZ", player.location.z.toFixed(0));
+            player.setScore("set", "Capi:playerJoinX", Math.floor(player.location.x));
+            player.setScore("set", "Capi:playerJoinY", Math.floor(player.location.y));
+            player.setScore("set", "Capi:playerJoinZ", Math.floor(player.location.z));
             player.setScore("add", "Capi:joinCount", 1);
             player.addTag("Capi:join");
             player.join = false;
@@ -175,13 +175,13 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
         player.setScore("set", "Capi:health", health);
 
         // pos
-        player.setScore("set", "Capi:x", player.location.x.toFixed(0));
-        player.setScore("set", "Capi:y", player.location.y.toFixed(0));
-        player.setScore("set", "Capi:z", player.location.z.toFixed(0));
+        player.setScore("set", "Capi:x", Math.floor(player.location.x));
+        player.setScore("set", "Capi:y", Math.floor(player.location.y));
+        player.setScore("set", "Capi:z", Math.floor(player.location.z));
 
         // rotation
-        player.setScore("set", "Capi:rx", player.rotation.x.toFixed(0));
-        player.setScore("set", "Capi:ry", player.rotation.y.toFixed(0));
+        player.setScore("set", "Capi:rx", Math.floor(player.rotation.x));
+        player.setScore("set", "Capi:ry", Math.floor(player.rotation.y));
 
         // selected slot
         player.setScore("set", "Capi:slot", player.selectedSlot);
