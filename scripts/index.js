@@ -57,7 +57,12 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
             }
         });
 
-        player.setScore = (type, object, score) => player.runCommandAsync(`scoreboard players ${type} @s ${object} ${score ? score : ""}`);
+        // player.setScore = (type, object, score) => player.runCommandAsync(`scoreboard players ${type} @s ${object} ${score ? score : ""}`);
+        player.setScore = (object, score = 0, type = "set") => {
+            if(type==="set")try{world.scoreboard.setScore(object,player.scoreboard,score);}catch{
+                player.runCommandAsync(`scoreboard players set @s ${object} ${score}`);}
+                else player.runCommandAsync(`scoreboard players ${type} @s ${object} ${score}`);
+            };
 
         // sneaking
         if (player.isSneaking) player.addTag("Capi:sneaking");
@@ -85,7 +90,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
             const setSlot = getScore(player, "Capi:setSlot");
             if (setSlot > -1) {
                 player.selectedSlot = setSlot;
-                player.setScore("reset", "Capi:setSlot");
+                player.setScore("Capi:setSlot", 0, "reset");
             }
         } catch {}
 

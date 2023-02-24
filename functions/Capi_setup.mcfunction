@@ -1,3 +1,56 @@
+scoreboard objectives remove Capi:health
+scoreboard objectives remove Capi:x
+scoreboard objectives remove Capi:y
+scoreboard objectives remove Capi:z
+scoreboard objectives remove Capi:rx
+scoreboard objectives remove Capi:ry
+scoreboard objectives remove Capi:slot
+scoreboard objectives remove Capi:setSlot
+scoreboard objectives remove Capi:chatLength
+
+scoreboard objectives remove Capi:timestamp
+scoreboard objectives remove Capi:chatCount
+scoreboard objectives remove Capi:blockPlaceX
+scoreboard objectives remove Capi:blockPlaceY
+scoreboard objectives remove Capi:blockPlaceZ
+
+scoreboard objectives remove Capi:effAddTick
+scoreboard objectives remove Capi:effAddLevel
+scoreboard objectives remove Capi:effAddState
+
+scoreboard objectives remove Capi:EcreateX
+scoreboard objectives remove Capi:EcreateY
+scoreboard objectives remove Capi:EcreateZ
+
+scoreboard objectives remove Capi:playerJoinX
+scoreboard objectives remove Capi:playerJoinY
+scoreboard objectives remove Capi:playerJoinZ
+scoreboard objectives remove Capi:joinCount
+
+### Projectile Hit - HitEntity
+scoreboard objectives remove Capi:PhitHeX
+scoreboard objectives remove Capi:PhitHeY
+scoreboard objectives remove Capi:PhitHeZ
+
+### Projectile Hit - Source
+scoreboard objectives remove Capi:PhitPX
+scoreboard objectives remove Capi:PhitPY
+scoreboard objectives remove Capi:PhitPZ
+
+### Projectile Hit - Entity
+scoreboard objectives remove Capi:PhitEX
+scoreboard objectives remove Capi:PhitEY
+scoreboard objectives remove Capi:PhitEZ
+scoreboard objectives remove Capi:blockBreakX
+scoreboard objectives remove Capi:blockBreakY
+scoreboard objectives remove Capi:blockBreakZ
+scoreboard objectives remove Capi:buttonXPos
+scoreboard objectives remove Capi:buttonYPos
+scoreboard objectives remove Capi:buttonZPos
+scoreboard objectives remove Capi:dimension
+scoreboard objectives remove Capi:attack
+scoreboard objectives remove Capi:damage
+scoreboard objectives remove Capi:hurt
 scoreboard objectives add Capi:health dummy
 scoreboard objectives add Capi:x dummy
 scoreboard objectives add Capi:y dummy
