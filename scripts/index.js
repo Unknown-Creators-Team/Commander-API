@@ -254,7 +254,7 @@ world.events.beforeChat.subscribe(chat => {
         return chat.cancel = true;
     }
     if (Config.get("ChatUIEnabled")) {
-        chat.cancel = true;
+        chat.sendToTargets = false;
         world.say(setVariable(player, String((Config.get("ChatUI")))).replace("{message}", msg));
     }
 });
