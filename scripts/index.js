@@ -220,6 +220,7 @@ world.events.entityHit.subscribe(entityHit => {
     const { entity: player, hitEntity: entity, hitBlock: block } = entityHit;
     if (player.typeId !== "minecraft:player") return;
     player.setScore("Capi:attack", 1, "add");
+    player.setScore("Capi:attack", 1, "add");
     player.addTag("Capi:attack");
     player.getTags().forEach(t => {if (t.startsWith("attacked:")) player.removeTag(t)});
     if (entity) player.addTag(`attacked:${entity.typeId}`);
@@ -251,7 +252,7 @@ world.events.beforeChat.subscribe(chat => {
     player.setScore("Capi:chatLength", msg.length, "set");
     player.setScore("Capi:chatCount", 1, "add");
     if (mute || player.hasTag("mute")) {
-        player.tell(mute.length > 0 ? mute : "§cYou have been muted.");
+        player.tell(mute.length ? mute : "§cYou have been muted.");
         return chat.cancel = true;
     }
     if (Config.get("ChatUIEnabled")) {
