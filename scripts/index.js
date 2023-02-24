@@ -200,7 +200,8 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
         if (player.hasTag(`pushed`) && player.pushedTime == 0) player.pushedTime++;
         if (player.pushedTime > 10){
             // player.getTags().forEach(t => { if(t.startsWith("button:")) player.removeTag(t)});
-            player.removeTag(player.getTags().find(t => t.startsWith("button:")));
+            const tag = player.getTags().find(t => t.startsWith("button:"));
+            if (tag) player.removeTag(tag);
             player.removeTag(`pushed`);
             player.pushedTime = 0;
         }
