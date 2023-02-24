@@ -17,7 +17,7 @@ import * as MinecraftUI from "@minecraft/server-ui";
 import tickEvent from "./lib/TickEvent.js";
 import getScore from "./lib/getScore.js";
 import { Database, ExtendedDatabase } from "./lib/Database.js";
-import { setVariable } from "./util.js";
+import { parse, setVariable } from "./util.js";
 import Config from "./config.js";
 import { Menu } from "./ui.js";
 
@@ -40,7 +40,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
                 player.removeTag(t);
             }
             if (t.startsWith("form:")) {
-                player.formJson = t.replace("form:","").replace(/'/g, "\"").replace(/`/g, "\"");
+                try { player.formJson = t.replace("form:","").replace(/'/g, "\"").replace(/`/g, "\""); } catch {}
                 player.removeTag(t);
             }
             if (t.startsWith("run:")) {
@@ -129,9 +129,19 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
 
         // Show form
         if (player.formJson) {
-            const Data = JSON.parse(player.formJson);
-            if (!Data.buttons) throw TypeError(`The button has not been passed. A button must be passed to display the form.`);
+            const Data = parse(player.formJson);
+            let parsingError = false;
             
+            if(Data.error) parsingError = Data.translate;
+            // if (!Data.buttons);
+            
+            if(parsingError) {
+                player.tell(parsingError);
+                player.formJson = false;
+
+                return;
+            }
+
             const Form = new MinecraftUI.ActionFormData();
             if (Data.title) Form.title(String(setVariable(player, Data.title)));
             if (Data.body) Form.body(String(setVariable(player, Data.body)));
@@ -143,7 +153,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
             });
 
             Form.show(player).then(response => player.addTag((Data.buttons[response.selection].tag)));
-            player.formJson = false;
+            
         }
 
         // Run command

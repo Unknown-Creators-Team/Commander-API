@@ -13,6 +13,7 @@
  * @LINK https://github.com/191225/Commander-API
  */
 
+import { translate } from "./Data/translate.js";
 import getScore from "./lib/getScore.js";
 
 export function setVariable(player, source) {
@@ -35,4 +36,32 @@ export function setVariable(player, source) {
         } catch {}
     }
     return source;
+}
+
+/**
+ * 
+ * @param { string } data
+ * @param { string } key
+ * @returns { {"error": string | undefined , "data": any | undefined, "translate": string | undefined} }
+ * 
+ * @author arutaka1220 
+ */
+export function parse(data, key) {
+    data = data.replace(`${key}:`,"").replace(/'/g, "\"").replace(/`/g, "\"");
+
+    try {
+        const parsed = JSON.parse(data);
+
+        return {"data": parsed};
+    } catch (e) {
+        const errorKey = String(e).split(":")[0];
+        let translated = translate[errorKey];
+
+        console.warn(e.stack);
+
+        if(translated) translated = translated(String(e).split(":")[1]);
+        else translated = errorKey;
+
+        return {"error": e, "translate": translated};
+    }
 }
