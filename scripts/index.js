@@ -23,8 +23,8 @@ import { Menu } from "./ui.js";
 
 const world = Minecraft.world;
 
-tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
-    for(const player of world.getPlayers()) {
+tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
+    for (const player of world.getPlayers()) {
         player.getTags().forEach((t) => {
             if (t.startsWith("rename:")) {
                 player.rename = t.replace("rename:", "");
@@ -40,19 +40,19 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
                 player.removeTag(t);
             }
             if (t.startsWith("form:")) {
-                try { player.formJson = t.replace("form:","").replace(/'/g, "\"").replace(/`/g, "\""); } catch {}
+                try { player.formJson = t.replace("form:", "").replace(/'/g, "\"").replace(/`/g, "\""); } catch { }
                 player.removeTag(t);
             }
             if (t.startsWith("run:")) {
-                player.run = t.replace("run:","").replace(/'/g, "\"").replace(/`/g, "\"");
+                player.run = t.replace("run:", "").replace(/'/g, "\"").replace(/`/g, "\"");
                 player.removeTag(t);
             }
             if (t.startsWith("tell:")) {
-                player.Tell = t.replace("tell:","").replace(/'/g, "\"").replace(/`/g, "\"");
+                player.Tell = t.replace("tell:", "").replace(/'/g, "\"").replace(/`/g, "\"");
                 player.removeTag(t);
             }
             if (t.startsWith("kick:")) {
-                player.kick = t.replace("kick:","").replace(/'/g, "\"").replace(/`/g, "\"");
+                player.kick = t.replace("kick:", "").replace(/'/g, "\"").replace(/`/g, "\"");
                 player.removeTag(t);
             }
         });
@@ -60,15 +60,21 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
         // player.setScore = (type, object, score) => player.runCommandAsync(`scoreboard players ${type} @s ${object} ${score ? score : ""}`);
 
         player.setScore = (object, score = 0, type = "set") => {
-            if(type==="set")try{world.scoreboard.setScore(object,player.scoreboard,score);}catch{
-                player.runCommandAsync(`scoreboard players set @s ${object} ${score}`);}
-                else player.runCommandAsync(`scoreboard players ${type} @s ${object} ${score}`);
-            };
+            if (type === "set") {
+                try { world.scoreboard.setScore(object, player.scoreboard, score); } catch {
+                    player.runCommandAsync(`scoreboard players set @s ${object} ${score}`);
+                };
+            } else if (type === "reset") {
+                player.runCommandAsync(`scoreboard players reset @s "${object}"`);
+            } else {
+                player.runCommandAsync(`scoreboard players ${type} @s ${object} ${score}`);
+            }
+        }
 
         // sneaking
         if (player.isSneaking) player.addTag("Capi:sneaking");
-            else player.removeTag("Capi:sneaking");
-        
+        else player.removeTag("Capi:sneaking");
+
         // tshoot
         if (player.hasTag("Capi:system_tshoot")) {
             player.getTags().forEach((t) => player.removeTag(t));
@@ -93,11 +99,11 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
                 player.selectedSlot = setSlot;
                 player.setScore("Capi:setSlot", 0, "reset");
             }
-        } catch {}
+        } catch { }
 
         // Set item
         const container = player.getComponent('inventory').container;
-        if (player.setItemJson) player.setItemJson.forEach(setItemJson => { 
+        if (player.setItemJson) player.setItemJson.forEach(setItemJson => {
             const Data = JSON.parse(setItemJson);
             if (!Data.item) return;
             const amount = Data.amount ? Data.amount : 1;
@@ -121,9 +127,9 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
                 }
                 item.getComponent("enchantments").enchantments = enchantments;
             }
-            
+
             if (typeof Data.slot == "number") container.setItem(Data.slot, item);
-                else container.addItem(item);
+            else container.addItem(item);
         });
         player.setItemJson = [];
 
@@ -131,11 +137,11 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
         if (player.formJson) {
             const Data = parse(player.formJson);
             let parsingError = false;
-            
-            if(Data.error) parsingError = Data.translate;
+
+            if (Data.error) parsingError = Data.translate;
             // if (!Data.buttons);
-            
-            if(parsingError) {
+
+            if (parsingError) {
                 player.tell(parsingError);
                 player.formJson = false;
 
@@ -145,15 +151,15 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
             const Form = new MinecraftUI.ActionFormData();
             if (Data.title) Form.title(String(setVariable(player, Data.title)));
             if (Data.body) Form.body(String(setVariable(player, Data.body)));
-           
+
             Data.buttons.forEach(b => {
                 if (!b.text) throw TypeError(`The button text is not passed.`);
                 if (b.textures) Form.button(String(setVariable(player, b.text)), String(b.textures));
-                    else Form.button(String(setVariable(player, b.text)));
+                else Form.button(String(setVariable(player, b.text)));
             });
 
             Form.show(player).then(response => player.addTag((Data.buttons[response.selection].tag)));
-            
+
         }
 
         // Run command
@@ -203,25 +209,25 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => {
         player.setScore("Capi:slot", player.selectedSlot, "set");
 
         // timestamp
-        player.setScore("Capi:timestamp", Math.floor( Date.now() / 1000 ), "set");
+        player.setScore("Capi:timestamp", Math.floor(Date.now() / 1000), "set");
 
         // dimension
         if (player.dimension.id === "minecraft:overworld") player.setScore("Capi:dimension", 0, "set");
-            else if (player.dimension.id === "minecraft:nether") player.setScore("Capi:dimension", -1, "set");
-            else if (player.dimension.id === "minecraft:the_end") player.setScore("Capi:dimension", 1, "set");
-            else player.setScore("Capi:dimension", -2, "set");
+        else if (player.dimension.id === "minecraft:nether") player.setScore("Capi:dimension", -1, "set");
+        else if (player.dimension.id === "minecraft:the_end") player.setScore("Capi:dimension", 1, "set");
+        else player.setScore("Capi:dimension", -2, "set");
 
         if (!player.pushedTime > 0) player.pushedTime = 0;
         if (player.pushedTime >= 1) player.pushedTime++;
         if (player.hasTag(`pushed`) && player.pushedTime == 0) player.pushedTime++;
-        if (player.pushedTime > 10){
+        if (player.pushedTime > 10) {
             // player.getTags().forEach(t => { if(t.startsWith("button:")) player.removeTag(t)});
             const tag = player.getTags().find(t => t.startsWith("button:"));
             if (tag) player.removeTag(tag);
             player.removeTag(`pushed`);
             player.pushedTime = 0;
         }
-        
+
         if (player.hasTag("Capi:open_config_gui")) Menu(player);
     }
 });
@@ -232,16 +238,16 @@ world.events.entityHit.subscribe(entityHit => {
     player.setScore("Capi:attack", 1, "add");
     player.setScore("Capi:attack", 1, "add");
     player.addTag("Capi:attack");
-    player.getTags().forEach(t => {if (t.startsWith("attacked:")) player.removeTag(t)});
+    player.getTags().forEach(t => { if (t.startsWith("attacked:")) player.removeTag(t) });
     if (entity) player.addTag(`attacked:${entity.typeId}`);
-        else if (block) player.addTag(`attacked:${block.typeId}`);
+    else if (block) player.addTag(`attacked:${block.typeId}`);
 });
 
 world.events.entityHurt.subscribe(entityHurt => {
     const { cause, damage, damagingEntity: player, hurtEntity: entity } = entityHurt;
     if (entity && entity.typeId === "minecraft:player") {
         entity.setScore("Capi:hurt", damage, "set");
-        entity.getTags().forEach(t => {if (t.startsWith("cause:")) entity.removeTag(t)});
+        entity.getTags().forEach(t => { if (t.startsWith("cause:")) entity.removeTag(t) });
         entity.addTag(`cause:${cause}`);
     }
     if (player && player.typeId === "minecraft:player") {
@@ -347,7 +353,7 @@ world.events.playerSpawn.subscribe(playerSpawn => {
 world.events.projectileHit.subscribe(projectileHit => {
     const { blockHit, entityHit, projectile, source: player } = projectileHit;
 
-    if(blockHit) {
+    if (blockHit) {
         const hitBlock = blockHit.block;
 
         player.setScore("Capi:PhitHbX", Math.floor(hitBlock.location.x), "set");
@@ -359,23 +365,23 @@ world.events.projectileHit.subscribe(projectileHit => {
         player.setScore("Capi:PhitPZ", Math.floor(player.location.z), "set");
     }
 
-    if(entityHit) {
+    if (entityHit) {
         player.setScore("Capi:PhitHeX", Math.floor(entityHit.entity.location.x), "set");
         player.setScore("Capi:PhitHeY", Math.floor(entityHit.entity.location.y), "set");
         player.setScore("Capi:PhitHeZ", Math.floor(entityHit.entity.location.z), "set");
     }
 
-    if(projectile) {
+    if (projectile) {
         player.setScore("Capi:PhitEX", Math.floor(projectile.location.x), "set");
         player.setScore("Capi:PhitEY", Math.floor(projectile.location.y), "set");
         player.setScore("Capi:PhitEZ", Math.floor(projectile.location.z), "set");
     }
-    
+
     let details = {}
 
-    if(blockHit) details["hitBlockId"] = blockHit.block.id;
-    if(entityHit) details["hitEntityId"] = entityHit.entity.id;
-    if(projectile) details["projectileId"] = projectile.id;
+    if (blockHit) details["hitBlockId"] = blockHit.block.id;
+    if (entityHit) details["hitEntityId"] = entityHit.entity.id;
+    if (projectile) details["projectileId"] = projectile.id;
 
     player.addTag(`Phit:${projectile.id}`);
     player.addTag(`PhitD:${JSON.stringify(details)}`);
@@ -403,7 +409,7 @@ world.events.buttonPush.subscribe(buttonPush => {
     const ButtonCode = Math.ceil(x * y * z);
     try {
         player.runCommandAsync(`tellraw @a[tag=buttonTracker] {"rawtext":[{"text":"[CAPI] pushed the button. §7(Player: ${player.name} , Pos: ${block.x} ${block.y} ${block.z} , Code: ${ButtonCode})"}]}`);
-    } catch {}
+    } catch { }
     player.setScore("Capi:buttonXPos", block.x, "set");
     player.setScore("Capi:buttonYPos", block.y, "set");
     player.setScore("Capi:buttonZPos", block.z, "set");
