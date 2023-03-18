@@ -4,20 +4,20 @@
 		"name": "Commander API",
 		"description": "マインクラフト統合版のコマンドを拡張します。",
 		"uuid": "ebac7142-c210-4d32-87ba-5650be52f456",
-		"version": [ 1, 0, 0 ],
-		"min_engine_version": [ 1, 19, 20 ]
+		"version": [ 1, 1, 0 ],
+		"min_engine_version": [ 1, 19, 0 ]
 	},
 	"metadata": {
 		"authors": ["Nano", "arutaka"],
-		"url": "https://github.com/arutaka1220/"
+		"url": "https://github.com/191225/Commander-API"
 	},
-	"modules": [{
+	"modules": [
+		{
 			"type": "data",
 			"uuid": "36f425e9-10c9-466d-a620-0362a30c9b6f",
 			"version": [ 1, 0, 0 ]
 		},
 		{
-			"description": "hi everyone!",
 			"language": "javascript",
 			"type": "script",
 			"uuid": "0d1f29e1-417f-48fb-b5fe-5a980830885a",
@@ -25,7 +25,8 @@
 			"entry": "scripts/index.js"
 		}
 	],
-	"dependencies": [{
+	"dependencies": [
+		{
 			"module_name": "@minecraft/server",
 			"version": "1.1.0-beta"
 		},
