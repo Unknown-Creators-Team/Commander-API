@@ -38,7 +38,6 @@ class DB extends Map{
 export class Database extends DB{
     constructor(name,instantLoad=false){
         super(name,defaultType);
-        console.warn(defaultType);
         const t = new Date().getTime();
         if(instantLoad) this.loadAll();
     }
