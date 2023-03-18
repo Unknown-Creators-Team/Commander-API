@@ -13,7 +13,7 @@
  */
 
 import * as Minecraft from "@minecraft/server";
-import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
+import * as MinecraftUI from "@minecraft/server-ui";
 import tickEvent from "./lib/TickEvent";
 import getScore from "./lib/getScore";
 import { Database, ExtendedDatabase } from "./lib/Database";
@@ -23,7 +23,7 @@ import Config from "./config";
 
 export function Menu(player) {
     player.removeTag("Capi:open_config_gui");
-    const Menu = new ActionFormData()
+    const Menu = new MinecraftUI.ActionFormData()
     .title("§lCommander API")
     .body("設定の変更後は §7/reload§r を実行して設定を反映させてください。")
     .button("§lプレイヤー退出メッセージ")
@@ -38,7 +38,7 @@ export function Menu(player) {
 const MenuBack = (player) => Menu(player);
 
 function LeaveMsg(player) {
-    const Menu = new ActionFormData()
+    const Menu = new MinecraftUI.ActionFormData()
     .title("§lCommander API")
     .body(`ステータス: ${Config.get("LeaveMsgEnabled") ? "有効" : "無効"}\nメッセージ: "${Config.get("LeaveMsg")}"`)
     .button("§l設定する");
@@ -59,11 +59,12 @@ function LeaveMsg(player) {
 }
 
 function LeaveMsgConfig(player) {
-    const Menu = new ModalFormData()
+    const Menu = new MinecraftUI.ModalFormData()
     .title("§lCommander API")
-    .textField("メッセージ", "(例) {name} がサーバーから抜けた！")
+    .textField("メッセージ", "(例) {name} がサーバーから抜けた！", Config.get("LeaveMsg") || null)
     .show(player).then(response => {
         if (response.formValues[0].length) Config.set("LeaveMsg", String(response.formValues[0]));
+            else if (!response.canceled) Config.set("LeaveMsg", null);
         LeaveMsgBack(player);
     });
 }
@@ -71,7 +72,7 @@ function LeaveMsgConfig(player) {
 const LeaveMsgBack = (player) => LeaveMsg(player);
 
 function ChatUI(player) {
-    const Menu = new ActionFormData()
+    const Menu = new MinecraftUI.ActionFormData()
     .title("§lCommander API")
     .body(`ステータス: ${Config.get("ChatUIEnabled") ? "有効" : "無効"}\nUI: "${Config.get("ChatUI")}"`)
     .button("§l設定する");
@@ -92,11 +93,13 @@ function ChatUI(player) {
 }
 
 function ChatUIConfig(player) {
-    const Menu = new ModalFormData()
+    
+    const Menu = new MinecraftUI.ModalFormData()
     .title("§lCommander API")
-    .textField("UI", "(例) {name} >> {message}")
+    .textField("UI", "(例) {name} >> {message}", Config.get("ChatUI") || null)
     .show(player).then(response => {
         if (response.formValues[0].length) Config.set("ChatUI", String(response.formValues[0]));
+            else if (!response.canceled) Config.set("ChatUI", null);
         ChatUIBack(player);
     });
 }
