@@ -46,7 +46,8 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 player.removeTag(t);
             }
             if (t.startsWith("run:")) {
-                player.run = t.replace("run:","").replace(/'/g, "\"");
+                if (!player.run) player.run = [];
+                player.run.push(t.replace("run:","").replace(/'/g, "\""));
                 player.removeTag(t);
             }
             if (t.startsWith("tell:")) {
@@ -114,7 +115,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         const container = player.getComponent('inventory').container;
         if (player.setItemJson) player.setItemJson.forEach(async setItemJson => {
             const Data = await safeParse(setItemJson).catch((error) => {
-                console.error(error);
+                console.error(error, error.stack);
                 player.sendMessage(`§c${error}`);
                 for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
                 setItemJson = [];
@@ -152,7 +153,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         // Show form
         if (player.formJson) {
             const Data = await safeParse(player.formJson).catch((error) => {
-                console.error(error);
+                console.error(error, error.stack);
                 player.sendMessage(`§c${error}`);
                 for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
             }).finally(() => player.formJson = false);
@@ -173,13 +174,24 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
         // Run command
         if (player.run) {
-            const Data = await safeParse(player.run).catch((error) => {
-                console.error(error);
-                player.sendMessage(`§c${error}`);
-                for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
-            }).finally(() => player.run = false);
-            Data.forEach(c => player.runCommandAsync(String(setVariable(player, c))));
+            player.run.forEach(async commands => {
+                const Data = await safeParse(commands).catch((error) => {
+                    console.error(error, error.stack);
+                    player.sendMessage(`§c${error}`);
+                    for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
+                });
+                if (typeof(Data) === "object" && Data.length) Data.forEach(c => {
+                    player.sendMessage(`CMD: ${String(setVariable(player, c))}`);
+                    player.runCommandAsync(String(setVariable(player, c)))
+                        .then((v) => {
+                            player.sendMessage(`コマンドの実行に成功しました: ${v.successCount}`)
+                        })
+                        .catch((reason) => player.sendMessage(`ERROR: ${reason}`))
+                    
+                });
+            });
         }
+        player.run = [];
 
         // tell
         if (player.tell) {
@@ -267,9 +279,11 @@ world.events.entityHurt.subscribe(entityHurt => {
         entity.setScore("Capi:hurt", damage);
         entity.getTags().forEach(t => {if (t.startsWith("cause:")) entity.removeTag(t)});
         entity.addTag(`cause:${cause}`);
+        entity.addTag(`Capi:hurt`);
     }
     if (player && player.typeId === "minecraft:player") {
         player.setScore("Capi:damage", damage);
+        entity.addTag(`Capi:damage`);
         if (entity && entity.getComponent("health").current <= 0)
             player.setScore("Capi:kill", 1, "add");
     }
@@ -292,6 +306,7 @@ world.events.beforeChat.subscribe(chat => {
         if (t.startsWith("chat:")) player.removeTag(t);
         if (t.startsWith("mute")) mute = t.slice(5);
     });
+    player.addTag(`Capi:chat`);
     player.addTag(`chat:${msg.replace(/"/g, "")}`);
     player.setScore("Capi:chatLength", msg.length);
     player.setScore("Capi:chatCount", 1, "add");
@@ -316,6 +331,7 @@ world.events.itemUse.subscribe(itemUse => {
     player.getTags().forEach((t) => {
         if (t.startsWith("itemUse:") || t.startsWith("itemUseD:")) player.removeTag(t);
     });
+    player.addTag(`Capi:itemUse`);
     player.addTag(`itemUse:${item.typeId}`);
     player.addTag(`itemUseD:${JSON.stringify(details).replace(/(\")/g, "`")}`);
 });
@@ -336,6 +352,7 @@ world.events.itemUseOn.subscribe(itemUseOn => {
     player.getTags().forEach((t) => {
         if (t.startsWith("itemUseOn:")) player.removeTag(t);
     });
+    player.addTag(`Capi:itemUseOn`);
     player.addTag(`itemUseOn:${block.typeId}`);
 })
 
@@ -344,6 +361,7 @@ world.events.blockPlace.subscribe(blockPlace => {
     player.getTags().forEach((t) => {
         if (t.startsWith("blockPlace:")) player.removeTag(t);
     });
+    player.addTag(`Capi:blockPlace`);
     player.addTag(`blockPlace:${block.typeId}`);
     player.setScore("Capi:blockPlaceX", block.location.x);
     player.setScore("Capi:blockPlaceY", block.location.y);
@@ -410,6 +428,7 @@ world.events.projectileHit.subscribe(projectileHit => {
     player.getTags().forEach((t) => {
         if (t.startsWith("hitWith:") || t.startsWith("hitTo:")) player.removeTag(t);
     });
+    player.addTag(`Capi:hit`);
     player.addTag(`hitWith:${projectile.typeId}`);
     player.addTag(`hitTo:${hit.typeId}`);
 });
@@ -419,6 +438,7 @@ world.events.blockBreak.subscribe(blockBreak => {
     player.getTags().forEach((t) => {
         if (t.startsWith("blockBreak:")) player.removeTag(t);
     });
+    player.addTag(`Capi:blockBreak`);
     player.addTag(`blockBreak:${brokenBlockPermutation.type.id}`);
     player.setScore("Capi:blockBreakX", block.x);
     player.setScore("Capi:blockBreakY", block.y);
