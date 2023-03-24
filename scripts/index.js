@@ -181,12 +181,12 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                     for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
                 });
                 if (typeof(Data) === "object" && Data.length) Data.forEach(c => {
-                    player.sendMessage(`CMD: ${String(setVariable(player, c))}`);
+                    // player.sendMessage(`CMD: ${String(setVariable(player, c))}`);
                     player.runCommandAsync(String(setVariable(player, c)))
-                        .then((v) => {
-                            player.sendMessage(`コマンドの実行に成功しました: ${v.successCount}`)
-                        })
-                        .catch((reason) => player.sendMessage(`ERROR: ${reason}`))
+                        // .then((v) => {
+                        //     player.sendMessage(`コマンドの実行に成功しました: ${v.successCount}`)
+                        // })
+                        // .catch((reason) => player.sendMessage(`ERROR: ${reason}`))
                     
                 });
             });
@@ -283,7 +283,7 @@ world.events.entityHurt.subscribe(entityHurt => {
     }
     if (player && player.typeId === "minecraft:player") {
         player.setScore("Capi:damage", damage);
-        entity.addTag(`Capi:damage`);
+        player.addTag(`Capi:damage`);
         if (entity && entity.getComponent("health").current <= 0)
             player.setScore("Capi:kill", 1, "add");
     }
