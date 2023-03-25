@@ -122,7 +122,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             });
             if (!Data.item) return;
             const amount = Data.amount ? Data.amount : 1;
-            const slot = Data.slot ? Data.slot : 0;
+            const slot = Data.slot ? Data.slot : false;
             const itemName = Data.item.replace("minecraft:", "");
             const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
             if (Data.name) item.nameTag = setVariable(player, Data.name);
@@ -142,11 +142,8 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 item.getComponent("enchantments").enchantments = enchantments;
             }
             
-            if (typeof Data.slot == "number") container.setItem(slot, item);
+            if (typeof slot == "number") container.setItem(slot, item);
                 else container.addItem(item);
-
-            if (typeof Data.slot == "number") container.setItem(Data.slot, item);
-            else container.addItem(item);
         });
         player.setItemJson = [];
 
