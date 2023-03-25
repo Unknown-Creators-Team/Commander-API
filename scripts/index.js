@@ -145,7 +145,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 }
                 if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
 
-                
+                if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
 
                 
 
