@@ -128,7 +128,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             if (Data.name) item.nameTag = setVariable(player, Data.name);
             if (Data.lore) {
                 for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
-                item.setLore(setVariable(player, Data.lore));
+                item.setLore(Data.lore);
             }
             if (Data.enchants) {
                 const enchantments = item.getComponent("enchantments").enchantments;
