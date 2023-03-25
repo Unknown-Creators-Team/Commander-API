@@ -74,15 +74,18 @@ export const safeParse = (object) => {
  * 
  * @param { string } pos pos
  * @param { Minecraft.Player } player player object
- * @param {( "x" | "y" | "z" )} type type of pos
+ * @param {( "x" | "y" | "z" | "rx" | "ry" )} type type of pos
  */
 export const parsePos = (pos, player, type) => {
     if (pos) {
         if (pos?.startsWith("~")) {
             const num = Number(pos.replace(/~/g, ""));
-            pos = player.location[type] + num;
+            if (type.startsWith("r")) pos = player.getRotation()[type.replace("r","")] + num;
+                else pos = player.location[type] + num;
         } else pos = Number(pos);
-    } else pos = player.location[type]
+    } else if (type.startsWith("r")) pos = player.getRotation()[type.replace("r","")];
+        else pos = player.location[type];
+    
     return pos;
 }   
 
