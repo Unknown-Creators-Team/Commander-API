@@ -519,6 +519,11 @@ system.events.scriptEventReceive.subscribe(scriptEventReceive => {
     } else if (type.toLowerCase() === "say") {
         if (player instanceof Minecraft.Player) world.sendMessage(setVariable(player, message));
             else world.sendMessage(setVariable({}, message));
+    } else if (["teleport","tp"].includes(type.toLowerCase()) && player instanceof Minecraft.Player) {
+        const msg = message.split(" "), x = parsePos(msg[0], player, "x"), y = parsePos(msg[1], player, "y"), z = parsePos(msg[2], player, "z")
+        const rx = parsePos(msg[3], player, "rx"), ry = parsePos(msg[4], player, "ry"), toDimension = msg[5] || player.dimension.id;
+
+        player.teleport({x, y, z}, world.getDimension(toDimension), rx, ry);
     }
     
 }, { namespaces: ["Capi"] });
