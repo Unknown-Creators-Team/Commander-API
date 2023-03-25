@@ -147,7 +147,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
                 if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
 
-                
+                if (Data.lock) item.lockMode = Minecraft.ItemLockMode[lock];
 
                 
                 
