@@ -112,17 +112,15 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         } catch { }
 
         // Set item
+
+        
         const container = player.getComponent('inventory').container;
         if (player.setItemJson) player.setItemJson.forEach(async setItemJson => {
             
             
             try {
-
                 const Data = await safeParse(setItemJson);
-
                 if (!Data.item) return;
-
-
                 const amount = Data.amount ? Data.amount : 1;
                 const slot = Data.slot ? Data.slot : false;
                 const itemName = Data.item.replace("minecraft:", "");
@@ -144,19 +142,15 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                     item.getComponent("enchantments").enchantments = enchantments;
                 }
                 if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
-
                 if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
-
                 if (Data.lock) item.lockMode = Minecraft.ItemLockMode[Data.lock];
-
                 if (Data.keep_on_death) item.keepOnDeath = Data.keep_on_death;
-                
                 if (typeof slot == "number") container.setItem(slot, item);
                     else container.addItem(item);
             } catch (e) {
-                console.error(error, error.stack);
-                player.sendMessage(`§c${error}`);
-                for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
+                console.error(e, e.stack);
+                player.sendMessage(`§c${e}`);
+                for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${e}`);
             }
             
         });
