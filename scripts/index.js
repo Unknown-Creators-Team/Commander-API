@@ -114,36 +114,51 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         // Set item
         const container = player.getComponent('inventory').container;
         if (player.setItemJson) player.setItemJson.forEach(async setItemJson => {
-            const Data = await safeParse(setItemJson).catch((error) => {
+            
+            
+            try {
+
+                const Data = await safeParse(setItemJson);
+
+                if (!Data.item) return;
+
+
+                const amount = Data.amount ? Data.amount : 1;
+                const slot = Data.slot ? Data.slot : false;
+                const itemName = Data.item.replace("minecraft:", "");
+                const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
+                if (Data.name) item.nameTag = setVariable(player, Data.name);
+                if (Data.lore) {
+                    for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
+                    item.setLore(Data.lore);
+                }
+                if (Data.enchants) {
+                    const enchantments = item.getComponent("enchantments").enchantments;
+                    for (let i = 0; i < Data.enchants.length; i++) {
+                        if (!Data.enchants[i].name) return;
+                        let enchantsName = Data.enchants[i].name;
+                        let enchantsLevel = 1;
+                        if (Data.enchants[i].level) enchantsLevel = Data.enchants[i].level;
+                        enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
+                    }
+                    item.getComponent("enchantments").enchantments = enchantments;
+                }
+                if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
+
+                
+
+                
+
+                
+                
+                if (typeof slot == "number") container.setItem(slot, item);
+                    else container.addItem(item);
+            } catch (e) {
                 console.error(error, error.stack);
                 player.sendMessage(`§c${error}`);
                 for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
-                setItemJson = [];
-            });
-            if (!Data.item) return;
-            const amount = Data.amount ? Data.amount : 1;
-            const slot = Data.slot ? Data.slot : false;
-            const itemName = Data.item.replace("minecraft:", "");
-            const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
-            if (Data.name) item.nameTag = setVariable(player, Data.name);
-            if (Data.lore) {
-                for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
-                item.setLore(Data.lore);
-            }
-            if (Data.enchants) {
-                const enchantments = item.getComponent("enchantments").enchantments;
-                for (let i = 0; i < Data.enchants.length; i++) {
-                    if (!Data.enchants[i].name) return;
-                    let enchantsName = Data.enchants[i].name;
-                    let enchantsLevel = 1;
-                    if (Data.enchants[i].level) enchantsLevel = Data.enchants[i].level;
-                    enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
-                }
-                item.getComponent("enchantments").enchantments = enchantments;
             }
             
-            if (typeof slot == "number") container.setItem(slot, item);
-                else container.addItem(item);
         });
         player.setItemJson = [];
 
