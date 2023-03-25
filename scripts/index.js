@@ -149,7 +149,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
                 if (Data.lock) item.lockMode = Minecraft.ItemLockMode[lock];
 
-                
+                if (Data.keep_on_death) item.keepOnDeath(Data.keep_on_death);
                 
                 if (typeof slot == "number") container.setItem(slot, item);
                     else container.addItem(item);
