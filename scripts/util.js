@@ -14,6 +14,7 @@
  */
 
 import * as Minecraft from "@minecraft/server";
+import ESON from "./lib/ESON.js";
 import getScore from "./lib/getScore.js";
 
 
@@ -66,6 +67,13 @@ export function setVariable(player, text) {
 export const safeParse = (object) => {
     return new Promise((resolve, reject) => {
         try { resolve(JSON.parse(object))
+        } catch (e) { reject(e) }
+    });
+}
+
+export const easySafeParse = (object) => {
+    return new Promise((resolve, reject) => {
+        try { resolve(ESON.parse(object))
         } catch (e) { reject(e) }
     });
 }

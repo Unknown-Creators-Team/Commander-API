@@ -17,7 +17,7 @@ import * as MinecraftUI from "@minecraft/server-ui";
 import tickEvent from "./lib/TickEvent.js";
 import getScore from "./lib/getScore.js";
 import { Database, ExtendedDatabase } from "./lib/Database.js";
-import { parsePos, safeParse, setVariable } from "./util.js";
+import { easySafeParse, parsePos, safeParse, setVariable } from "./util.js";
 import Config from "./config.js";
 import { Menu } from "./ui.js";
 
@@ -38,11 +38,11 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             }
             if (t.startsWith("setItem:")) {
                 if (!player.setItemJson) player.setItemJson = [];
-                player.setItemJson.push(t.replace("setItem:", "").replace(/'/g, '\"'));
+                player.setItemJson.push(t.replace("setItem:", ""));
                 player.removeTag(t);
             }
             if (t.startsWith("form:")) {
-                try { player.formJson = t.replace("form:","").replace(/'/g, "\""); } catch {}
+                try { player.formJson = t.replace("form:",""); } catch {}
                 player.removeTag(t);
             }
             if (t.startsWith("run:")) {
@@ -105,7 +105,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         // Set slot
         try {
             const setSlot = getScore(player, "Capi:setSlot");
-            if (setSlot > -1) {
+            if (setSlot >= 0) {
                 player.selectedSlot = setSlot;
                 player.setScore("Capi:setSlot", 0, "reset");
             }
@@ -119,7 +119,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             
             
             try {
-                const Data = await safeParse(setItemJson);
+                const Data = await easySafeParse(setItemJson);
                 if (!Data.item) return;
                 const amount = Data.amount ? Data.amount : 1;
                 const slot = Data.slot ? Data.slot : false;
@@ -158,7 +158,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
         // Show form
         if (player.formJson) {
-            const Data = await safeParse(player.formJson).catch((error) => {
+            const Data = await easySafeParse(player.formJson).catch((error) => {
                 console.error(error, error.stack);
                 player.sendMessage(`§c${error}`);
                 for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
