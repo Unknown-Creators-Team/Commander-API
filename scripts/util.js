@@ -19,49 +19,62 @@ import getScore from "./lib/getScore.js";
 
 
 /**
- * @param { Minecraft.Player } player
- * @param { string } text 
- * @returns { string }
+ * 
+ * @param {Minecraft.Player} player 
+ * @param {string} text 
+ * @returns 
  */
 export function setVariable(player, text) {
-    if (!text?.length) return text;
-    const dataLength = text.split("").filter(t => t === "{").length;
-    for (let i = 0; i < dataLength; i++) {
-        text = text.replace("{name}", player.name);
-        text = text.replace("{nametag}", player.nameTag);
-        text = text.replace("{nl}", `\n`);
-
-        // tag
-        try {
-            const tag = text.split("{tag:")[1].split("}")[0];
-            const hasTag = player.getTags().find(t => t.split(":")[0] === tag);
-            if (tag) text = text.replace(`{tag:${tag}}`, hasTag.slice(tag.length + 1));
-        } catch {}
-
-        // score
-        try {
-            const score = text.split("{score:")[1].split("}")[0];
-            if (score) text = text.replace(`{score:${score}}`, getScore(player, score));
-        } catch {}
-
-        // calc
-        try {
-            const calc = text.split("{calc:")[1].split("}")[0];
-            if (calc) text = text.replace(`{calc:${calc}}`, `${stringCalc(calc)}`);
-        } catch {}
-
-        // dimension
-        try {
-            const dimension = Number(text.split("{dimension:")[1].split("}")[0]);
-            if (typeof(dimension) === "number") {
-                if (dimension === 0) text = text.replace(`{dimension:${dimension}}`, "overworld");
-                if (dimension === -1) text = text.replace(`{dimension:${dimension}}`, "nether");
-                if (dimension === 1) text = text.replace(`{dimension:${dimension}}`, "end");
-                if (![-1, 0, 1].includes(dimension)) dimension = text.replace(`{dimension:${dimension}}`, "null");
-            }
-        } catch {}
-    }
-    return text;
+    return new Promise(async (resolve, reject) => { try {
+        if (!text?.length) resolve(text);
+        const dataLength = text.split("").filter(t => t === "{").length;
+        
+        for (let i = 0; i < dataLength; i++) {
+            text = text.replace("{name}", player.name);
+            text = text.replace("{nametag}", player.nameTag);
+            text = text.replace("{nl}", `\n`);
+    
+            // tag
+            try {
+                const tag = text.split("{tag:")[1].split("}")[0];
+                const hasTag = player.getTags().find(t => t.split(":")[0] === tag);
+                if (tag) text = text.replace(`{tag:${tag}}`, hasTag.slice(tag.length + 1));
+            } catch {}
+    
+            // score
+            try {
+                const score = text.split("{score:")[1].split("}")[0];
+                const str = `${score}}`;
+                const object = await easySafeParse(str).catch(error => console.error(error, str));
+                if (Object.values(object).length === 0) {
+                    if (score) text = text.replace(`{score:${score}}`, getScore(player, score));
+                } else if (Object.values(object).length > 0) {
+                    const playerName = object.name || player;
+                    const objectName = object.object;
+                    text = text.replace(`{score:${score}}}`, getScore(playerName, objectName));
+                }
+                
+            } catch {}
+    
+            // calc
+            try {
+                const calc = text.split("{calc:")[1].split("}")[0];
+                if (calc) text = text.replace(`{calc:${calc}}`, `${stringCalc(calc)}`);
+            } catch {}
+    
+            // dimension
+            try {
+                const dimension = Number(text.split("{dimension:")[1].split("}")[0]);
+                if (typeof(dimension) === "number") {
+                    if (dimension === 0) text = text.replace(`{dimension:${dimension}}`, "overworld");
+                    if (dimension === -1) text = text.replace(`{dimension:${dimension}}`, "nether");
+                    if (dimension === 1) text = text.replace(`{dimension:${dimension}}`, "end");
+                    if (![-1, 0, 1].includes(dimension)) dimension = text.replace(`{dimension:${dimension}}`, "null");
+                }
+            } catch {}
+        }
+        resolve(text);
+    } catch (e) {reject(e)}})
 }
 
 export const safeParse = (object) => {
