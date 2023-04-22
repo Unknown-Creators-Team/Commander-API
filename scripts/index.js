@@ -285,25 +285,33 @@ world.events.entityHurt.subscribe(async entityHurt => {
     const { cause, damagingEntity: player } = damageSource;
     
     if (entity && entity.typeId === "minecraft:player") {
-        const health = entity.getComponent("health").current;
-        if (health <= 0) entity.setScore("Capi:death", 1, "add");
         entity.setScore("Capi:hurt", damage);
+        entity.addTag(`Capi:hurt`);
         entity.getTags().forEach(t => {if (t.startsWith("cause:")) entity.removeTag(t)});
         entity.addTag(`cause:${cause}`);
-        entity.addTag(`Capi:hurt`);
     }
     if (player && player.typeId === "minecraft:player") {
         player.setScore("Capi:damage", damage);
         player.addTag(`Capi:damage`);
-        if (entity && entity.getComponent("health").current <= 0)
-            player.setScore("Capi:kill", 1, "add");
     }
+});
 
-    if (player && entity && player.typeId === "minecraft:player" && entity.typeId === "minecraft:player") {
-        const health = entity.getComponent("health").current;
-        if (health <= 0) {
+world.events.entityDie.subscribe(entityDie => {
+    const { damageSource, deadEntity: entity } = entityDie;
+    const { damagingEntity: player, cause } = damageSource;
+
+    if (player && player?.typeId === "minecraft:player") {
+
+        if (entity?.typeId === "minecraft:player") {
             player.setScore("Capi:killPlayer", 1, "add");
             entity.setScore("Capi:deathPlayer", 1, "add");
+        } else player.setScore("Capi:kill", 1, "add");
+    }
+
+    if (entity.typeId === "minecraft:player") {
+
+        if (player && player.typeId !== "minecraft:player") {
+            entity.setScore("Capi:death", 1, "add");
         }
     }
 });
