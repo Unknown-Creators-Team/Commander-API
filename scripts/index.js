@@ -20,6 +20,7 @@ import { Database, ExtendedDatabase } from "./lib/Database.js";
 import { easySafeParse, parsePos, safeParse, setVariable } from "./util.js";
 import Config from "./config.js";
 import { Menu } from "./ui.js";
+import ESON from "./lib/ESON.js";
 
 const world = Minecraft.world;
 const system = Minecraft.system;
@@ -80,6 +81,13 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 player.runCommandAsync(`scoreboard players ${type} @s ${object} ${score}`);
             }
         }
+
+        // speed
+        player.setScore("Capi:speedX", Math.round(player.getVelocity().x * 10));
+        player.setScore("Capi:speedY", Math.round(player.getVelocity().y * 10));
+        player.setScore("Capi:speedZ", Math.round(player.getVelocity().z * 10));
+        player.setScore("Capi:speedXZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().z ** 2)) * 10));
+        player.setScore("Capi:speedXYZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().y ** 2) + (player.getVelocity().z ** 2)) * 10));
 
         // sneaking
         if (player.isSneaking) player.addTag("Capi:sneaking");
@@ -206,9 +214,10 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
         // tell
         if (player.tell) {
-            player.sendMessage(String(await setVariable(player, player.tell)));
-            player.tell = false;
+            const text = await setVariable(player, player.tell);
+            player.sendMessage(String(text));
         }
+        player.tell = false;
 
         // Kick
         if (player.kick) {
@@ -277,7 +286,7 @@ world.events.entityHit.subscribe(async entityHit => {
     player.addTag("Capi:attack");
     player.getTags().forEach(t => { if (t.startsWith("attacked:")) player.removeTag(t) });
     if (entity) player.addTag(`attacked:${entity.typeId}`);
-    else if (block) player.addTag(`attacked:${block.typeId}`);
+        else if (block) player.addTag(`attacked:${block.typeId}`);
 });
 
 world.events.entityHurt.subscribe(async entityHurt => {
@@ -304,14 +313,20 @@ world.events.entityDie.subscribe(entityDie => {
 
         if (entity?.typeId === "minecraft:player") {
             player.setScore("Capi:killPlayer", 1, "add");
+            player.addTag("Capi:killPlayer");
             entity.setScore("Capi:deathPlayer", 1, "add");
-        } else player.setScore("Capi:kill", 1, "add");
+            player.addTag("Capi:deathPlayer");
+        } else {
+            player.setScore("Capi:kill", 1, "add");
+            player.addTag("Capi:kill");
+        }
     }
 
     if (entity.typeId === "minecraft:player") {
 
-        if (player && player.typeId !== "minecraft:player") {
+        if (player?.typeId !== "minecraft:player") {
             entity.setScore("Capi:death", 1, "add");
+            entity.addTag("Capi:death");
         }
     }
 });
@@ -319,11 +334,11 @@ world.events.entityDie.subscribe(entityDie => {
 world.events.beforeChat.subscribe(async chat => {
     const player = chat.sender;
     let msg = chat.message;
-    let mute;
+    let mute = false;
     player.getTags().forEach((t) => {
         t = t.replace(/"/g, "");
         if (t.startsWith("chat:")) player.removeTag(t);
-        if (t.startsWith("mute")) mute = t.slice(5);
+        if (t.startsWith("mute:")) mute = t.slice(5);
     });
     player.addTag(`Capi:chat`);
     player.addTag(`chat:${msg.replace(/"/g, "")}`);
@@ -335,7 +350,8 @@ world.events.beforeChat.subscribe(async chat => {
     }
     if (Config.get("ChatUIEnabled")) {
         chat.sendToTargets = true;
-        world.sendMessage(await setVariable(player, String((Config.get("ChatUI")))).replace("{message}", msg));
+        const text = await setVariable(player, String((Config.get("ChatUI"))));
+        world.sendMessage(text.replace("{message}", msg));
     }
 });
 
@@ -352,7 +368,7 @@ world.events.itemUse.subscribe(async itemUse => {
     });
     player.addTag(`Capi:itemUse`);
     player.addTag(`itemUse:${item.typeId}`);
-    player.addTag(`itemUseD:${JSON.stringify(details).replace(/(\")/g, "`")}`);
+    player.addTag(`itemUseD:${ESON.stringify(details)}`);
 });
 
 world.events.itemUseOn.subscribe(async itemUseOn => {
@@ -438,7 +454,7 @@ world.events.projectileHit.subscribe(projectileHit => {
 
     const hit = projectileHit.getBlockHit()?.block || projectileHit.getEntityHit()?.entity;
 
-    if(hit) {
+    if (hit) {
         player.setScore("Capi:hitX", Math.floor(hit.location.x));
         player.setScore("Capi:hitY", Math.floor(hit.location.y));
         player.setScore("Capi:hitZ", Math.floor(hit.location.z));

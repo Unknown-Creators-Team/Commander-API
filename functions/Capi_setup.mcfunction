@@ -31,6 +31,11 @@ scoreboard objectives add Capi:joinCount dummy
 scoreboard objectives add Capi:hitX dummy
 scoreboard objectives add Capi:hitY dummy
 scoreboard objectives add Capi:hitZ dummy
+scoreboard objectives add Capi:speedX dummy
+scoreboard objectives add Capi:speedY dummy
+scoreboard objectives add Capi:speedZ dummy
+scoreboard objectives add Capi:speedXZ dummy
+scoreboard objectives add Capi:speedXYZ dummy
 scoreboard objectives add Capi:blockBreakX dummy
 scoreboard objectives add Capi:blockBreakY dummy
 scoreboard objectives add Capi:blockBreakZ dummy
