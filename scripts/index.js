@@ -145,7 +145,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                         if (!Data.enchants[i].name) return;
                         let enchantsName = Data.enchants[i].name;
                         let enchantsLevel = 1;
-                        if (Data.enchants[i].level) enchantsLevel = Data.enchants[i].level;
+                        if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
                         enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
                     }
                     item.getComponent("enchantments").enchantments = enchantments;
