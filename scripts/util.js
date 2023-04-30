@@ -76,7 +76,6 @@ export function setVariable(player, text) {
                     if (![-1, 0, 1].includes(dimension)) dimension = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "null");
                 }
             } catch {}
-            console.warn(dataLength - i === 1)
             if (dataLength - i === 1) resolve(text);
         }
     } catch (e) {reject(e)}})

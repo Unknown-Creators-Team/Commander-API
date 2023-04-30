@@ -74,6 +74,10 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         if (player.isOp()) player.addTag("Capi:hasOp");
             else player.removeTag("Capi:hasOp");
 
+        // sneaking
+        if (player.isSneaking) player.addTag("Capi:sneaking");
+        else player.removeTag("Capi:sneaking");
+
         player.setScore = (object, score = 0, type = "set") => {
             if (type === "set") {
                 try { world.scoreboard.setScore(object, player.scoreboard, score); } catch {
@@ -86,16 +90,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             }
         }
 
-        // speed
-        player.setScore("Capi:speedX", Math.round(player.getVelocity().x * 10));
-        player.setScore("Capi:speedY", Math.round(player.getVelocity().y * 10));
-        player.setScore("Capi:speedZ", Math.round(player.getVelocity().z * 10));
-        player.setScore("Capi:speedXZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().z ** 2)) * 10));
-        player.setScore("Capi:speedXYZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().y ** 2) + (player.getVelocity().z ** 2)) * 10));
-
-        // sneaking
-        if (player.isSneaking) player.addTag("Capi:sneaking");
-        else player.removeTag("Capi:sneaking");
+        
 
         // tshoot
         if (player.hasTag("Capi:system_tshoot")) {
@@ -244,7 +239,11 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             const directionZ = await setVariable(player, Data.directionZ || Data[1] || 0);
             const horizontalStrength = await setVariable(player, Data.horizontalStrength || Data[2] || 0);
             const verticalStrength = await setVariable(player, Data.verticalStrength || Data[3] || 0);
-            player.applyKnockback(Number(directionX), Number(directionZ), Number(horizontalStrength), Number(verticalStrength));
+            player.applyKnockback(
+                Number(typeof(directionX) !== "string" ? directionX : 0),
+                Number(typeof(directionZ) !== "string" ? directionZ : 0),
+                Number(typeof(horizontalStrength) !== "string" ? horizontalStrength : 0),
+                Number(typeof(verticalStrength) !== "string" ? verticalStrength : 0));
             player.knockback = false;
         }
 
@@ -259,6 +258,18 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         }
 
         // Set scoreboard
+        // speed
+        player.setScore("Capi:speedX", Math.round(player.getVelocity().x * 10));
+        player.setScore("Capi:speedY", Math.round(player.getVelocity().y * 10));
+        player.setScore("Capi:speedZ", Math.round(player.getVelocity().z * 10));
+        player.setScore("Capi:speedXZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().z ** 2)) * 10));
+        player.setScore("Capi:speedXYZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().y ** 2) + (player.getVelocity().z ** 2)) * 10));
+
+        // vector
+        player.setScore("Capi:vectorX", Math.round(player.getViewDirection().x * 100));
+        player.setScore("Capi:vectorY", Math.round(player.getViewDirection().y * 100));
+        player.setScore("Capi:vectorZ", Math.round(player.getViewDirection().z * 100));
+    
         // health
         const health = Math.round(player.getComponent("health").current);
         player.setScore("Capi:health", health);
