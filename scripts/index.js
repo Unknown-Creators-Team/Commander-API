@@ -373,10 +373,7 @@ world.events.itemUse.subscribe(async itemUse => {
 
 world.events.itemUseOn.subscribe(async itemUseOn => {
     const { source: player, item, getBlockLocation } = itemUseOn;
-    // FIXME: getBlockLocation don't working. This bug will be fixed in 1.19.80.
-    // const block = player.dimension.getBlock(getBlockLocation());
-
-    const block = player.getBlockFromViewDirection({maxDistance: 7});
+    const block = player.dimension.getBlock(getBlockLocation());
 
     if (!block instanceof Minecraft.Block || !block?.location) return; 
     
