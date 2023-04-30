@@ -343,8 +343,8 @@ world.events.itemUse.subscribe(itemUse => {
 });
 
 world.events.itemUseOn.subscribe(itemUseOn => {
-    const { source: player, item, getBlockLocation } = itemUseOn;
-    const block = player.dimension.getBlock(getBlockLocation());
+    const { source: player, item } = itemUseOn;
+    const block = player.dimension.getBlock(itemUseOn.getBlockLocation());
 
     if (!block instanceof Minecraft.Block || !block?.location) return; 
     
