@@ -377,6 +377,13 @@ world.events.beforeChat.subscribe(async chat => {
     player.addTag(`chat:${msg.replace(/"/g, "")}`);
     player.setScore("Capi:chatLength", msg.length);
     player.setScore("Capi:chatCount", 1, "add");
+    if (Config.get("CancelSendMsgEnabled")) {
+        const CancelSendMsg = Config.get("CancelSendMsg");
+        const start = CancelSendMsg?.start.some(v => v.length && msg.startsWith(v));
+        const end = CancelSendMsg?.end.some(v => v.length && msg.endsWith(v));
+        const include = CancelSendMsg?.include.some(v => v.length && msg.includes(v));
+        if (start || end || include) return chat.cancel = true;
+    }
     if (mute || player.hasTag("mute")) {
         player.sendMessage(mute.length ? mute : "§cYou have been muted.");
         return chat.cancel = true;

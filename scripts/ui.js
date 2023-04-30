@@ -28,10 +28,14 @@ export function Menu(player) {
     .body("設定の変更後は §7/reload§r を実行して設定を反映させてください。")
     .button("§lプレイヤー退出メッセージ")
     .button("§lチャットUI")
+    .button("§l送信キャンセル")
+    .button("§l§4リセット")
     .button("§l§c閉じる")
     .show(player).then(response => {
         if (response.selection === 0) LeaveMsg(player);
         if (response.selection === 1) ChatUI(player);
+        if (response.selection === 2) CancelSendMsg(player);
+        if (response.selection === 3) Config.clear();
     });
 }
 
@@ -105,3 +109,43 @@ function ChatUIConfig(player) {
 }
 
 const ChatUIBack = (player) => ChatUI(player);
+
+function CancelSendMsg (player) {
+    const Menu = new MinecraftUI.ActionFormData()
+    .title("§lCommander API")
+    .body(`ステータス: ${Config.get("CancelSendMsgEnabled") ? "有効" : "無効"}\nで始まっているか: "§a${Config.get("CancelSendMsg")?.start.join("§r, §a")}§r"\nで終わっているか: "§a${Config.get("CancelSendMsg")?.end.join("§r, §a")}§r"\nが含まれているか: "§a${Config.get("CancelSendMsg")?.include.join("§r, §a")}§r"`)
+    .button("§l設定する");
+    if (Config.get("CancelSendMsgEnabled")) Menu.button("§l§c無効にする");
+        else Menu.button("§l§2有効にする");
+
+    Menu.button("§l戻る")
+    .button("§l§c閉じる")
+    .show(player).then(response => {
+        if (response.selection === 0) CancelSendMsgConfig(player);
+        if (response.selection === 1) {
+            if (Config.get("CancelSendMsgEnabled")) Config.set("CancelSendMsgEnabled", false);
+                else Config.set("CancelSendMsgEnabled", true);
+                CancelSendMsgBack(player);
+        }
+        if (response.selection === 2) MenuBack(player);
+    });
+}
+
+function CancelSendMsgConfig (player) {
+    const Menu = new MinecraftUI.ModalFormData()
+    .title("§lCommander API")
+    .textField("で始まっているか", "(例) !, ?, #", Config.get("CancelSendMsg")?.start.join(", ") || null)
+    .textField("で終わっているか", "(例) ,, ., :)", Config.get("CancelSendMsg")?.end.join(", ") || null)
+    .textField("が含まれているか", "(例) help, !menu", Config.get("CancelSendMsg")?.include.join(", ") || null)
+    .show(player).then(response => {
+        const object = {
+            start: response.formValues[0].split(", "),
+            end: response.formValues[1].split(", "),
+            include: response.formValues[2].split(", ")
+        }
+        Config.set("CancelSendMsg", object);
+        CancelSendMsgBack(player);
+    });
+}
+
+const CancelSendMsgBack = (player) => CancelSendMsg(player);
