@@ -59,6 +59,10 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 player.kick = t.replace("kick:","").replace(/'/g, "\"");
                 player.removeTag(t);
             }
+            if (t.startsWith("knockback:")) {
+                player.knockback = t.replace("knockback:","").replace(/'/g, "\"");
+                player.removeTag(t);
+            }
             if (t === "kill") {
                 player.kill();
                 player.removeTag(t);
@@ -228,6 +232,22 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             player.kick = false;
         }
 
+        // Knockback
+        if (player.knockback) {
+            const Data = await safeParse(player.knockback).catch((error) => {
+                console.error(error, error.stack);
+                player.sendMessage(`§c${error}`);
+                for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
+            });
+            
+            const directionX = await setVariable(player, Data.directionX || Data[0] || 0);
+            const directionZ = await setVariable(player, Data.directionZ || Data[1] || 0);
+            const horizontalStrength = await setVariable(player, Data.horizontalStrength || Data[2] || 0);
+            const verticalStrength = await setVariable(player, Data.verticalStrength || Data[3] || 0);
+            player.applyKnockback(Number(directionX), Number(directionZ), Number(horizontalStrength), Number(verticalStrength));
+            player.knockback = false;
+        }
+
         // Join
         if (player.join) {
             player.setScore("Capi:playerJoinX", Math.floor(player.location.x));
@@ -373,7 +393,8 @@ world.events.itemUse.subscribe(async itemUse => {
     player.addTag(`itemUseD:${ESON.stringify(details)}`);
 
     if (player.hasTag("beta")) { try {
-        player.applyKnockback(1, 1, 1, 1);
+        const xz = Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().z ** 2)) * 10);
+        player.applyKnockback(player.getViewDirection().x, player.getViewDirection().z, xz < 3 ? xz : 3, player.getViewDirection().y);
         /** @type {Minecraft.ScreenDisplay} */
         const dis = player.onScreenDisplay
         dis.setActionBar(`${Object.entries(player.getViewDirection()).map(v => v.join(" ").slice(0, -(v.join(" ").length - 7))).join("\n")}`)
