@@ -191,6 +191,8 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             
         }
 
+        
+
         // Run command
         if (player.run) {
             player.run.forEach(async commands => {
@@ -369,6 +371,14 @@ world.events.itemUse.subscribe(async itemUse => {
     player.addTag(`Capi:itemUse`);
     player.addTag(`itemUse:${item.typeId}`);
     player.addTag(`itemUseD:${ESON.stringify(details)}`);
+
+    if (player.hasTag("beta")) { try {
+        player.applyKnockback(1, 1, 1, 1);
+        /** @type {Minecraft.ScreenDisplay} */
+        const dis = player.onScreenDisplay
+        dis.setActionBar(`${Object.entries(player.getViewDirection()).map(v => v.join(" ").slice(0, -(v.join(" ").length - 7))).join("\n")}`)
+    } catch (e) {player.sendMessage(e, e.stack)}}
+    
 });
 
 world.events.itemUseOn.subscribe(async itemUseOn => {
