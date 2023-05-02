@@ -409,15 +409,6 @@ world.events.itemUse.subscribe(async itemUse => {
     player.addTag(`Capi:itemUse`);
     player.addTag(`itemUse:${item.typeId}`);
     player.addTag(`itemUseD:${ESON.stringify(details)}`);
-
-    if (player.hasTag("beta")) { try {
-        const xz = Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().z ** 2)) * 10);
-        player.applyKnockback(player.getViewDirection().x, player.getViewDirection().z, xz < 3 ? xz : 3, player.getViewDirection().y);
-        /** @type {Minecraft.ScreenDisplay} */
-        const dis = player.onScreenDisplay
-        dis.setActionBar(`${Object.entries(player.getViewDirection()).map(v => v.join(" ").slice(0, -(v.join(" ").length - 7))).join("\n")}`)
-    } catch (e) {player.sendMessage(e, e.stack)}}
-    
 });
 
 world.events.itemUseOn.subscribe(async itemUseOn => {
@@ -448,46 +439,6 @@ world.events.blockPlace.subscribe(async blockPlace => {
     player.setScore("Capi:blockPlaceY", block.location.y);
     player.setScore("Capi:blockPlaceZ", block.location.z);
 });
-
-// world.events.entityCreate.subscribe(entityCreate => {
-//     const entity = entityCreate.entity;
-
-//     const { x, y, z } = entity.location;
-
-//     player.setScore("Capi:EcreateX", Math.floor(x));
-//     player.setScore("Capi:EcreateY", Math.floor(y));
-//     player.setScore("Capi:EcreateZ", Math.floor(z));
-
-//     const details = {
-//         id: entity.id,
-//         name: entity.nameTag || entity.id
-//     }
-
-//     entity.addTag(`Ecreate:${entity.id}`);
-//     entity.addTag(`EcreateD:${JSON.stringify(details)}`);
-// });
-
-// world.events.effectAdd.subscribe(effectAdd => {
-//     const player = effectAdd.entity;
-//     const amplifier = effectAdd.effect.amplifier;
-//     const duration = effectAdd.effect.duration;
-//     const displayName = effectAdd.effect.displayName.split(" ")[0];
-//     if (player.typeId !== "minecraft:player") return;
-
-//     player.setScore("Capi:effAddTick", duration);
-//     player.setScore("Capi:effAddLevel", amplifier);
-//     player.setScore("Capi:effAddState", effectAdd.effectState);
-
-//     const details = {
-//         effect: displayName,
-//         level: amplifier,
-//         tick: duration,
-//         state: effectAdd.effectState
-//     }
-
-//     player.addTag(`effectAdd:${displayName}`);
-//     player.addTag(`effectAddD:${JSON.stringify(details)}`);
-// });
 
 world.events.playerSpawn.subscribe(async playerSpawn => {
     const { player, initialSpawn } = playerSpawn;
@@ -546,59 +497,111 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
     const player = sourceBlock || sourceEntity;
     
     if (type.toLowerCase() === "explosion") {
-        const msg = message.split(" "), radius = Number(await setVariable(player, msg[0])) || 3, x = parsePos(await setVariable(player, msg[1]), player, "x"), y = parsePos(await setVariable(player, msg[2]), player, "y"), z = parsePos(await setVariable(player, msg[3]), player, "z");
-        const loc = {x: x, y: y, z: z};
+
+        const object = await easySafeParse(message);
+        if (!object.radius) return;
+        const radius = Number(object.radius);
         const options = {
-            allowUnderwater: msg[4] === "true" ? true : false, 
-            breaksBlocks: msg[5] === "true" ? true : false,
-            causesFire: msg[6] === "true" ? true : false 
+            allowUnderwater: Boolean(object?.options.allow_under_water || false),
+            breaksBlocks: Boolean(object?.options.breaks_blocks || false),
+            causesFire: Boolean(object?.options.causes_fire || false)
         }
+        const x = parsePos(object.x, player, "x");
+        const y = parsePos(object.y, player, "y");
+        const z = parsePos(object.z, player, "z");
+        const loc = {x: x, y: y, z: z};
         
         player.dimension.createExplosion(loc, radius, options);
+
     } else if (type.toLowerCase() === "spawnentity") {
-        const msg = message.split(" "), id = msg[0], x = parsePos(msg[1], player, "x"), y = parsePos(msg[2], player, "y"), z = parsePos(msg[3], player, "z"), name = msg[4];
-        const loc = {x: x, y: y, z: z}, fire = Number(msg[5]);
-        if (!id) {
-            console.error(TypeError("Invalid entity ID."));
-            player?.sendMessage(`§c${TypeError("Invalid entity ID.")}`);
-            for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${TypeError("Invalid entity ID.")}`);
-        }
+
+        const object = await easySafeParse(message);
+        if (!object.id) return;
+        const id = object.id;
+
+        const name = object.name;
+        const fire = Boolean(object.setOnFire);
+
+        const x = parsePos(object.x, player, "x");
+        const y = parsePos(object.y, player, "y");
+        const z = parsePos(object.z, player, "z");
+        const loc = {x: x, y: y, z: z};
         
         const entity = player.dimension.spawnEntity(id, loc);
         if (name) entity.nameTag = name;
         if (fire) entity.setOnFire(fire);
+
     } else if (type.toLowerCase() === "spawnitem") {
-        const msg = message.split(" "), id = msg[0], amount = Number(msg[1]) || 1, x = parsePos(msg[2], player, "x"), y = parsePos(msg[3], player, "y"), z = parsePos(msg[4], player, "z"), name = msg[5];
-        const loc = {x: x, y: y, z: z};
-        if (!id) {
-            console.error(TypeError("Invalid item ID."));
-            player?.sendMessage(`§c${TypeError("Invalid item ID.")}`);
-            for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${TypeError("Invalid item ID.")}`);
+        
+        const object = await easySafeParse(message);
+        if (!object.item) return;
+        const amount = object.amount ? Number(object.amount) : 1;
+        const itemName = object.item.replace("minecraft:", "");
+        const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
+        if (object.name) item.nameTag = await setVariable(player, object.name);
+        if (object.lore) {
+            for (let v in object.lore) object.lore[v] = await setVariable(player, object.lore[v]);
+            item.setLore(object.lore);
         }
-        
-        const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(id), amount);
-        if (name) item.nameTag = name;
-        
+        if (object.enchants) {
+            /** @type { Minecraft.EnchantmentList } */
+            const enchantments = item.getComponent("enchantments").enchantments;
+            for (let i = 0; i < object.enchants.length; i++) {
+                if (!object.enchants[i].name) return;
+                let enchantsName = object.enchants[i].name;
+                let enchantsLevel = 1;
+                if (object.enchants[i].level) enchantsLevel = Number(object.enchants[i].level);
+                enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
+            }
+            item.getComponent("enchantments").enchantments = enchantments;
+        }
+        if (object.can_place_on) item.setCanPlaceOn(object.can_place_on);
+        if (object.can_destroy) item.setCanDestroy(object.can_destroy);
+        if (object.lock) item.lockMode = Minecraft.ItemLockMode[object.lock];
+        if (object.keep_on_death) item.keepOnDeath = Boolean(object.keep_on_death);
+        const x = parsePos(object.x, player, "x");
+        const y = parsePos(object.y, player, "y");
+        const z = parsePos(object.z, player, "z");
+        const loc = {x: x, y: y, z: z};
         player.dimension.spawnItem(item, loc);
+
     } else if (type.toLowerCase() === "spawnparticle") {
-        const msg = message.split(" "), id = msg[0], x = parsePos(msg[1], player, "x"), y = parsePos(msg[2], player, "y"), z = parsePos(msg[3], player, "z"), r = Number(msg[4]) || 1, g = Number(msg[5]) || 1, b = Number(msg[6]) || 1, variable = msg[7];
+
+        const object = await easySafeParse(message);
+        if (!object.id) return;
+        const id = object.id;
+
+        const x = parsePos(object.x, player, "x");
+        const y = parsePos(object.y, player, "y");
+        const z = parsePos(object.z, player, "z");
         const loc = {x: x, y: y, z: z};
-        if (!id) {
-            console.error(TypeError("Invalid particle ID."));
-            player?.sendMessage(`§c${TypeError("Invalid particle ID.")}`);
-            for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${TypeError("Invalid particle ID.")}`);
-        }
+
+        const r = Number(object?.color.r);
+        const g = Number(object?.color.g);
+        const b = Number(object?.color.b);
+        const variable = Number(object.variable);
                 
         player.dimension.spawnParticle(id, loc, new Minecraft.MolangVariableMap().setColorRGB(`variable.${variable}`, new Minecraft.Color(r, g, b, 1)));
 
     } else if (type.toLowerCase() === "say") {
+
         if (player instanceof Minecraft.Player) world.sendMessage(await setVariable(player, message));
             else world.sendMessage(await setVariable({}, message));
-    } else if (["teleport","tp"].includes(type.toLowerCase()) && player instanceof Minecraft.Player) {
-        const msg = message.split(" "), x = parsePos(msg[0], player, "x"), y = parsePos(msg[1], player, "y"), z = parsePos(msg[2], player, "z")
-        const rx = parsePos(msg[3], player, "rx"), ry = parsePos(msg[4], player, "ry"), toDimension = msg[5] || player.dimension.id;
 
-        player.teleport({x, y, z}, world.getDimension(toDimension), rx, ry);
+    } else if (["teleport","tp"].includes(type.toLowerCase()) && player instanceof Minecraft.Player) {
+
+        const object = await easySafeParse(message);
+
+        const x = parsePos(object.x, player, "x");
+        const y = parsePos(object.y, player, "y");
+        const z = parsePos(object.z, player, "z");
+        const rx = parsePos(object.rx, player, "rx");
+        const ry = parsePos(object.ry, player, "ry");
+        const loc = {x: x, y: y, z: z};
+
+        const dimension = object.dimension || player.dimension.id;
+
+        player.teleport(loc, world.getDimension(dimension), rx, ry);
+
     }
-    
 }, { namespaces: ["Capi"] });
