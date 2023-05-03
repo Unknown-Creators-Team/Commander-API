@@ -19,15 +19,16 @@ import getScore from "./lib/getScore.js";
 import { Database, ExtendedDatabase } from "./lib/Database.js";
 import { easySafeParse, parsePos, safeParse, setVariable } from "./util.js";
 import Config from "./config.js";
-import { Menu } from "./ui.js";
 import ESON from "./lib/ESON.js";
+import { UI } from "./ui.js";
 
 const world = Minecraft.world;
 const system = Minecraft.system;
 
 tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
     // world.sendMessage("a")
-    for(const player of world.getPlayers()) {
+    // world.getPlayers().forEach(p => p.sendMessage(String(tps)))
+    world.getPlayers().forEach(async (player) => {
         player.getTags().forEach((t) => {
             if (t.startsWith("rename:")) {
                 player.rename = t.replace("rename:", "");
@@ -152,7 +153,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
                 if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
                 if (Data.lock) item.lockMode = Minecraft.ItemLockMode[Data.lock];
-                if (Data.keep_on_death) item.keepOnDeath = Boolean(Data.keep_on_death);
+                if (Data.keep_on_death) item.keepOnDeath = Data.keep_on_death === "true" ? true : false;
                 if (typeof slot == "number") container.setItem(slot, item);
                     else container.addItem(item);
             } catch (e) {
@@ -228,24 +229,24 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         }
 
         // Knockback
-        if (player.knockback) {
+        if (player.knockback) { try {
             const Data = await safeParse(player.knockback).catch((error) => {
                 console.error(error, error.stack);
                 player.sendMessage(`§c${error}`);
                 for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
             });
             
-            const directionX = await setVariable(player, Data.directionX || Data[0] || 0);
-            const directionZ = await setVariable(player, Data.directionZ || Data[1] || 0);
-            const horizontalStrength = await setVariable(player, Data.horizontalStrength || Data[2] || 0);
-            const verticalStrength = await setVariable(player, Data.verticalStrength || Data[3] || 0);
+            const directionX = String(await setVariable(player, Data.directionX || Data[0] || 0));
+            const directionZ = String(await setVariable(player, Data.directionZ || Data[1] || 0));
+            const horizontalStrength = String(await setVariable(player, Data.horizontalStrength || Data[2] || 0));
+            const verticalStrength = String(await setVariable(player, Data.verticalStrength || Data[3] || 0));
             player.applyKnockback(
-                Number(typeof(directionX) !== "string" ? directionX : 0),
-                Number(typeof(directionZ) !== "string" ? directionZ : 0),
-                Number(typeof(horizontalStrength) !== "string" ? horizontalStrength : 0),
-                Number(typeof(verticalStrength) !== "string" ? verticalStrength : 0));
+                Number(directionX.search(/[^0-9-.]/) >= 0 ? 0 : directionX),
+                Number(directionZ.search(/[^0-9-.]/) >= 0 ? 0 : directionZ),
+                Number(horizontalStrength.search(/[^0-9-.]/) >= 0 ? 0 : horizontalStrength),
+                Number(verticalStrength.search(/[^0-9-.]/) >= 0 ? 0 : verticalStrength));
             player.knockback = false;
-        }
+        } catch (e) {console.error(e)}}
 
         // Join
         if (player.join) {
@@ -306,8 +307,11 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             player.pushedTime = 0;
         }
 
-        if (player.hasTag("Capi:open_config_gui")) Menu(player);
-    }
+        if (player.hasTag("Capi:open_config_gui")) {
+            const ui = new UI(player);
+            ui.Menu();
+        }
+    })
 } catch (e) {
     console.error(e, e.stack)
 }});
@@ -365,6 +369,7 @@ world.events.entityDie.subscribe(entityDie => {
 });
 
 world.events.beforeChat.subscribe(async chat => {
+    console.warn("sending")
     const player = chat.sender;
     let msg = chat.message;
     let mute = false;
@@ -390,9 +395,12 @@ world.events.beforeChat.subscribe(async chat => {
     }
     if (Config.get("ChatUIEnabled")) {
         chat.sendToTargets = true;
+        console.warn("changing")
         const text = await setVariable(player, String((Config.get("ChatUI"))));
+        console.warn("changed")
         world.sendMessage(text.replace("{message}", msg));
     }
+    console.warn("sent")
 });
 
 world.events.itemUse.subscribe(async itemUse => {
@@ -502,9 +510,9 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
         if (!object.radius) return;
         const radius = Number(object.radius);
         const options = {
-            allowUnderwater: Boolean(object?.options.allow_under_water || false),
-            breaksBlocks: Boolean(object?.options.breaks_blocks || false),
-            causesFire: Boolean(object?.options.causes_fire || false)
+            allowUnderwater: object?.options.allow_under_water === "true" ? true : false,
+            breaksBlocks: object?.options.breaks_blocks === "true" ? true : false,
+            causesFire: object?.options.causes_fire === "true" ? true : false
         }
         const x = parsePos(object.x, player, "x");
         const y = parsePos(object.y, player, "y");
@@ -513,14 +521,14 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
         
         player.dimension.createExplosion(loc, radius, options);
 
-    } else if (type.toLowerCase() === "spawnentity") {
+    } else if (["spawn", "entity"].every(v => type.toLowerCase().includes(v))) {
 
         const object = await easySafeParse(message);
         if (!object.id) return;
         const id = object.id;
 
         const name = object.name;
-        const fire = Boolean(object.setOnFire);
+        const fire = Number(object.setOnFire);
 
         const x = parsePos(object.x, player, "x");
         const y = parsePos(object.y, player, "y");
@@ -531,7 +539,7 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
         if (name) entity.nameTag = name;
         if (fire) entity.setOnFire(fire);
 
-    } else if (type.toLowerCase() === "spawnitem") {
+    } else if (["spawn", "item"].every(v => type.toLowerCase().includes(v))) {
         
         const object = await easySafeParse(message);
         if (!object.item) return;
@@ -558,14 +566,14 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
         if (object.can_place_on) item.setCanPlaceOn(object.can_place_on);
         if (object.can_destroy) item.setCanDestroy(object.can_destroy);
         if (object.lock) item.lockMode = Minecraft.ItemLockMode[object.lock];
-        if (object.keep_on_death) item.keepOnDeath = Boolean(object.keep_on_death);
+        if (object.keep_on_death) item.keepOnDeath = object.keep_on_death === "true" ? true : false;
         const x = parsePos(object.x, player, "x");
         const y = parsePos(object.y, player, "y");
         const z = parsePos(object.z, player, "z");
         const loc = {x: x, y: y, z: z};
         player.dimension.spawnItem(item, loc);
 
-    } else if (type.toLowerCase() === "spawnparticle") {
+    } else if (["spawn", "particle"].every(v => type.toLowerCase().includes(v))) {
 
         const object = await easySafeParse(message);
         if (!object.id) return;

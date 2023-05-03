@@ -24,8 +24,8 @@ import getScore from "./lib/getScore.js";
  * @param {string} text 
  * @returns 
  */
-export function setVariable(player, text) {
-    return new Promise(async (resolve, reject) => { try {
+export async function setVariable(player, text) {
+    return await new Promise(async (resolve, reject) => { try {
 
         if (!player instanceof Minecraft.Player) reject("player needs Player Class");
         if (!text?.length) resolve(text);
@@ -76,6 +76,7 @@ export function setVariable(player, text) {
                     if (![-1, 0, 1].includes(dimension)) dimension = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "null");
                 }
             } catch {}
+            
             if (dataLength - i === 1) resolve(text);
         }
     } catch (e) {reject(e)}})
