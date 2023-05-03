@@ -500,15 +500,15 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
     const type = id.split(":")[1];
     const player = sourceBlock || sourceEntity;
     
-    if (type.toLowerCase() === "explosion") {
+    if (type.toLowerCase() === "explosion") { try {
 
         const object = await easySafeParse(message);
         if (!object.radius) return;
         const radius = Number(object.radius);
         const options = {
-            allowUnderwater: object?.options.allow_under_water === "true" ? true : false,
-            breaksBlocks: object?.options.breaks_blocks === "true" ? true : false,
-            causesFire: object?.options.causes_fire === "true" ? true : false
+            allowUnderwater: object.options?.allow_under_water === "true" ? true : false,
+            breaksBlocks: object.options?.breaks_blocks === "true" ? true : false,
+            causesFire: object.options?.causes_fire === "true" ? true : false
         }
         const x = parsePos(object.x, player, "x");
         const y = parsePos(object.y, player, "y");
@@ -517,14 +517,14 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
         
         player.dimension.createExplosion(loc, radius, options);
 
-    } else if (["spawn", "entity"].every(v => type.toLowerCase().includes(v))) {
+    } catch(e) {console.error(e)}} else if (["spawn", "entity"].every(v => type.toLowerCase().includes(v))) {
 
         const object = await easySafeParse(message);
         if (!object.id) return;
         const id = object.id;
 
         const name = object.name;
-        const fire = Number(object.setOnFire);
+        const fire = Number(object.set_on_fire);
 
         const x = parsePos(object.x, player, "x");
         const y = parsePos(object.y, player, "y");
@@ -568,7 +568,6 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
         const z = parsePos(object.z, player, "z");
         const loc = {x: x, y: y, z: z};
         player.dimension.spawnItem(item, loc);
-
     } else if (["spawn", "particle"].every(v => type.toLowerCase().includes(v))) {
 
         const object = await easySafeParse(message);
