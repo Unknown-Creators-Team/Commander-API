@@ -369,7 +369,6 @@ world.events.entityDie.subscribe(entityDie => {
 });
 
 world.events.beforeChat.subscribe(async chat => {
-    console.warn("sending")
     const player = chat.sender;
     let msg = chat.message;
     let mute = false;
@@ -395,12 +394,9 @@ world.events.beforeChat.subscribe(async chat => {
     }
     if (Config.get("ChatUIEnabled")) {
         chat.sendToTargets = true;
-        console.warn("changing")
         const text = await setVariable(player, String((Config.get("ChatUI"))));
-        console.warn("changed")
         world.sendMessage(text.replace("{message}", msg));
     }
-    console.warn("sent")
 });
 
 world.events.itemUse.subscribe(async itemUse => {
