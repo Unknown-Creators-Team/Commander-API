@@ -17,9 +17,10 @@ import * as MinecraftUI from "@minecraft/server-ui";
 import tickEvent from "./lib/TickEvent.js";
 import getScore from "./lib/getScore.js";
 import { Database, ExtendedDatabase } from "./lib/Database.js";
-import { parsePos, safeParse, setVariable } from "./util.js";
+import { easySafeParse, parsePos, safeParse, setVariable } from "./util.js";
 import Config from "./config.js";
 import { Menu } from "./ui.js";
+import ESON from "./lib/ESON.js";
 
 const world = Minecraft.world;
 const system = Minecraft.system;
@@ -38,11 +39,11 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             }
             if (t.startsWith("setItem:")) {
                 if (!player.setItemJson) player.setItemJson = [];
-                player.setItemJson.push(t.replace("setItem:", "").replace(/'/g, '\"'));
+                player.setItemJson.push(t.replace("setItem:", ""));
                 player.removeTag(t);
             }
             if (t.startsWith("form:")) {
-                try { player.formJson = t.replace("form:","").replace(/'/g, "\""); } catch {}
+                try { player.formJson = t.replace("form:",""); } catch {}
                 player.removeTag(t);
             }
             if (t.startsWith("run:")) {
@@ -81,6 +82,13 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             }
         }
 
+        // speed
+        player.setScore("Capi:speedX", Math.round(player.getVelocity().x * 10));
+        player.setScore("Capi:speedY", Math.round(player.getVelocity().y * 10));
+        player.setScore("Capi:speedZ", Math.round(player.getVelocity().z * 10));
+        player.setScore("Capi:speedXZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().z ** 2)) * 10));
+        player.setScore("Capi:speedXYZ", Math.round(Math.sqrt((player.getVelocity().x ** 2) + (player.getVelocity().y ** 2) + (player.getVelocity().z ** 2)) * 10));
+
         // sneaking
         if (player.isSneaking) player.addTag("Capi:sneaking");
         else player.removeTag("Capi:sneaking");
@@ -92,7 +100,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
         // Rename
         if (player.rename) {
-            player.nameTag = setVariable(player, player.rename);
+            player.nameTag = await setVariable(player, player.rename);
             player.rename = false;
         }
 
@@ -105,7 +113,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         // Set slot
         try {
             const setSlot = getScore(player, "Capi:setSlot");
-            if (setSlot > -1) {
+            if (setSlot >= 0) {
                 player.selectedSlot = setSlot;
                 player.setScore("Capi:setSlot", 0, "reset");
             }
@@ -119,24 +127,25 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             
             
             try {
-                const Data = await safeParse(setItemJson);
+                const Data = await easySafeParse(setItemJson);
                 if (!Data.item) return;
-                const amount = Data.amount ? Data.amount : 1;
-                const slot = Data.slot ? Data.slot : false;
+                const amount = Data.amount ? Number(Data.amount) : 1;
+                const slot = Data.slot ? Number(Data.slot) : false;
                 const itemName = Data.item.replace("minecraft:", "");
                 const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
-                if (Data.name) item.nameTag = setVariable(player, Data.name);
+                if (Data.name) item.nameTag = await setVariable(player, Data.name);
                 if (Data.lore) {
-                    for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
+                    for (let v in Data.lore) Data.lore[v] = await setVariable(player, Data.lore[v]);
                     item.setLore(Data.lore);
                 }
                 if (Data.enchants) {
+                    /** @type { Minecraft.EnchantmentList } */
                     const enchantments = item.getComponent("enchantments").enchantments;
                     for (let i = 0; i < Data.enchants.length; i++) {
                         if (!Data.enchants[i].name) return;
                         let enchantsName = Data.enchants[i].name;
                         let enchantsLevel = 1;
-                        if (Data.enchants[i].level) enchantsLevel = Data.enchants[i].level;
+                        if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
                         enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
                     }
                     item.getComponent("enchantments").enchantments = enchantments;
@@ -144,7 +153,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
                 if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
                 if (Data.lock) item.lockMode = Minecraft.ItemLockMode[Data.lock];
-                if (Data.keep_on_death) item.keepOnDeath = Data.keep_on_death;
+                if (Data.keep_on_death) item.keepOnDeath = Boolean(Data.keep_on_death);
                 if (typeof slot == "number") container.setItem(slot, item);
                     else container.addItem(item);
             } catch (e) {
@@ -158,24 +167,28 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
         // Show form
         if (player.formJson) {
-            const Data = await safeParse(player.formJson).catch((error) => {
+            const Data = await easySafeParse(player.formJson).catch((error) => {
                 console.error(error, error.stack);
                 player.sendMessage(`§c${error}`);
                 for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
             }).finally(() => player.formJson = false);
-
             const Form = new MinecraftUI.ActionFormData();
-            if (Data.title) Form.title(String(setVariable(player, Data.title)));
-            if (Data.body) Form.body(String(setVariable(player, Data.body)));
+            if (Data.title) Form.title(String(await setVariable(player, Data.title)));
+            if (Data.body) Form.body(String(await setVariable(player, Data.body)));
 
-            Data.buttons.forEach(b => {
+            Data.buttons.forEach(async (b, index) => {
                 if (!b.text) throw TypeError(`The button text is not passed.`);
-                if (b.textures) Form.button(String(setVariable(player, b.text)), String(b.textures));
-                else Form.button(String(setVariable(player, b.text)));
+                const text = await setVariable(player, b.text);
+                if (b.textures) Form.button(text, String(b.textures));
+                    else Form.button(text);
+
+                if (text && Data.buttons.length - 1 === index) {
+                    const response = await Form.show(player);
+                    if (Data.buttons[response.selection]?.tag) player.addTag((Data.buttons[response.selection].tag));
+                }
             });
-
-            Form.show(player).then(response => player.addTag((Data.buttons[response.selection].tag)));
-
+            
+            
         }
 
         // Run command
@@ -186,9 +199,9 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                     player.sendMessage(`§c${error}`);
                     for (const ply of world.getPlayers({tags: ["Capi:hasOp"]})) ply.sendMessage(`§c${error}`);
                 });
-                if (typeof(Data) === "object" && Data.length) Data.forEach(c => {
-                    // player.sendMessage(`CMD: ${String(setVariable(player, c))}`);
-                    player.runCommandAsync(String(setVariable(player, c)))
+                if (typeof(Data) === "object" && Data.length) Data.forEach(async c => {
+                    // player.sendMessage(`CMD: ${String(await setVariable(player, c))}`);
+                    player.runCommandAsync(String(await setVariable(player, c)))
                         // .then((v) => {
                         //     player.sendMessage(`コマンドの実行に成功しました: ${v.successCount}`)
                         // })
@@ -201,13 +214,14 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
         // tell
         if (player.tell) {
-            player.sendMessage(String(setVariable(player, player.tell)));
-            player.tell = false;
+            const text = await setVariable(player, player.tell);
+            player.sendMessage(String(text));
         }
+        player.tell = false;
 
         // Kick
         if (player.kick) {
-            player.runCommandAsync(`kick "${player.name}" ${setVariable(player, player.kick)}`)
+            player.runCommandAsync(`kick "${player.name}" ${await setVariable(player, player.kick)}`)
             .catch((e) => world.sendMessage(`[${player.name}] §c${e}`));
             player.kick = false;
         }
@@ -265,52 +279,66 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
     console.error(e, e.stack)
 }});
 
-world.events.entityHit.subscribe(entityHit => {
+world.events.entityHit.subscribe(async entityHit => {
     const { entity: player, hitEntity: entity, hitBlock: block } = entityHit;
     if (player.typeId !== "minecraft:player") return;
     player.setScore("Capi:attacks", 1, "add");
     player.addTag("Capi:attack");
     player.getTags().forEach(t => { if (t.startsWith("attacked:")) player.removeTag(t) });
     if (entity) player.addTag(`attacked:${entity.typeId}`);
-    else if (block) player.addTag(`attacked:${block.typeId}`);
+        else if (block) player.addTag(`attacked:${block.typeId}`);
 });
 
-world.events.entityHurt.subscribe(entityHurt => {
+world.events.entityHurt.subscribe(async entityHurt => {
     const { damage, damageSource, hurtEntity: entity } = entityHurt;
     const { cause, damagingEntity: player } = damageSource;
     
     if (entity && entity.typeId === "minecraft:player") {
-        const health = entity.getComponent("health").current;
-        if (health <= 0) entity.setScore("Capi:death", 1, "add");
         entity.setScore("Capi:hurt", damage);
+        entity.addTag(`Capi:hurt`);
         entity.getTags().forEach(t => {if (t.startsWith("cause:")) entity.removeTag(t)});
         entity.addTag(`cause:${cause}`);
-        entity.addTag(`Capi:hurt`);
     }
     if (player && player.typeId === "minecraft:player") {
         player.setScore("Capi:damage", damage);
         player.addTag(`Capi:damage`);
-        if (entity && entity.getComponent("health").current <= 0)
+    }
+});
+
+world.events.entityDie.subscribe(entityDie => {
+    const { damageSource, deadEntity: entity } = entityDie;
+    const { damagingEntity: player, cause } = damageSource;
+
+    if (player && player?.typeId === "minecraft:player") {
+
+        if (entity?.typeId === "minecraft:player") {
+            player.setScore("Capi:killPlayer", 1, "add");
+            player.addTag("Capi:killPlayer");
+            entity.setScore("Capi:deathPlayer", 1, "add");
+            player.addTag("Capi:deathPlayer");
+        } else {
             player.setScore("Capi:kill", 1, "add");
+            player.addTag("Capi:kill");
+        }
     }
 
-    if (player && entity && player.typeId === "minecraft:player" && entity.typeId === "minecraft:player") {
-        const health = entity.getComponent("health").current;
-        if (health <= 0) {
-            player.setScore("Capi:killPlayer", 1, "add");
-            entity.setScore("Capi:deathPlayer", 1, "add");
+    if (entity.typeId === "minecraft:player") {
+
+        if (player?.typeId !== "minecraft:player") {
+            entity.setScore("Capi:death", 1, "add");
+            entity.addTag("Capi:death");
         }
     }
 });
 
-world.events.beforeChat.subscribe(chat => {
+world.events.beforeChat.subscribe(async chat => {
     const player = chat.sender;
     let msg = chat.message;
-    let mute;
+    let mute = false;
     player.getTags().forEach((t) => {
         t = t.replace(/"/g, "");
         if (t.startsWith("chat:")) player.removeTag(t);
-        if (t.startsWith("mute")) mute = t.slice(5);
+        if (t.startsWith("mute:")) mute = t.slice(5);
     });
     player.addTag(`Capi:chat`);
     player.addTag(`chat:${msg.replace(/"/g, "")}`);
@@ -322,11 +350,12 @@ world.events.beforeChat.subscribe(chat => {
     }
     if (Config.get("ChatUIEnabled")) {
         chat.sendToTargets = true;
-        world.sendMessage(setVariable(player, String((Config.get("ChatUI")))).replace("{message}", msg));
+        const text = await setVariable(player, String((Config.get("ChatUI"))));
+        world.sendMessage(text.replace("{message}", msg));
     }
 });
 
-world.events.itemUse.subscribe(itemUse => {
+world.events.itemUse.subscribe(async itemUse => {
     const player = itemUse.source;
     const item = itemUse.item;
     const details = {
@@ -339,10 +368,10 @@ world.events.itemUse.subscribe(itemUse => {
     });
     player.addTag(`Capi:itemUse`);
     player.addTag(`itemUse:${item.typeId}`);
-    player.addTag(`itemUseD:${JSON.stringify(details).replace(/(\")/g, "`")}`);
+    player.addTag(`itemUseD:${ESON.stringify(details)}`);
 });
 
-world.events.itemUseOn.subscribe(itemUseOn => {
+world.events.itemUseOn.subscribe(async itemUseOn => {
     const { source: player, item } = itemUseOn;
     const block = player.dimension.getBlock(itemUseOn.getBlockLocation());
 
@@ -359,7 +388,7 @@ world.events.itemUseOn.subscribe(itemUseOn => {
     player.addTag(`itemUseOn:${block.typeId}`);
 })
 
-world.events.blockPlace.subscribe(blockPlace => {
+world.events.blockPlace.subscribe(async blockPlace => {
     const { player, block } = blockPlace;
     player.getTags().forEach((t) => {
         if (t.startsWith("blockPlace:")) player.removeTag(t);
@@ -411,7 +440,7 @@ world.events.blockPlace.subscribe(blockPlace => {
 //     player.addTag(`effectAddD:${JSON.stringify(details)}`);
 // });
 
-world.events.playerSpawn.subscribe(playerSpawn => {
+world.events.playerSpawn.subscribe(async playerSpawn => {
     const { player, initialSpawn } = playerSpawn;
     if (initialSpawn) player.join = true;
 });
@@ -422,7 +451,7 @@ world.events.projectileHit.subscribe(projectileHit => {
 
     const hit = projectileHit.getBlockHit()?.block || projectileHit.getEntityHit()?.entity;
 
-    if(hit) {
+    if (hit) {
         player.setScore("Capi:hitX", Math.floor(hit.location.x));
         player.setScore("Capi:hitY", Math.floor(hit.location.y));
         player.setScore("Capi:hitZ", Math.floor(hit.location.z));
@@ -436,7 +465,7 @@ world.events.projectileHit.subscribe(projectileHit => {
     player.addTag(`hitTo:${hit.typeId}`);
 });
 
-world.events.blockBreak.subscribe(blockBreak => {
+world.events.blockBreak.subscribe(async blockBreak => {
     const { player, block, brokenBlockPermutation } = blockBreak;
     player.getTags().forEach((t) => {
         if (t.startsWith("blockBreak:")) player.removeTag(t);
@@ -448,12 +477,12 @@ world.events.blockBreak.subscribe(blockBreak => {
     player.setScore("Capi:blockBreakZ", block.z);
 });
 
-world.events.playerLeave.subscribe(playerLeave => {
+world.events.playerLeave.subscribe(async playerLeave => {
     const player = playerLeave.playerName;
     if (Config.get("LeaveMsgEnabled")) world.sendMessage(String((Config.get("LeaveMsg")).replace("{name}", player)));
 });
 
-world.events.buttonPush.subscribe(buttonPush => {
+world.events.buttonPush.subscribe(async buttonPush => {
     const { block, dimension, source: player } = buttonPush;
     const { x, y, z } = block;
     player.setScore("Capi:buttonXPos", x);
@@ -462,13 +491,13 @@ world.events.buttonPush.subscribe(buttonPush => {
     player.addTag(`pushed`);
 });
 
-system.events.scriptEventReceive.subscribe(scriptEventReceive => {
+system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
     const { id, initiator, message, sourceBlock, sourceEntity, sourceType } = scriptEventReceive;
     const type = id.split(":")[1];
     const player = sourceBlock || sourceEntity;
     
     if (type.toLowerCase() === "explosion") {
-        const msg = message.split(" "), radius = Number(setVariable(player, msg[0])) || 3, x = parsePos(setVariable(player, msg[1]), player, "x"), y = parsePos(setVariable(player, msg[2]), player, "y"), z = parsePos(setVariable(player, msg[3]), player, "z");
+        const msg = message.split(" "), radius = Number(await setVariable(player, msg[0])) || 3, x = parsePos(await setVariable(player, msg[1]), player, "x"), y = parsePos(await setVariable(player, msg[2]), player, "y"), z = parsePos(await setVariable(player, msg[3]), player, "z");
         const loc = {x: x, y: y, z: z};
         const options = {
             allowUnderwater: msg[4] === "true" ? true : false, 
@@ -514,8 +543,8 @@ system.events.scriptEventReceive.subscribe(scriptEventReceive => {
         player.dimension.spawnParticle(id, loc, new Minecraft.MolangVariableMap().setColorRGB(`variable.${variable}`, new Minecraft.Color(r, g, b, 1)));
 
     } else if (type.toLowerCase() === "say") {
-        if (player instanceof Minecraft.Player) world.sendMessage(setVariable(player, message));
-            else world.sendMessage(setVariable({}, message));
+        if (player instanceof Minecraft.Player) world.sendMessage(await setVariable(player, message));
+            else world.sendMessage(await setVariable({}, message));
     } else if (["teleport","tp"].includes(type.toLowerCase()) && player instanceof Minecraft.Player) {
         const msg = message.split(" "), x = parsePos(msg[0], player, "x"), y = parsePos(msg[1], player, "y"), z = parsePos(msg[2], player, "z")
         const rx = parsePos(msg[3], player, "rx"), ry = parsePos(msg[4], player, "ry"), toDimension = msg[5] || player.dimension.id;
