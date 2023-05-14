@@ -352,7 +352,7 @@ world.events.entityDie.subscribe(entityDie => {
             player.setScore("Capi:killPlayer", 1, "add");
             player.addTag("Capi:killPlayer");
             entity.setScore("Capi:deathPlayer", 1, "add");
-            player.addTag("Capi:deathPlayer");
+            entity.addTag("Capi:deathPlayer");
         } else {
             player.setScore("Capi:kill", 1, "add");
             player.addTag("Capi:kill");
