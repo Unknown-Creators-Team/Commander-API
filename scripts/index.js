@@ -15,9 +15,8 @@
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 import tickEvent from "./lib/TickEvent.js";
-import getScore from "./lib/getScore.js";
 import { Database, ExtendedDatabase } from "./lib/Database.js";
-import { easySafeParse, parsePos, safeParse, setVariable } from "./util.js";
+import { easySafeParse, parsePos, safeParse, setVariable, getScore } from "./util.js";
 import Config from "./config.js";
 import ESON from "./lib/ESON.js";
 import { UI } from "./ui.js";
@@ -25,6 +24,7 @@ import { UI } from "./ui.js";
 const { world, system } = Minecraft;
 
 // #region プレイヤーのPrototype追加 
+// 知らないと思うんですけど！この26行目の↓みたいなの押せば閉じれるんですよねこれ！
 
 Minecraft.Player.prototype.setScore = function(object, score = 0, type = "set") {
     if (type === "set") {
@@ -36,6 +36,86 @@ Minecraft.Player.prototype.setScore = function(object, score = 0, type = "set") 
     } else {
         this.runCommandAsync(`scoreboard players ${type} @s ${object} ${score}`);
     }
+}
+
+/**
+ * 
+ * @param {Minecraft.Player} player 
+ * @returns {{set: (objectName: string, score: number) => void, reset: (objectName: string) => void, add: (objectName: string, score: number) => void, remove: (objectName: string, score: number) => void, get: (objectName: string) => number}}
+ */
+function createScoreManager(player) {
+    const scores = {
+        set: (objectName, score) => {
+            try {
+                const objective = world.scoreboard.getObjectives().find((v) => v.id === objectName);
+                if (!objective) return undefined;
+                world.scoreboard.setScore(objective, player.scoreboardIdentity, score);
+            } catch (e) {
+                player.runCommandAsync(`scoreboard players set @s "${objectName}" ${score}`);
+            }
+        },
+        reset: (objectName) => {
+            player.runCommandAsync(`scoreboard players reset @s "${objectName}"`);
+        },
+        add: (objectName, score) => {
+            try {
+                const objective = world.scoreboard.getObjectives().find((v) => v.id === objectName);
+                if (!objective) return undefined;
+                score += world.scoreboard.getScore(objective, player.scoreboardIdentity);
+                world.scoreboard.setScore(objective, player.scoreboardIdentity, score);
+            } catch (e) {
+                player.runCommandAsync(`scoreboard players add @s "${objectName}" ${score}`);
+            }
+        },
+        remove: (objectName, score) => {
+            try {
+                const objective = world.scoreboard.getObjectives().find((v) => v.id === objectName);
+                if (!objective) return undefined;
+                score = world.scoreboard.getScore(objective, player.scoreboardIdentity) - score;
+                world.scoreboard.setScore(objective, player.scoreboardIdentity, score);
+            } catch (e) {
+                player.runCommandAsync(`scoreboard players remove @s "${objectName}" ${score}`);
+            }
+        },
+        get: (objectName) => {
+            try {
+                const objective = world.scoreboard.getObjectives().find((v) => v.id === objectName);
+                if (!objective) return undefined;
+                return world.scoreboard.getScore(objective, player.scoreboardIdentity);
+            } catch (e) {
+                return undefined;
+            }
+        }
+    };
+    
+    return scores;
+}
+
+function configureNativeFunction () {
+    world.getAllPlayers().forEach(player => {
+        // @ts-ignore
+        if(!player.score) player.score = createScoreManager(player);
+    });
+};
+
+system.run(() => configureNativeFunction());
+
+// Minecraft.Player.prototype.score = {
+//     set: (objectName, score) => {
+//         try { 
+//             world.scoreboard.setScore(world.scoreboard.getObjectives().find((v) => v.id === objectName), this.scoreboardIdentity, score); 
+//         } catch (e) {
+//             this.runCommandAsync(`scoreboard players set @s ${objectName} ${score}`);
+//         }
+//     },
+//     reset: (objectName) => {},
+//     add: (objectName, score) => {},
+//     remove: (objectName, score) => {}
+// }
+
+// @ts-ignore
+Minecraft.Entity.prototype.getComponentNew = function(componentId) {
+    return this.getComponent(componentId);
 }
 
 // #endregion
@@ -121,8 +201,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         } catch { }
 
         // Set item
-        
-        const container = player.getComponent('inventory').container;
+        const container = player.getComponentNew('inventory').container;
         if (player.setItemJson) player.setItemJson.forEach(async setItemJson => {
             try {
                 const Data = await easySafeParse(setItemJson);
@@ -365,6 +444,7 @@ world.beforeEvents.chatSend.subscribe(async chat => {
     const player = chat.sender;
 
     let msg = chat.message;
+    /** @type { false | string } */
     let mute = false;
 
     player.getTags().forEach((t) => {
@@ -374,7 +454,7 @@ world.beforeEvents.chatSend.subscribe(async chat => {
     });
     player.addTag(`Capi:chat`);
     player.addTag(`chat:${msg.replace(/"/g, "")}`);
-    player.setScore("Capi:chatLength", msg.length);
+    player.setScore("Capi:chatLength", msg.length, "settings");
     player.setScore("Capi:chatCount", 1, "add");
     if (Config.get("CancelSendMsgEnabled")) {
         const CancelSendMsg = Config.get("CancelSendMsg");
@@ -440,6 +520,7 @@ world.afterEvents.blockPlace.subscribe(async blockPlace => {
 });
 
 world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
+    configureNativeFunction();
     const { player, initialSpawn } = playerSpawn;
     if (initialSpawn) player.join = true;
 });
@@ -484,6 +565,9 @@ world.afterEvents.playerLeave.subscribe(async playerLeave => {
 world.afterEvents.buttonPush.subscribe(async buttonPush => {
     const { block, dimension, source: player } = buttonPush;
     const { x, y, z } = block;
+
+    if(!(player instanceof Minecraft.Player)) return;
+    
     player.setScore("Capi:buttonXPos", x);
     player.setScore("Capi:buttonYPos", y);
     player.setScore("Capi:buttonZPos", z);

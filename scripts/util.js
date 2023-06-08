@@ -15,8 +15,9 @@
 
 import * as Minecraft from "@minecraft/server";
 import ESON from "./lib/ESON.js";
-import getScore from "./lib/getScore.js";
 
+const world = Minecraft.world;
+const system = Minecraft.system;
 
 /**
  * 
@@ -26,7 +27,7 @@ import getScore from "./lib/getScore.js";
  */
 export async function setVariable(player, text) {
     return await new Promise(async (resolve, reject) => { try {
-        if (!player instanceof Minecraft.Player) reject("player needs Player Class");
+        if (!(player instanceof Minecraft.Player)) reject("player needs Player Class");
         if (!text?.length) resolve(text);
         const dataLength = text.split("").filter(t => t === "{").length;
         
@@ -133,4 +134,32 @@ const stringCalc = (str) => {
       }
     }
     return result;
+}
+
+/**
+ * get score
+ * @param { Minecraft.Entity | string } target target
+ * @param { string } objective object name
+ * @returns { number | undefined }
+ */
+export function getScore(target, objective) {
+    // if target is a string, get the score by name
+    if (typeof(target) === "string") {
+        // get all scores in the objective
+        const scores = world.scoreboard.getObjective(objective).getScores();
+        // find the score with the matching name
+        const score = scores.find(({ participant }) => participant.displayName === target);
+        // return the score value
+        if (score) return score.score;
+        else return undefined;
+    } else {
+        // if target is a player, get the score by player
+        try {
+            // get the score by player
+            const score = target.scoreboardIdentity.getScore(world.scoreboard.getObjective(objective));
+            // return the score value
+            if (score) return score;
+                else return undefined;
+        } catch (e) { return undefined; }
+    }
 }
