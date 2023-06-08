@@ -26,7 +26,6 @@ import getScore from "./lib/getScore.js";
  */
 export async function setVariable(player, text) {
     return await new Promise(async (resolve, reject) => { try {
-
         if (!player instanceof Minecraft.Player) reject("player needs Player Class");
         if (!text?.length) resolve(text);
         const dataLength = text.split("").filter(t => t === "{").length;
