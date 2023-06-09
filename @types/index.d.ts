@@ -13,6 +13,7 @@ declare module "@minecraft/server" {
 
     interface Entity { // getComponentNew("inventory") -> Inventory index.jsの41行目
         getTypedComponent<T extends keyof EntityComponentMap>(componentId: T): EntityComponentMap[T]
+        isPlayer(): this is Player;
     }
 
     interface ItemStack {
@@ -31,6 +32,7 @@ declare module "@minecraft/server" {
         tell?: string | false;
         kick?: string | false;
         knockback?: string | false;
+        join?: any;
 
         setItemJson?: any | false;
         formJson?: any | false;
