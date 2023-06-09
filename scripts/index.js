@@ -345,7 +345,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         player.setScore("Capi:vectorZ", Math.round(player.getViewDirection().z * 100));
     
         // health
-        const health = Math.round(player.getComponent("health").current);
+        const health = Math.round(player.getTypedComponent("health").current);
         player.setScore("Capi:health", health);
 
         // pos

@@ -4,6 +4,7 @@ import * as MCUI from "@minecraft/server-ui";
 declare module "@minecraft/server" {
     interface EntityComponentMap {
         "inventory": MC.EntityInventoryComponent;
+        "health": MC.EntityHealthComponent
     }
 
     interface ItemComponentMap {
