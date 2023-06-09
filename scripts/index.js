@@ -483,17 +483,19 @@ world.beforeEvents.chatSend.subscribe(async chat => {
     }
 });
 
-world.afterEvents.itemUse.subscribe(async itemUse => {
-    const player = itemUse.source;
-    const item = itemUse.item;
+world.afterEvents.itemUse.subscribe(itemUse => {
+    const { source: player, itemStack: item } = itemUse;
+
     const details = {
         id: item.typeId,
         name: item.nameTag,
         lore: item.getLore()
     }
+
     player.getTags().forEach((t) => {
         if (t.startsWith("itemUse:") || t.startsWith("itemUseD:")) player.removeTag(t);
     });
+
     player.addTag(`Capi:itemUse`);
     player.addTag(`itemUse:${item.typeId}`);
     player.addTag(`itemUseD:${ESON.stringify(details)}`);
@@ -502,7 +504,7 @@ world.afterEvents.itemUse.subscribe(async itemUse => {
 world.afterEvents.itemUseOn.subscribe(async itemUseOn => {
     const { source: player, itemStack: item, block } = itemUseOn;
     
-    if(!(player instanceof Minecraft.Player)) return;
+    if(!player.isPlayer()) return;
 
     player.score.set("Capi:itemUseOnX", block.location.x);
     player.score.set("Capi:itemUseOnY", block.location.y);
@@ -524,9 +526,9 @@ world.afterEvents.blockPlace.subscribe(blockPlace => {
 
     player.addTag(`Capi:blockPlace`);
     player.addTag(`blockPlace:${block.typeId}`);
-    player.setScore("Capi:blockPlaceX", block.location.x);
-    player.setScore("Capi:blockPlaceY", block.location.y);
-    player.setScore("Capi:blockPlaceZ", block.location.z);
+    player.score.set("Capi:blockPlaceX", block.location.x);
+    player.score.set("Capi:blockPlaceY", block.location.y);
+    player.score.set("Capi:blockPlaceZ", block.location.z);
 });
 
 world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
@@ -594,7 +596,6 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
     const player = sourceBlock || sourceEntity;
     
     if (type.toLowerCase() === "explosion") { try {
-
         const object = await easySafeParse(message);
         if (!object.radius) return;
         const radius = Number(object.radius);
@@ -642,7 +643,7 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
         }
         if (object.enchants) {
             /** @type { Minecraft.EnchantmentList } */
-            const enchantments = item.getComponent("enchantments").enchantments;
+            const enchantments = item.getTypedComponent("enchantments").enchantments;
             for (let i = 0; i < object.enchants.length; i++) {
                 if (!object.enchants[i].name) return;
                 let enchantsName = object.enchants[i].name;
@@ -650,7 +651,7 @@ system.events.scriptEventReceive.subscribe(async scriptEventReceive => {
                 if (object.enchants[i].level) enchantsLevel = Number(object.enchants[i].level);
                 enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
             }
-            item.getComponent("enchantments").enchantments = enchantments;
+            item.getTypedComponent("enchantments").enchantments = enchantments;
         }
         if (object.can_place_on) item.setCanPlaceOn(object.can_place_on);
         if (object.can_destroy) item.setCanDestroy(object.can_destroy);

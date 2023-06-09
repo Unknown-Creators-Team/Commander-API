@@ -101,6 +101,8 @@ export const easySafeParse = (object) => {
  * @param { string } pos pos
  * @param { Minecraft.Player } player player object
  * @param {( "x" | "y" | "z" | "rx" | "ry" )} type type of pos
+ * 
+ * @returns { number }
  */
 export const parsePos = (pos, player, type) => {
     if (pos) {
