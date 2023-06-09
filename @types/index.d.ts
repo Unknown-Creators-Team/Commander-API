@@ -6,19 +6,13 @@ declare module "@minecraft/server" {
     }
 
     interface Entity { // getComponentNew("inventory") -> Inventory index.jsの41行目
-        getComponentNew<T extends keyof ComponentMap>(componentId: T): ComponentMap[T]
+        getTypedComponent<T extends keyof ComponentMap>(componentId: T): ComponentMap[T]
     }
 
     interface Player {
         setScore(objectName: string, score: number, type?: "set" | "reset" | "remove" | "add"): void;
 
-        score: {
-            set: (objectName: string, score: number) => void;
-            reset: (objectName: string) => void;
-            add: (objectName: string, score: number) => void;
-            remove: (objectName: string, score: number) => void;
-            get: (objectName: string) => number;
-        }
+        score: ScoreboardManager;
         
         rename?: string | false;
         resetName?: boolean;
@@ -30,5 +24,13 @@ declare module "@minecraft/server" {
 
         setItemJson?: any | false;
         formJson?: any | false;
-    } 
+    }
+
+    export interface ScoreboardManager {
+        set: (objectName: string, score: number) => void;
+        reset: (objectName: string) => void;
+        add: (objectName: string, score: number) => void;
+        remove: (objectName: string, score: number) => void;
+        get: (objectName: string) => number;
+    }
 }

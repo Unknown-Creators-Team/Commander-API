@@ -41,10 +41,10 @@ Minecraft.Player.prototype.setScore = function(object, score = 0, type = "set") 
 /**
  * 
  * @param {Minecraft.Player} player 
- * @returns {{set: (objectName: string, score: number) => void, reset: (objectName: string) => void, add: (objectName: string, score: number) => void, remove: (objectName: string, score: number) => void, get: (objectName: string) => number}}
+ * @returns { Minecraft.ScoreboardManager }
  */
-function createScoreManager(player) {
-    const scores = {
+function createScoreboardManager(player) {
+    return {
         set: (objectName, score) => {
             try {
                 const objective = world.scoreboard.getObjectives().find((v) => v.id === objectName);
@@ -86,15 +86,13 @@ function createScoreManager(player) {
                 return undefined;
             }
         }
-    };
-    
-    return scores;
+    }
 }
 
 function configureNativeFunction () {
     world.getAllPlayers().forEach(player => {
         // @ts-ignore
-        if(!player.score) player.score = createScoreManager(player);
+        if(!player.score) player.score = createScoreboardManager(player);
     });
 };
 
@@ -114,7 +112,7 @@ system.run(() => configureNativeFunction());
 // }
 
 // @ts-ignore
-Minecraft.Entity.prototype.getComponentNew = function(componentId) {
+Minecraft.Entity.prototype.getTypedComponent = function(componentId) {
     return this.getComponent(componentId);
 }
 
