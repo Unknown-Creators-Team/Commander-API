@@ -1,4 +1,5 @@
 import * as MC from "@minecraft/server";
+import * as MCUI from "@minecraft/server-ui";
 
 declare module "@minecraft/server" {
     interface ComponentMap {
@@ -32,5 +33,19 @@ declare module "@minecraft/server" {
         add: (objectName: string, score: number) => void;
         remove: (objectName: string, score: number) => void;
         get: (objectName: string) => number;
+    }
+}
+
+declare module "@minecraft/server-ui" {
+    interface ActionFormData {
+        show(player: MC.Player): Promise<MCUI.ActionFormResponse>;
+    }
+
+    interface ModalFormData {
+        show(player: MC.Player): Promise<MCUI.ModalFormResponse>;
+    }
+
+    interface MessageFormData {
+        show(player: MC.Player): Promise<MCUI.MessageFormResponse>;
     }
 }

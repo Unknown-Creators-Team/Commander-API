@@ -119,8 +119,6 @@ Minecraft.Entity.prototype.getTypedComponent = function(componentId) {
 // #endregion
 
 tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
-    // world.sendMessage("a")
-    // world.getPlayers().forEach(p => p.sendMessage(String(tps)))
     world.getPlayers().forEach(async (player) => {
         player.getTags().forEach((t) => {
             if (t.startsWith("rename:")) {
@@ -199,7 +197,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
         } catch { }
 
         // Set item
-        const container = player.getComponentNew('inventory').container;
+        const container = player.getTypedComponent('inventory').container;
         if (player.setItemJson) player.setItemJson.forEach(async setItemJson => {
             try {
                 const Data = await easySafeParse(setItemJson);
