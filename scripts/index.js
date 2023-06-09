@@ -21,7 +21,7 @@ import Config from "./config.js";
 import ESON from "./lib/ESON.js";
 import { UI } from "./ui.js";
 
-const { world, system } = Minecraft;
+const { world, system } = Minecraft; 
 
 // #region Prototype追加 
 // 知らないと思うんですけど！この26行目の↓みたいなの押せば閉じれるんですよねこれ！
