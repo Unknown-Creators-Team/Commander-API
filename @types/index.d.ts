@@ -21,6 +21,7 @@ declare module "@minecraft/server" {
     }
 
     interface Player {
+        /** @deprecated moved to <Player>.score */
         setScore(objectName: string, score: number, type?: "set" | "reset" | "remove" | "add"): void;
 
         score: ScoreboardManager;

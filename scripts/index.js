@@ -26,7 +26,11 @@ const { world, system } = Minecraft;
 // #region Prototype追加 
 // 知らないと思うんですけど！この26行目の↓みたいなの押せば閉じれるんですよねこれ！
 
+const DeprecatedWarning = (message) => console.warn(`[Commander-API] Deprecated warning: ${message}`);
+
 Minecraft.Player.prototype.setScore = function(object, score = 0, type = "set") {
+    DeprecatedWarning(`Player.setScore is Deprecated.`);
+
     if (type === "set") {
         try { world.scoreboard.setScore(world.scoreboard.getObjectives().find((v) => v.id === object), this.scoreboardIdentity, score); } catch {
             this.runCommandAsync(`scoreboard players set @s ${object} ${score}`);
@@ -114,6 +118,10 @@ system.run(() => configureNativeFunction());
 // @ts-ignore
 Minecraft.Entity.prototype.getTypedComponent = function(componentId) {
     return this.getComponent(componentId);
+}
+
+Minecraft.Entity.prototype.isPlayer = function() {
+    return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;
 }
 
 // @ts-ignore
@@ -492,14 +500,13 @@ world.afterEvents.itemUse.subscribe(async itemUse => {
 });
 
 world.afterEvents.itemUseOn.subscribe(async itemUseOn => {
-    const { source: player, item } = itemUseOn;
-    const block = player.dimension.getBlock(itemUseOn.getBlockLocation());
-
-    if (!block instanceof Minecraft.Block || !block?.location) return; 
+    const { source: player, itemStack: item, block } = itemUseOn;
     
-    player.setScore("Capi:itemUseOnX", block.location.x);
-    player.setScore("Capi:itemUseOnY", block.location.y);
-    player.setScore("Capi:itemUseOnZ", block.location.z);
+    if(!(player instanceof Minecraft.Player)) return;
+
+    player.score.set("Capi:itemUseOnX", block.location.x);
+    player.score.set("Capi:itemUseOnY", block.location.y);
+    player.score.set("Capi:itemUseOnZ", block.location.z);
 
     player.getTags().forEach((t) => {
         if (t.startsWith("itemUseOn:")) player.removeTag(t);
@@ -508,11 +515,13 @@ world.afterEvents.itemUseOn.subscribe(async itemUseOn => {
     player.addTag(`itemUseOn:${block.typeId}`);
 })
 
-world.afterEvents.blockPlace.subscribe(async blockPlace => {
+world.afterEvents.blockPlace.subscribe(blockPlace => {
     const { player, block } = blockPlace;
+
     player.getTags().forEach((t) => {
         if (t.startsWith("blockPlace:")) player.removeTag(t);
     });
+
     player.addTag(`Capi:blockPlace`);
     player.addTag(`blockPlace:${block.typeId}`);
     player.setScore("Capi:blockPlaceX", block.location.x);
@@ -523,24 +532,26 @@ world.afterEvents.blockPlace.subscribe(async blockPlace => {
 world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
     configureNativeFunction();
     const { player, initialSpawn } = playerSpawn;
+
     if (initialSpawn) player.join = true;
 });
 
 world.afterEvents.projectileHit.subscribe(projectileHit => {
     const { getBlockHit, getEntityHit, projectile, source: player } = projectileHit;
-    if (player.typeId !== "minecraft:player") return;
+    if (!player.isPlayer()) return;
 
     const hit = projectileHit.getBlockHit()?.block || projectileHit.getEntityHit()?.entity;
 
     if (hit) {
-        player.setScore("Capi:hitX", Math.floor(hit.location.x));
-        player.setScore("Capi:hitY", Math.floor(hit.location.y));
-        player.setScore("Capi:hitZ", Math.floor(hit.location.z));
+        player.score.set("Capi:hitX", Math.floor(hit.location.x));
+        player.score.set("Capi:hitY", Math.floor(hit.location.y));
+        player.score.set("Capi:hitZ", Math.floor(hit.location.z));
     }
 
     player.getTags().forEach((t) => {
         if (t.startsWith("hitWith:") || t.startsWith("hitTo:")) player.removeTag(t);
     });
+
     player.addTag(`Capi:hit`);
     player.addTag(`hitWith:${projectile.typeId}`);
     player.addTag(`hitTo:${hit.typeId}`);
@@ -548,14 +559,16 @@ world.afterEvents.projectileHit.subscribe(projectileHit => {
 
 world.afterEvents.blockBreak.subscribe(async blockBreak => {
     const { player, block, brokenBlockPermutation } = blockBreak;
+
     player.getTags().forEach((t) => {
         if (t.startsWith("blockBreak:")) player.removeTag(t);
     });
+
     player.addTag(`Capi:blockBreak`);
     player.addTag(`blockBreak:${brokenBlockPermutation.type.id}`);
-    player.setScore("Capi:blockBreakX", block.x);
-    player.setScore("Capi:blockBreakY", block.y);
-    player.setScore("Capi:blockBreakZ", block.z);
+    player.score.set("Capi:blockBreakX", block.x);
+    player.score.set("Capi:blockBreakY", block.y);
+    player.score.set("Capi:blockBreakZ", block.z);
 });
 
 world.afterEvents.playerLeave.subscribe(async playerLeave => {
@@ -567,11 +580,11 @@ world.afterEvents.buttonPush.subscribe(async buttonPush => {
     const { block, dimension, source: player } = buttonPush;
     const { x, y, z } = block;
 
-    if(!(player instanceof Minecraft.Player)) return;
+    if(!player.isPlayer()) return;
     
-    player.setScore("Capi:buttonXPos", x);
-    player.setScore("Capi:buttonYPos", y);
-    player.setScore("Capi:buttonZPos", z);
+    player.score.set("Capi:buttonXPos", x);
+    player.score.set("Capi:buttonYPos", y);
+    player.score.set("Capi:buttonZPos", z);
     player.addTag(`pushed`);
 });
 
