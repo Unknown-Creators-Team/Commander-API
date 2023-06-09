@@ -23,7 +23,7 @@ import { UI } from "./ui.js";
 
 const { world, system } = Minecraft;
 
-// #region プレイヤーのPrototype追加 
+// #region Prototype追加 
 // 知らないと思うんですけど！この26行目の↓みたいなの押せば閉じれるんですよねこれ！
 
 Minecraft.Player.prototype.setScore = function(object, score = 0, type = "set") {
@@ -113,6 +113,11 @@ system.run(() => configureNativeFunction());
 
 // @ts-ignore
 Minecraft.Entity.prototype.getTypedComponent = function(componentId) {
+    return this.getComponent(componentId);
+}
+
+// @ts-ignore
+Minecraft.ItemStack.prototype.getTypedComponent = function(componentId) {
     return this.getComponent(componentId);
 }
 
@@ -213,7 +218,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                 }
                 if (Data.enchants) {
                     /** @type { Minecraft.EnchantmentList } */
-                    const enchantments = item.getComponent("enchantments").enchantments;
+                    const enchantments = item.getTypedComponent("enchantments").enchantments;
                     for (let i = 0; i < Data.enchants.length; i++) {
                         if (!Data.enchants[i].name) return;
                         let enchantsName = Data.enchants[i].name;
@@ -221,7 +226,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                         if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
                         enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
                     }
-                    item.getComponent("enchantments").enchantments = enchantments;
+                    item.getTypedComponent("enchantments").enchantments = enchantments;
                 }
                 if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
                 if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);

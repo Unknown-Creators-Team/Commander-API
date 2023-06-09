@@ -2,12 +2,20 @@ import * as MC from "@minecraft/server";
 import * as MCUI from "@minecraft/server-ui";
 
 declare module "@minecraft/server" {
-    interface ComponentMap {
-        "inventory": MC.EntityInventoryComponent
+    interface EntityComponentMap {
+        "inventory": MC.EntityInventoryComponent;
+    }
+
+    interface ItemComponentMap {
+        "enchantments": MC.ItemEnchantsComponent;
     }
 
     interface Entity { // getComponentNew("inventory") -> Inventory index.jsの41行目
-        getTypedComponent<T extends keyof ComponentMap>(componentId: T): ComponentMap[T]
+        getTypedComponent<T extends keyof EntityComponentMap>(componentId: T): EntityComponentMap[T]
+    }
+
+    interface ItemStack {
+        getTypedComponent<T extends keyof ItemComponentMap>(componentId: T): ItemComponentMap[T];
     }
 
     interface Player {
