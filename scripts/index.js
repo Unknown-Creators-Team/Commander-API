@@ -232,6 +232,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
                         let enchantsName = Data.enchants[i].name;
                         let enchantsLevel = 1;
                         if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
+                        // MEMO: EnchantmentTypesに変更された？
                         enchantments.addEnchantment(new Minecraft.Enchantment(Minecraft.MinecraftEnchantmentTypes[enchantsName], enchantsLevel));
                     }
                     item.getTypedComponent("enchantments").enchantments = enchantments;
@@ -377,6 +378,7 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
             else if (player.dimension.id === "minecraft:the_end") player.setScore("Capi:dimension", 1);
             else player.setScore("Capi:dimension", -2);
 
+        // Question: これなに
         if (!player.pushedTime > 0) player.pushedTime = 0;
         if (player.pushedTime >= 1) player.pushedTime++;
         if (player.hasTag(`pushed`) && player.pushedTime == 0) player.pushedTime++;
@@ -399,8 +401,10 @@ tickEvent.subscribe("main", async ({currentTick, deltaTime, tps}) => { try {
 
 world.afterEvents.entityHit.subscribe(async entityHit => {
     const { entity: player, hitEntity: entity, hitBlock: block } = entityHit;
-    if (player.typeId !== "minecraft:player") return;
-    player.setScore("Capi:attacks", 1, "add");
+
+    if (!player.isPlayer()) return;
+
+    player.score.add("Capi:attacks", 1);
     player.addTag("Capi:attack");
     player.getTags().forEach(t => { if (t.startsWith("attacked:")) player.removeTag(t) });
     if (entity) player.addTag(`attacked:${entity.typeId}`);
@@ -411,14 +415,14 @@ world.afterEvents.entityHurt.subscribe(async entityHurt => {
     const { damage, damageSource, hurtEntity: entity } = entityHurt;
     const { cause, damagingEntity: player } = damageSource;
     
-    if (entity && entity.typeId === "minecraft:player") {
-        entity.setScore("Capi:hurt", damage);
+    if (entity && entity.isPlayer()) {
+        entity.score.set("Capi:hurt", damage);
         entity.addTag(`Capi:hurt`);
         entity.getTags().forEach(t => {if (t.startsWith("cause:")) entity.removeTag(t)});
         entity.addTag(`cause:${cause}`);
     }
-    if (player && player.typeId === "minecraft:player") {
-        player.setScore("Capi:damage", damage);
+    if (player && player.isPlayer()) {
+        player.score.set("Capi:damage", damage);
         player.addTag(`Capi:damage`);
     }
 });
@@ -427,23 +431,22 @@ world.afterEvents.entityDie.subscribe(entityDie => {
     const { damageSource, deadEntity: entity } = entityDie;
     const { damagingEntity: player, cause } = damageSource;
 
-    if (player && player?.typeId === "minecraft:player") {
+    if (player && player.isPlayer()) {
 
-        if (entity?.typeId === "minecraft:player") {
-            player.setScore("Capi:killPlayer", 1, "add");
+        if (entity && entity.isPlayer()) {
+            player.score.add("Capi:killPlayer", 1);
             player.addTag("Capi:killPlayer");
-            entity.setScore("Capi:deathPlayer", 1, "add");
+            entity.score.add("Capi:deathPlayer", 1);
             entity.addTag("Capi:deathPlayer");
         } else {
-            player.setScore("Capi:kill", 1, "add");
+            player.score.add("Capi:kill", 1);
             player.addTag("Capi:kill");
         }
     }
 
-    if (entity.typeId === "minecraft:player") {
-
-        if (player?.typeId !== "minecraft:player") {
-            entity.setScore("Capi:death", 1, "add");
+    if (entity.isPlayer()) {
+        if (!player.isPlayer()) {
+            entity.score.add("Capi:death", 1);
             entity.addTag("Capi:death");
         }
     }
@@ -453,7 +456,7 @@ world.beforeEvents.chatSend.subscribe(async chat => {
     const player = chat.sender;
 
     let msg = chat.message;
-    /** @type { false | string } */
+    /** @type { string } */
     let mute = false;
 
     player.getTags().forEach((t) => {
@@ -464,7 +467,7 @@ world.beforeEvents.chatSend.subscribe(async chat => {
     player.addTag(`Capi:chat`);
     player.addTag(`chat:${msg.replace(/"/g, "")}`);
     player.setScore("Capi:chatLength", msg.length, "settings");
-    player.setScore("Capi:chatCount", 1, "add");
+    player.score.add("Capi:chatCount", 1);
     if (Config.get("CancelSendMsgEnabled")) {
         const CancelSendMsg = Config.get("CancelSendMsg");
         const start = CancelSendMsg?.start.some(v => v.length && msg.startsWith(v));

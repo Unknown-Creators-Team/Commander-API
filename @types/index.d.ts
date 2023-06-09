@@ -37,6 +37,8 @@ declare module "@minecraft/server" {
 
         setItemJson?: any | false;
         formJson?: any | false;
+
+        pushedTime?: number;
     }
 
     export interface ScoreboardManager {
