@@ -56,13 +56,14 @@
 * プレイヤー退出時にメッセージを送信する
 * チャットのUIを変更する
 * 条件がそろったメッセージの送信をキャンセルする
+* 付与されたタグを何ticks後かに削除する（デフォルトで有効）
 
 ## セットアップ
 ① [リリース](https://github.com/191225/Commander-API/releases)からバージョンを選択し、`.mcpack`をダウンロードしてください。([最新のリリース](https://github.com/191225/Commander-API/releases/latest))<br>
 ② `.mcpack`をそのままマインクラフトにインポートしてください。(インポートの方法は解説しません)<br>
 ③ Commander APIをワールドに適用しワールドを開く。<br>
-④ `/function Capi_setup`を実行し、セットアップをする。<br>
-⑤ `/function Capi_config`で設定する。(オプション)
+④ `/function Capi/setup`を実行し、セットアップをする。<br>
+⑤ `/function Capi/config`で設定する。(オプション)
 
 ## Wiki
 Commander APIには機能が分かりやすく解説されたWikiがあります！<br>
