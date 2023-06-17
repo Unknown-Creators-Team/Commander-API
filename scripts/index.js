@@ -325,7 +325,7 @@ world.beforeEvents.chatSend.subscribe(chat => {
     
     player.getTags().forEach((t) => {
         t = t.replace(/"/g, "");
-        if (t.startsWith("chat:")) player.removeTag(t);
+        if (t.startsWith("chat:")) system.run(() => player.removeTag(t));
         if (t.startsWith("mute:")) mute = t.slice(5);
     });
     player.addTagWillRemove(`Capi:chat`);
@@ -346,7 +346,7 @@ world.beforeEvents.chatSend.subscribe(chat => {
     if (Config.get("ChatUIEnabled")) {
         chat.sendToTargets = true;
         const text = setVariable(player, String((Config.get("ChatUI"))));
-        world.sendMessage(text.replace("{message}", msg));
+        world.sendMessage(text.replace(/({message}|{msg})/gi, msg));
     }
 });
 
@@ -396,7 +396,10 @@ world.afterEvents.blockPlace.subscribe(blockPlace => {
 world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
     const { player, initialSpawn } = playerSpawn;
 
-    if (initialSpawn) player.join = true;
+    if (initialSpawn) {
+        player.join = true;
+        if (Config.hasAll("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", true);
+    }
 });
 
 world.afterEvents.projectileHit.subscribe(projectileHit => {

@@ -32,7 +32,6 @@ function createScoreboardManager(player) {
                 if (!objective) return undefined;
                 world.scoreboard.setScore(objective, player.scoreboardIdentity, score);
             } catch (e) {
-                console.warn(e);
                 player.runCommandAsync(`scoreboard players set @s "${objectName}" ${score}`);
             }
         },
