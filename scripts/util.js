@@ -15,8 +15,8 @@
 
 import * as Minecraft from "@minecraft/server";
 import ESON from "./lib/ESON.js";
-import getScore from "./lib/getScore.js";
 
+const { world, system } = Minecraft;
 
 /**
  * 
@@ -25,70 +25,66 @@ import getScore from "./lib/getScore.js";
  * @returns 
  */
 export function setVariable(player, text) {
-    return new Promise(async (resolve, reject) => { try {
-        if (!text?.length) resolve(text);
-        const dataLength = text.split("").filter(t => t === "{").length;
+    if (!(player instanceof Minecraft.Player)) return Error("player needs Player Class");
+    if (!text?.length) return text;
+    const dataLength = text.split("").filter(t => t === "{").length;
+    
+    if (!dataLength) return text;
+
+    for (let i = 0; i < dataLength; i++) {
+        text = text.replace(/({name}|{name,})/i, player.name);
+        text = text.replace(/({nametag}|{nametag,})/i, player.nameTag);
+        text = text.replace(/({nl}|{nl,})/i, `\n`);
+
+        // tag
+        try {
+            const tag = text.split("{tag:")[1].split(/(}|,})/i)[0];
+            const hasTag = player.getTags().find(t => t.split(":")[0] === tag);
+            if (tag) text = text.replace(new RegExp(`({tag:${tag}}|{tag:${tag},})`, "i"), hasTag.slice(tag.length + 1));
+        } catch {}
+
+        // score
+        try {
+            const score = text.split("{score:")[1].split(/(}|,})/i)[0];
+            const str = `${score}}`;
+            const object = easySafeParse(str);
+            if (Object.values(object).length === 0) {
+                if (score) text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(player, score));
+            } else if (Object.values(object).length > 0) {
+                const playerName = object.name || player;
+                const objectName = object.object;
+                text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(playerName, objectName));
+            }
+            
+        } catch (e) {}
+
+        // calc
+        try {
+            const calc = text.split("{calc:")[1].split(/(}|,})/i)[0];
+            if (calc && stringCalc(calc)) text = text.replace(new RegExp(`({calc:${calc}}|{calc:${calc},})`, "i"), `${stringCalc(calc)}`);
+        } catch {}
+
+        // dimension
+        try {
+            const dimension = Number(text.split("{dimension:")[1].split(/(}|,})/i)[0]);
+            if (typeof(dimension) === "number") {
+                if (dimension === 0) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "overworld");
+                if (dimension === -1) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "nether");
+                if (dimension === 1) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "end");
+                if (![-1, 0, 1].includes(dimension)) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "null");
+            }
+        } catch {}
         
-        for (let i = 0; i < dataLength; i++) {
-            text = text.replace(/({name}|{name,})/i, player.name);
-            text = text.replace(/({nametag}|{nametag,})/i, player.nameTag);
-            text = text.replace(/({nl}|{nl,})/i, `\n`);
-    
-            // tag
-            try {
-                const tag = text.split("{tag:")[1].split(/(}|,})/i)[0];
-                const hasTag = player.getTags().find(t => t.split(":")[0] === tag);
-                if (tag) text = text.replace(new RegExp(`({tag:${tag}}|{tag:${tag},})`, "i"), hasTag.slice(tag.length + 1));
-            } catch {}
-    
-            // score
-            try {
-                const score = text.split("{score:")[1].split(/(}|,})/i)[0];
-                const str = `${score}}`;
-                const object = await easySafeParse(str).catch(error => console.error(error, str));
-                if (Object.values(object).length === 0) {
-                    if (score) text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(player, score));
-                } else if (Object.values(object).length > 0) {
-                    const playerName = object.name || player;
-                    const objectName = object.object;
-                    text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(playerName, objectName));
-                }
-                
-            } catch {}
-    
-            // calc
-            try {
-                const calc = text.split("{calc:")[1].split(/(}|,})/i)[0];
-                if (calc && stringCalc(calc)) text = text.replace(new RegExp(`({calc:${calc}}|{calc:${calc},})`, "i"), `${stringCalc(calc)}`);
-            } catch {}
-    
-            // dimension
-            try {
-                const dimension = Number(text.split("{dimension:")[1].split(/(}|,})/i)[0]);
-                if (typeof(dimension) === "number") {
-                    if (dimension === 0) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "overworld");
-                    if (dimension === -1) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "nether");
-                    if (dimension === 1) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "end");
-                    if (![-1, 0, 1].includes(dimension)) dimension = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "null");
-                }
-            } catch {}
-        }
-        resolve(text);
-    } catch (e) {reject(e)}})
+        if (dataLength - i === 1) return text;
+    }
 }
 
 export const safeParse = (object) => {
-    return new Promise((resolve, reject) => {
-        try { resolve(JSON.parse(object))
-        } catch (e) { reject(e) }
-    });
+    return JSON.parse(object);
 }
 
 export const easySafeParse = (object) => {
-    return new Promise((resolve, reject) => {
-        try { resolve(ESON.parse(object))
-        } catch (e) { reject(e) }
-    });
+    return ESON.parse(object);
 }
 
 /**
@@ -96,6 +92,8 @@ export const easySafeParse = (object) => {
  * @param { string } pos pos
  * @param { Minecraft.Player } player player object
  * @param {( "x" | "y" | "z" | "rx" | "ry" )} type type of pos
+ * 
+ * @returns { number }
  */
 export const parsePos = (pos, player, type) => {
     if (pos) {
@@ -129,4 +127,34 @@ const stringCalc = (str) => {
       }
     }
     return result;
+}
+
+
+
+/**
+ * get score
+ * @param { Minecraft.Entity | string } target target
+ * @param { string } objective object name
+ * @returns { number | undefined }
+ */
+export function getScore(target, objective) {
+    // if target is a string, get the score by name
+    if (typeof(target) === "string") {
+        // get all scores in the objective
+        const scores = world.scoreboard.getObjective(objective).getScores();
+        // find the score with the matching name
+        const score = scores.find(({ participant }) => participant.displayName === target);
+        // return the score value
+        if (score) return score.score;
+        else return undefined;
+    } else {
+        // if target is a player, get the score by player
+        try {
+            // get the score by player
+            const score = target.scoreboardIdentity.getScore(world.scoreboard.getObjective(objective));
+            // return the score value
+            if (score) return score;
+                else return undefined;
+        } catch (e) { return undefined; }
+    }
 }

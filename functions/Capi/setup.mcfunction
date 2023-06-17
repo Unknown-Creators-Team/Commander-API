@@ -53,5 +53,8 @@ scoreboard objectives add Capi:deathPlayer dummy
 scoreboard objectives add Capi:itemUseOnX dummy
 scoreboard objectives add Capi:itemUseOnY dummy
 scoreboard objectives add Capi:itemUseOnZ dummy
+scoreboard objectives add Capi:vectorX dummy
+scoreboard objectives add Capi:vectorY dummy
+scoreboard objectives add Capi:vectorZ dummy
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false
