@@ -102,7 +102,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
         } catch { }
 
         // Set item
-        const container = player.getTypedComponent('inventory').container;
+        const container = player.getComponent('inventory').container;
         if (player.setItemJson) player.setItemJson.forEach(setItemJson => {
             try {
                 const Data = easySafeParse(setItemJson);
@@ -118,7 +118,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
                 }
                 if (Data.enchants) {
                     /** @type { Minecraft.EnchantmentList } */
-                    const enchantments = item.getTypedComponent("enchantments").enchantments;
+                    const enchantments = item.getComponent("enchantments").enchantments;
                     for (let i = 0; i < Data.enchants.length; i++) {
                         if (!Data.enchants[i].name) return;
                         let enchantsName = Data.enchants[i].name;
@@ -126,7 +126,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
                         if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
                         enchantments.addEnchantment(new Minecraft.Enchantment(enchantsName, enchantsLevel));
                     }
-                    item.getTypedComponent("enchantments").enchantments = enchantments;
+                    item.getComponent("enchantments").enchantments = enchantments;
                 }
                 if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
                 if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
@@ -230,7 +230,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
         player.score.set("Capi:vectorZ", Math.round(player.getViewDirection().z * 100));
     
         // health
-        const health = Math.round(player.getTypedComponent("health").current);
+        const health = Math.round(player.getComponent("health").current);
         player.score.set("Capi:health", health);
 
         // pos
@@ -254,18 +254,6 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
             else if (player.dimension.id === "minecraft:the_end") player.score.set("Capi:dimension", 1);
             else player.score.set("Capi:dimension", -2);
 
-        // Question: これなに
-        if (player.pushedTime < 0) player.pushedTime = 0;
-        if (player.pushedTime >= 1) player.pushedTime++;
-        if (player.hasTag(`pushed`) && player.pushedTime == 0) player.pushedTime++;
-        if (player.pushedTime > 10) {
-            // player.getTags().forEach(t => { if(t.startsWith("button:")) player.removeTag(t)});
-            const tag = player.getTags().find(t => t.startsWith("button:"));
-            if (tag) player.removeTag(tag);
-            player.removeTag(`pushed`);
-            player.pushedTime = 0;
-        }
-
         if (player.hasTag("Capi:open_config_gui")) {
             const ui = new UI(player);
             ui.Menu();
@@ -282,7 +270,7 @@ world.afterEvents.entityHit.subscribe(entityHit => {
 
     player.score.add("Capi:attacks", 1);
     player.addTagWillRemove("Capi:attack");
-    player.getTags().forEach(t => { if (t.startsWith("attacked:")) player.removeTag(t) });
+    player.removeTags(player.getTags().filter(t => t.startsWith("attacked:")));
     if (entity) player.addTagWillRemove(`attacked:${entity.typeId}`);
         else if (block) player.addTagWillRemove(`attacked:${block.typeId}`);
 });
@@ -294,7 +282,7 @@ world.afterEvents.entityHurt.subscribe(entityHurt => {
     if (entity && entity.isPlayer()) {
         entity.score.set("Capi:hurt", damage);
         entity.addTagWillRemove(`Capi:hurt`);
-        entity.getTags().forEach(t => {if (t.startsWith("cause:")) entity.removeTag(t)});
+        player.removeTags(player.getTags().filter(t => t.startsWith("cause:")));
         entity.addTagWillRemove(`cause:${cause}`);
     }
     if (player && player.isPlayer()) {
@@ -371,9 +359,7 @@ world.afterEvents.itemUse.subscribe(itemUse => {
         lore: item.getLore()
     }
 
-    player.getTags().forEach((t) => {
-        if (t.startsWith("itemUse:") || t.startsWith("itemUseD:")) player.removeTag(t);
-    });
+    player.removeTags(player.getTags().filter(t => t.startsWith("itemUse:") || t.startsWith("itemUseD:")));
 
     player.addTagWillRemove(`Capi:itemUse`);
     player.addTagWillRemove(`itemUse:${item.typeId}`);
@@ -389,9 +375,8 @@ world.afterEvents.itemUseOn.subscribe(async itemUseOn => {
     player.score.set("Capi:itemUseOnY", block.location.y);
     player.score.set("Capi:itemUseOnZ", block.location.z);
 
-    player.getTags().forEach((t) => {
-        if (t.startsWith("itemUseOn:")) player.removeTag(t);
-    });
+    player.removeTags(player.getTags().filter(t => t.startsWith("itemUseOn:")));
+
     player.addTagWillRemove(`Capi:itemUseOn`);
     player.addTagWillRemove(`itemUseOn:${block.typeId}`);
 })
@@ -399,9 +384,7 @@ world.afterEvents.itemUseOn.subscribe(async itemUseOn => {
 world.afterEvents.blockPlace.subscribe(blockPlace => {
     const { player, block } = blockPlace;
 
-    player.getTags().forEach((t) => {
-        if (t.startsWith("blockPlace:")) player.removeTag(t);
-    });
+    player.removeTags(player.getTags().filter(t => t.startsWith("blockPlace:")));
 
     player.addTagWillRemove(`Capi:blockPlace`);
     player.addTagWillRemove(`blockPlace:${block.typeId}`);
@@ -428,9 +411,7 @@ world.afterEvents.projectileHit.subscribe(projectileHit => {
         player.score.set("Capi:hitZ", Math.floor(hit.location.z));
     }
 
-    player.getTags().forEach((t) => {
-        if (t.startsWith("hitWith:") || t.startsWith("hitTo:")) player.removeTag(t);
-    });
+    player.removeTags(player.getTags().filter(t => t.startsWith("hitWith:") || t.startsWith("hitTo:")));
 
     player.addTagWillRemove(`Capi:hit`);
     player.addTagWillRemove(`hitWith:${projectile.typeId}`);
@@ -440,9 +421,7 @@ world.afterEvents.projectileHit.subscribe(projectileHit => {
 world.afterEvents.blockBreak.subscribe(async blockBreak => {
     const { player, block, brokenBlockPermutation } = blockBreak;
 
-    player.getTags().forEach((t) => {
-        if (t.startsWith("blockBreak:")) player.removeTag(t);
-    });
+    player.removeTags(player.getTags().filter(t => t.startsWith("blockBreak:")));
 
     player.addTagWillRemove(`Capi:blockBreak`);
     player.addTagWillRemove(`blockBreak:${brokenBlockPermutation.type.id}`);
@@ -465,7 +444,7 @@ world.afterEvents.buttonPush.subscribe(async buttonPush => {
     player.score.set("Capi:buttonXPos", x);
     player.score.set("Capi:buttonYPos", y);
     player.score.set("Capi:buttonZPos", z);
-    player.addTag(`pushed`);
+    player.addTagWillRemove(`Capi:pushed`);
 });
 
 system.events.scriptEventReceive.subscribe(scriptEventReceive => {
@@ -521,7 +500,7 @@ system.events.scriptEventReceive.subscribe(scriptEventReceive => {
         }
         if (object.enchants) {
             /** @type { Minecraft.EnchantmentList } */
-            const enchantments = item.getTypedComponent("enchantments").enchantments;
+            const enchantments = item.getComponent("enchantments").enchantments;
             for (let i = 0; i < object.enchants.length; i++) {
                 if (!object.enchants[i].name) return;
                 let enchantsName = object.enchants[i].name;
@@ -529,7 +508,7 @@ system.events.scriptEventReceive.subscribe(scriptEventReceive => {
                 if (object.enchants[i].level) enchantsLevel = Number(object.enchants[i].level);
                 enchantments.addEnchantment(new Minecraft.Enchantment(enchantsName, enchantsLevel));
             }
-            item.getTypedComponent("enchantments").enchantments = enchantments;
+            item.getComponent("enchantments").enchantments = enchantments;
         }
         if (object.can_place_on) item.setCanPlaceOn(object.can_place_on);
         if (object.can_destroy) item.setCanDestroy(object.can_destroy);

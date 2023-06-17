@@ -12,7 +12,7 @@ declare module "@minecraft/server" {
     }
 
     interface Entity { // getComponentNew("inventory") -> Inventory index.jsの41行目
-        getTypedComponent<T extends keyof EntityComponentMap>(componentId: T): EntityComponentMap[T]
+        getComponent<T extends keyof EntityComponentMap>(componentId: T): EntityComponentMap[T]
         isPlayer(): this is Player;
 
         addTags(tags: string[]): void;
@@ -21,7 +21,7 @@ declare module "@minecraft/server" {
     }
 
     interface ItemStack {
-        getTypedComponent<T extends keyof ItemComponentMap>(componentId: T): ItemComponentMap[T];
+        getComponent<T extends keyof ItemComponentMap>(componentId: T): ItemComponentMap[T];
     }
 
     interface Player {

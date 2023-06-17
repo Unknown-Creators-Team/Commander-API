@@ -79,37 +79,46 @@ export function configureNativeFunction () {
 };
 
 system.runInterval(() => configureNativeFunction());
-console.warn("NativeCode.js is loaded.")
+// console.warn("NativeCode.js is loaded.")
 
 // world.afterEvents.playerSpawn.subscribe(() => configureNativeFunction());
 
 // @ts-ignore
-Minecraft.Entity.prototype.getTypedComponent = function(componentId) {
-    return this.getComponent(componentId);
-}
+// Minecraft.Entity.prototype.getTypedComponent = function(componentId) {
+//     return this.getComponent(componentId);
+// }
 
-Minecraft.Entity.prototype.isPlayer = function() {
-    return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;
-}
+// Minecraft.Entity.prototype.isPlayer = function() {
+//     return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;
+// }
 
-Minecraft.Entity.prototype.addTags = function(tags) {
-    for(const tag of tags) {
-        this.addTag(tag);
-    }
-}
+// Minecraft.Entity.prototype.addTags = function(tags) {
+//     for (const tag of tags) this.addTag(tag);
+// }
 
-Minecraft.Entity.prototype.removeTags = function(tags) {
-    for(const tag of tags) {
-        this.removeTag(tag);
-    }
-}
+// Minecraft.Entity.prototype.removeTags = function(tags) {
+//     for(const tag of tags) this.removeTag(tag);
+// }
 
-Minecraft.Entity.prototype.addTagWillRemove = function(tag) {
-    this.addTag(tag);
-    system.runTimeout(() => this.removeTag(tag), Config.hasAll("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
-}
+// Minecraft.Player.prototype.addTagWillRemove = function(tag) {
+//     this.addTag(tag);
+//     system.runTimeout(() => this.removeTag(tag), Config.hasAll("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
+// }
+
+Object.assign(Minecraft.Entity.prototype, {
+    addTagWillRemove (tag) {
+        system.run(() => {
+            this.addTag(tag);
+            if (!Config.get("TagWillRemoveTickEnabled")) return;
+            system.runTimeout(() => this.removeTag(tag), Config.hasAll("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
+        });
+    },
+    removeTags (tags) {tags.forEach(tag => this.removeTag(tag));},
+    addTags (tags) {tags.forEach(tag => this.addTag(tag));},
+    isPlayer () {return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;},
+});
 
 // @ts-ignore
-Minecraft.ItemStack.prototype.getTypedComponent = function(componentId) {
-    return this.getComponent(componentId);
-}
+// Minecraft.ItemStack.prototype.getTypedComponent = function(componentId) {
+//     return this.getComponent(componentId);
+// }
