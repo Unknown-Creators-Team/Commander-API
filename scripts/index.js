@@ -505,6 +505,48 @@ world.afterEvents.buttonPush.subscribe(async buttonPush => {
     player.addTagWillRemove(`Capi:pushed`);
 });
 
+world.afterEvents.pressurePlatePush.subscribe(pressurePlatePush => {
+    const { block, dimension, source: player } = pressurePlatePush;
+    const { x, y, z } = block;
+
+    if(!player.isPlayer()) return;
+
+    player.score.set("Capi:plateX", x);
+    player.score.set("Capi:plateY", y);
+    player.score.set("Capi:plateZ", z);
+    player.addTagWillRemove(`Capi:pushed`);
+});
+
+world.afterEvents.pressurePlatePop.subscribe(pressurePlatePop => {
+    const { block, dimension } = pressurePlatePop;
+    const { x, y, z } = block;
+
+    const distance = (location) => Math.sqrt(((location.x - x) ** 2) + ((location.y - y) ** 2) + ((location.z - z) ** 2));
+
+    const player = world.getPlayers().reduce((a, b) => distance(a.location) < distance(b.location) ? a : b, world.getPlayers()[0]);
+    
+    if(!player.isPlayer()) return;
+
+    player.score.set("Capi:plateX", x);
+    player.score.set("Capi:plateY", y);
+    player.score.set("Capi:plateZ", z);
+    player.addTagWillRemove(`Capi:pop`);
+});
+
+world.afterEvents.tripWireTrip.subscribe(tripWireTrip => {
+    const { block, dimension, sources: players } = tripWireTrip;
+    const { x, y, z } = block;
+
+    players.forEach(player => {
+        if(!player.isPlayer()) return;
+
+        player.score.set("Capi:tripX", x);
+        player.score.set("Capi:tripY", y);
+        player.score.set("Capi:tripZ", z);
+        player.addTagWillRemove(`Capi:trip`);
+    });
+});
+
 system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
     const { id, initiator, message, sourceBlock, sourceEntity, sourceType } = scriptEventReceive;
     const type = id.split(":")[1];
