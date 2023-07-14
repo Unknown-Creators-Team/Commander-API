@@ -299,6 +299,9 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
             else if (player.dimension.id === "minecraft:the_end") player.score.set("Capi:dimension", 1);
             else player.score.set("Capi:dimension", -2);
 
+        // fall distance
+        player.score.set("Capi:fall", Math.round(player.fallDistance));
+
         if (player.hasTag("Capi:open_config_gui")) {
             const ui = new UI(player);
             ui.Menu();

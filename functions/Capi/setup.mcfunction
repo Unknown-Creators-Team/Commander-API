@@ -62,5 +62,6 @@ scoreboard objectives add Capi:plateZ dummy
 scoreboard objectives add Capi:tripX dummy
 scoreboard objectives add Capi:tripY dummy
 scoreboard objectives add Capi:tripZ dummy
+scoreboard objectives add Capi:fall dummy
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false
