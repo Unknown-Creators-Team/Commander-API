@@ -547,6 +547,20 @@ world.afterEvents.tripWireTrip.subscribe(tripWireTrip => {
     });
 });
 
+world.afterEvents.targetBlockHit.subscribe(targetBlockHit => {
+    const { block, dimension, source: player, previousRedstonePower, redstonePower } = targetBlockHit;
+    const { x, y, z } = block;
+
+    if(!player.isPlayer()) return;
+
+    player.score.set("Capi:targetHitX", x);
+    player.score.set("Capi:targetHitY", y);
+    player.score.set("Capi:targetHitZ", z);
+    player.score.set("Capi:targetHitPower", redstonePower);
+    
+    player.addTagWillRemove(`Capi:targetHit`);
+});
+
 system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
     const { id, initiator, message, sourceBlock, sourceEntity, sourceType } = scriptEventReceive;
     const type = id.split(":")[1];
