@@ -114,7 +114,7 @@ export const parsePos = (pos, player, type) => {
  * @returns { number | string | undefined }
  */
 const stringCalc = (str) => {
-    if (str.match(/[^0-9-+*/% ]/g)) return false;
+    if (str.match(/[^0-9-+*/% ]/g)) return undefined;
     str = str.split(" ");
     let result = Number(str[0]);
     for (let i = 1; i < str.length;i++) {
@@ -151,7 +151,7 @@ export function getScore(target, objective) {
         // if target is a player, get the score by player
         try {
             // get the score by player
-            const score = target.scoreboardIdentity.getScore(world.scoreboard.getObjective(objective));
+            const score = world.scoreboard.getObjective(objective).getScore(target);
             // return the score value
             if (score) return score;
                 else return undefined;
