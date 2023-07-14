@@ -59,5 +59,8 @@ scoreboard objectives add Capi:vectorZ dummy
 scoreboard objectives add Capi:plateX dummy
 scoreboard objectives add Capi:plateY dummy
 scoreboard objectives add Capi:plateZ dummy
+scoreboard objectives add Capi:tripX dummy
+scoreboard objectives add Capi:tripY dummy
+scoreboard objectives add Capi:tripZ dummy
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false
