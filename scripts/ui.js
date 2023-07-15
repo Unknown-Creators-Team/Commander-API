@@ -74,7 +74,7 @@ export class UI {
         .title("§lCommander API")
         .textField("メッセージ", "(例) {name} がサーバーから抜けた！", Config.get("LeaveMsg") || null)
         .show(this.player).then(response => {
-            if (response.formValues[0]?.length) Config.set("LeaveMsg", String(response.formValues[0]));
+            if (response.formValues && response.formValues[0]?.length) Config.set("LeaveMsg", String(response.formValues[0]));
                 else if (!response.canceled) Config.set("LeaveMsg", null);
             this.LeaveMsg();
         });
@@ -107,7 +107,7 @@ export class UI {
         .title("§lCommander API")
         .textField("UI", "(例) {name} >> {message}", Config.get("ChatUI") || null)
         .show(this.player).then(response => {
-            if (response.formValues[0]?.length) Config.set("ChatUI", String(response.formValues[0]));
+            if (response.formValues && response.formValues[0]?.length) Config.set("ChatUI", String(response.formValues[0]));
                 else if (!response.canceled) Config.set("ChatUI", null);
             this.ChatUI();
         });
@@ -141,12 +141,15 @@ export class UI {
         .textField("で終わっているか", "(例) ,, ., :)", Config.get("CancelSendMsg")?.end.join(", ") || null)
         .textField("が含まれているか", "(例) help, !Form", Config.get("CancelSendMsg")?.include.join(", ") || null)
         .show(this.player).then(response => {
-            const object = {
-                start: response.formValues[0]?.split(", "),
-                end: response.formValues[1]?.split(", "),
-                include: response.formValues[2]?.split(", ")
+            if (response.formValues) {
+                const object = {
+                    start: response.formValues[0]?.split(", "),
+                    end: response.formValues[1]?.split(", "),
+                    include: response.formValues[2]?.split(", ")
+                }
+                Config.set("CancelSendMsg", object);
             }
-            Config.set("CancelSendMsg", object);
+            
             this.CancelSendMsg();
         });
     }
@@ -175,9 +178,9 @@ export class UI {
     TagWillRemoveTickConfig() {
         const Form = new MinecraftUI.ModalFormData()
         .title("§lCommander API")
-        .textField("Tick", "(例) 20", Config.get("TagWillRemoveTick") || null)
+        .textField("Tick", "(例) 20", String(Config.get("TagWillRemoveTick")) || "20")
         .show(this.player).then(response => {
-            if (response.formValues[0]?.length) Config.set("TagWillRemoveTick", Number(response.formValues[0]));
+            if (response.formValues && response.formValues[0].length) Config.set("TagWillRemoveTick", Number(response.formValues[0]));
                 else if (!response.canceled) Config.set("TagWillRemoveTick", null);
             this.TagWillRemoveTick();
         });

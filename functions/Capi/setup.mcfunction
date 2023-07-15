@@ -62,13 +62,10 @@ scoreboard objectives add Capi:plateZ dummy
 scoreboard objectives add Capi:tripX dummy
 scoreboard objectives add Capi:tripY dummy
 scoreboard objectives add Capi:tripZ dummy
-<<<<<<< HEAD
 scoreboard objectives add Capi:fall dummy
-=======
 scoreboard objectives add Capi:targetHitX dummy
 scoreboard objectives add Capi:targetHitY dummy
 scoreboard objectives add Capi:targetHitZ dummy
 scoreboard objectives add Capi:targetHitPower dummy
->>>>>>> e127d0f260861bd5b267eb55a7d3f77a361d7a80
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false
