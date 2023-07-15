@@ -556,12 +556,12 @@ world.afterEvents.targetBlockHit.subscribe(targetBlockHit => {
 
     if(!player.isPlayer()) return;
 
-    player.score.set("Capi:tHitX", x);
-    player.score.set("Capi:tHitY", y);
-    player.score.set("Capi:tHitZ", z);
-    player.score.set("Capi:tHitPower", redstonePower);
+    player.score.set("Capi:targetX", x);
+    player.score.set("Capi:targetY", y);
+    player.score.set("Capi:targetZ", z);
+    player.score.set("Capi:targetPower", redstonePower);
     
-    player.addTagWillRemove(`Capi:tHit`);
+    player.addTagWillRemove(`Capi:target`);
 });
 
 system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
