@@ -66,6 +66,7 @@ scoreboard objectives add Capi:tHitX dummy
 scoreboard objectives add Capi:tHitY dummy
 scoreboard objectives add Capi:tHitZ dummy
 scoreboard objectives add Capi:tHitPower dummy
+scoreboard objectives add Capi:fall dummy
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false
 
