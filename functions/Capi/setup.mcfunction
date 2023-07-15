@@ -59,5 +59,13 @@ scoreboard objectives add Capi:vectorZ dummy
 scoreboard objectives add Capi:plateX dummy
 scoreboard objectives add Capi:plateY dummy
 scoreboard objectives add Capi:plateZ dummy
+scoreboard objectives add Capi:tripX dummy
+scoreboard objectives add Capi:tripY dummy
+scoreboard objectives add Capi:tripZ dummy
+scoreboard objectives add Capi:targetX dummy
+scoreboard objectives add Capi:targetY dummy
+scoreboard objectives add Capi:targetZ dummy
+scoreboard objectives add Capi:targetPower dummy
+scoreboard objectives add Capi:fall dummy
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false

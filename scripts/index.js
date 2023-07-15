@@ -299,6 +299,9 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
             else if (player.dimension.id === "minecraft:the_end") player.score.set("Capi:dimension", 1);
             else player.score.set("Capi:dimension", -2);
 
+        // fall distance
+        player.score.set("Capi:fall", Math.round(player.fallDistance));
+
         if (player.hasTag("Capi:open_config_gui")) {
             const ui = new UI(player);
             ui.Menu();
@@ -545,6 +548,20 @@ world.afterEvents.tripWireTrip.subscribe(tripWireTrip => {
         player.score.set("Capi:tripZ", z);
         player.addTagWillRemove(`Capi:trip`);
     });
+});
+
+world.afterEvents.targetBlockHit.subscribe(targetBlockHit => {
+    const { block, dimension, source: player, previousRedstonePower, redstonePower } = targetBlockHit;
+    const { x, y, z } = block;
+
+    if(!player.isPlayer()) return;
+
+    player.score.set("Capi:targetX", x);
+    player.score.set("Capi:targetY", y);
+    player.score.set("Capi:targetZ", z);
+    player.score.set("Capi:targetPower", redstonePower);
+    
+    player.addTagWillRemove(`Capi:target`);
 });
 
 system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
