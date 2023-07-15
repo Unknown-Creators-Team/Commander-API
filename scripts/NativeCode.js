@@ -114,7 +114,10 @@ Object.assign(Minecraft.Entity.prototype, {
     },
     removeTags (tags) {tags.forEach(tag => this.removeTag(tag));},
     addTags (tags) {tags.forEach(tag => this.addTag(tag));},
-    isPlayer () {return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;},
+    isPlayer () {
+        if (!this.isValid()) return false;
+        return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;
+    },
 });
 
 // @ts-ignore

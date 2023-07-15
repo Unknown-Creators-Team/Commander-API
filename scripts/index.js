@@ -14,6 +14,7 @@
 
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
+// import * as MinecraftVanilla from "@minecraft/vanilla-data";
 import tickEvent from "./lib/TickEvent.js";
 import { Database, ExtendedDatabase } from "./lib/Database.js";
 import { easySafeParse, parsePos, safeParse, setVariable, getScore } from "./util.js";
@@ -24,8 +25,14 @@ import "./NativeCode.js";
 
 const { world, system } = Minecraft;
 
+system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => beforeWatchdogTerminate.cancel = true);
+
 tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
-    world.getPlayers().forEach((player) => {
+    world.getPlayers().forEach((PLAYER) => {
+        const player = PLAYER;
+
+        if (!player.isValid()) return;
+
         player.getTags().forEach((t) => {
             if (t.startsWith("rename:")) {
                 player.rename = t.replace("rename:", "");
@@ -61,7 +68,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
                 player.knockback = t.replace("knockback:","").replace(/'/g, "\"");
                 player.removeTag(t);
             }
-            if (t === "kill") {
+            if (t.startsWith("kill:")) {
                 player.kill();
                 player.removeTag(t);
             }
@@ -71,9 +78,47 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
         if (player.isOp()) player.addTag("Capi:hasOp");
             else player.removeTag("Capi:hasOp");
 
+        // flying
+        if (player.isFlying) player.addTag("Capi:flying");
+            else player.removeTag("Capi:flying");
+
+        // gliding
+        if (player.isGliding) player.addTag("Capi:gliding");
+            else player.removeTag("Capi:gliding");
+
+        // jumping
+        if (player.isJumping) player.addTag("Capi:jumping");
+            else player.removeTag("Capi:jumping");
+
+        // climbing
+        if (player.isClimbing) player.addTag("Capi:climbing");
+            else player.removeTag("Capi:climbing");
+
+        // falling
+        if (player.isFalling) player.addTag("Capi:falling");
+            else player.removeTag("Capi:falling");
+            
+        // in water
+        if (player.isInWater) player.addTag("Capi:inWater");
+            else player.removeTag("Capi:inWater");
+
+        // on ground
+        if (player.isOnGround) player.addTag("Capi:onGround");
+            else player.removeTag("Capi:onGround");
+
         // sneaking
         if (player.isSneaking) player.addTag("Capi:sneaking");
         else player.removeTag("Capi:sneaking");
+
+        // sprinting
+        if (player.isSprinting) player.addTag("Capi:sprinting");
+            else player.removeTag("Capi:sprinting");
+
+        // swimming
+        if (player.isSwimming) player.addTag("Capi:swimming");
+            else player.removeTag("Capi:swimming");
+
+        
         
         // tshoot
         if (player.hasTag("Capi:system_tshoot")) {
@@ -230,7 +275,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
         player.score.set("Capi:vectorZ", Math.round(player.getViewDirection().z * 100));
     
         // health
-        const health = Math.round(player.getComponent("health").current);
+        const health = Math.round(player.getComponent("health").currentValue);
         player.score.set("Capi:health", health);
 
         // pos
@@ -254,6 +299,9 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
             else if (player.dimension.id === "minecraft:the_end") player.score.set("Capi:dimension", 1);
             else player.score.set("Capi:dimension", -2);
 
+        // fall distance
+        player.score.set("Capi:fall", Math.round(player.fallDistance));
+
         if (player.hasTag("Capi:open_config_gui")) {
             const ui = new UI(player);
             ui.Menu();
@@ -263,16 +311,26 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
     console.error(e, e.stack)
 }});
 
-world.afterEvents.entityHit.subscribe(entityHit => {
-    const { entity: player, hitEntity: entity, hitBlock: block } = entityHit;
+world.afterEvents.entityHitEntity.subscribe(entityHitEntity => {
+    const { damagingEntity: player, hitEntity: entity } = entityHitEntity;
 
     if (!player.isPlayer()) return;
 
     player.score.add("Capi:attacks", 1);
     player.addTagWillRemove("Capi:attack");
     player.removeTags(player.getTags().filter(t => t.startsWith("attacked:")));
-    if (entity) player.addTagWillRemove(`attacked:${entity.typeId}`);
-        else if (block) player.addTagWillRemove(`attacked:${block.typeId}`);
+    player.addTagWillRemove(`attacked:${entity.typeId}`);
+});
+
+world.afterEvents.entityHitBlock.subscribe(entityHitBlock => {
+    const { damagingEntity: player, hitBlock: block } = entityHitBlock;
+
+    if (!player.isPlayer()) return;
+
+    player.score.add("Capi:attacks", 1);
+    player.addTagWillRemove("Capi:attack");
+    player.removeTags(player.getTags().filter(t => t.startsWith("attacked:")));
+    player.addTagWillRemove(`attacked:${block.typeId}`);
 });
 
 world.afterEvents.entityHurt.subscribe(entityHurt => {
@@ -450,7 +508,63 @@ world.afterEvents.buttonPush.subscribe(async buttonPush => {
     player.addTagWillRemove(`Capi:pushed`);
 });
 
-system.events.scriptEventReceive.subscribe(scriptEventReceive => {
+world.afterEvents.pressurePlatePush.subscribe(pressurePlatePush => {
+    const { block, dimension, source: player } = pressurePlatePush;
+    const { x, y, z } = block;
+
+    if(!player.isPlayer()) return;
+
+    player.score.set("Capi:plateX", x);
+    player.score.set("Capi:plateY", y);
+    player.score.set("Capi:plateZ", z);
+    player.addTagWillRemove(`Capi:pushed`);
+});
+
+world.afterEvents.pressurePlatePop.subscribe(pressurePlatePop => {
+    const { block, dimension } = pressurePlatePop;
+    const { x, y, z } = block;
+
+    const distance = (location) => Math.sqrt(((location.x - x) ** 2) + ((location.y - y) ** 2) + ((location.z - z) ** 2));
+
+    const player = world.getPlayers().reduce((a, b) => distance(a.location) < distance(b.location) ? a : b, world.getPlayers()[0]);
+    
+    if(!player.isPlayer()) return;
+
+    player.score.set("Capi:plateX", x);
+    player.score.set("Capi:plateY", y);
+    player.score.set("Capi:plateZ", z);
+    player.addTagWillRemove(`Capi:pop`);
+});
+
+world.afterEvents.tripWireTrip.subscribe(tripWireTrip => {
+    const { block, dimension, sources: players } = tripWireTrip;
+    const { x, y, z } = block;
+
+    players.forEach(player => {
+        if(!player.isPlayer()) return;
+
+        player.score.set("Capi:tripX", x);
+        player.score.set("Capi:tripY", y);
+        player.score.set("Capi:tripZ", z);
+        player.addTagWillRemove(`Capi:trip`);
+    });
+});
+
+world.afterEvents.targetBlockHit.subscribe(targetBlockHit => {
+    const { block, dimension, source: player, previousRedstonePower, redstonePower } = targetBlockHit;
+    const { x, y, z } = block;
+
+    if(!player.isPlayer()) return;
+
+    player.score.set("Capi:targetX", x);
+    player.score.set("Capi:targetY", y);
+    player.score.set("Capi:targetZ", z);
+    player.score.set("Capi:targetPower", redstonePower);
+    
+    player.addTagWillRemove(`Capi:target`);
+});
+
+system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
     const { id, initiator, message, sourceBlock, sourceEntity, sourceType } = scriptEventReceive;
     const type = id.split(":")[1];
     const player = sourceBlock || sourceEntity;
