@@ -9,14 +9,6 @@ Commander APIとは統合版のコマンドを大幅に拡張するアドオン�
 他のアドオンと重複しないように設計されています。<br>
 機能の提案は[サポートサーバー](https://discord.gg/QF3n85dr4P)にてご提案ください。
 
-## 開発者
-* ### Nano
-[Github](https://github.com/191225/)
-* ### Arutaka
-[Github](https://github.com/arutaka1220)
-
-***
-
 # セットアップ
 ① [リリース](https://github.com/191225/Commander-API/releases)からバージョンを選択し、`.mcpack`をダウンロードしてください。([最新のリリース](https://github.com/191225/Commander-API/releases/latest))<br>
 ② `.mcpack`をそのままマインクラフトにインポートしてください。(インポートの方法は解説しません)<br>

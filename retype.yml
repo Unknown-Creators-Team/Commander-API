@@ -4,6 +4,7 @@ url: c-api.docs.un-known.xyz # Add your website here
 branding:
   title: Commander API
   label: v1.6.0
+  logo: https://www.un-known.xyz/images/projects/commander_api-icon.webp
 poweredByRetype: true # Set to false to remove the Powered by Retype branding.
                       # A Retype Pro license is required.
                       # See: https://retype.com/pro
