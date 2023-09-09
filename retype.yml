@@ -1,6 +1,6 @@
 input: .
 output: .retype
-url: docs.un-known.xyz # Add your website here
+url: c-api.docs.un-known.xyz # Add your website here
 branding:
   title: Commander API
   label: v1.6.0
@@ -9,6 +9,6 @@ poweredByRetype: true # Set to false to remove the Powered by Retype branding.
                       # See: https://retype.com/pro
 links:
   - text: Getting Started
-    link: https://retype.com/guides/getting-started/
+    link: https://c-api.docs.un-known.xyz/guides/getting-started/
 footer:
   copyright: "&copy; Copyright. All rights reserved."
