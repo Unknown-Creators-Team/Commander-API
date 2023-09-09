@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://docs.un-known.xyz/sitemap.xml.gz
+Sitemap: https://c-api.docs.un-known.xyz/sitemap.xml.gz
