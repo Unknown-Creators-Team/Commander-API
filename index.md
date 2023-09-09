@@ -1,4 +1,4 @@
-# Welcome to the Commander API Wiki!!
+# Home
 Commander APIのWikiへようこそ！<br>
 このページではCommander APIで使える機能を細かく解説しています。<br>
 わからないところや不備などありましたら、[サポートサーバー](https://discord.gg/QF3n85dr4P)にてお問い合わせください。
