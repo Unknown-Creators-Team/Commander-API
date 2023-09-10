@@ -1,3 +1,15 @@
+---
+label: 退出メッセージ
+icon: arrow-left
+authors:
+  - name: Nano
+    email: nano@un-known.xyz
+    link: https://twitter.com/Nano191225
+    avatar: /images/nano-icon.png
+date: 2023-09-10T11:00
+description: プレイヤーがワールドを退出したときに送信するメッセージを設定します。
+layout: default
+---
 プレイヤーがワールドを退出したときに送信するメッセージを設定します。<br><br>
 
 <div align="center">

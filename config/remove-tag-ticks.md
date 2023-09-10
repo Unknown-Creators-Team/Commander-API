@@ -1,3 +1,15 @@
+---
+label: タグ自動削除
+icon: diff-removed
+authors:
+  - name: Nano
+    email: nano@un-known.xyz
+    link: https://twitter.com/Nano191225
+    avatar: /images/nano-icon.png
+date: 2023-09-10T11:00
+description: Commander APIによって付与されたタグを自動で削除するticksを設定します。
+layout: default
+---
 Commander APIによって付与されたタグを自動で削除するticksを設定します。
 
 <div align="center">

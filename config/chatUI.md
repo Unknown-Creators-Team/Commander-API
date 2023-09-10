@@ -1,3 +1,15 @@
+---
+label: チャットUI
+icon: comment
+authors:
+  - name: Nano
+    email: nano@un-known.xyz
+    link: https://twitter.com/Nano191225
+    avatar: /images/nano-icon.png
+date: 2023-09-10T11:00
+description: チャットのUIを変更します。
+layout: default
+---
 チャットのUIを変更します。<br><br>
 
 <div align="center">
