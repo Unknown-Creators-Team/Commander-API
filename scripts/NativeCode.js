@@ -116,7 +116,7 @@ Object.assign(Minecraft.Entity.prototype, {
     addTags (tags) {tags.forEach(tag => this.addTag(tag));},
     isPlayer () {
         if (!this.isValid()) return false;
-        return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;
+        return this.typeId === "minecraft:player" || this instanceof Minecraft.Player;
     },
 });
 

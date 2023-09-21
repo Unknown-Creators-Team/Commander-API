@@ -25,7 +25,7 @@ const { world, system } = Minecraft;
  * @returns 
  */
 export function setVariable(player, text) {
-    if (!(player instanceof Minecraft.Player)) return Error("player needs Player Class");
+    if (!(player instanceof Minecraft.Player)) throw Error("player needs Player Class");
     if (!text?.length) return text;
     const dataLength = text.split("").filter(t => t === "{").length;
     
@@ -49,11 +49,11 @@ export function setVariable(player, text) {
             const str = `${score}}`;
             const object = easySafeParse(str);
             if (Object.values(object).length === 0) {
-                if (score) text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(player, score));
+                if (score) text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(player, score).toString());
             } else if (Object.values(object).length > 0) {
                 const playerName = object.name || player;
                 const objectName = object.object;
-                text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(playerName, objectName));
+                text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(playerName, objectName).toString());
             }
             
         } catch (e) {}

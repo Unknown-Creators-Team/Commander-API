@@ -15,7 +15,7 @@
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 import tickEvent from "./lib/TickEvent";
-import { Database, ExtendedDatabase } from "./lib/Database";
+import { ScoreboardDatabase } from "./lib/DatabaseMC";
 import { setVariable, getScore } from "./util";
 import Config from "./config";
 
