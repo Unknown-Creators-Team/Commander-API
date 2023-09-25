@@ -106,17 +106,19 @@ system.runInterval(() => configureNativeFunction());
 
 Object.assign(Minecraft.Entity.prototype, {
     addTagWillRemove (tag) {
+        if (!Config.has("TagWillRemoveTick"))
+            Config.set("TagWillRemoveTick", 10);
         system.run(() => {
             this.addTag(tag);
             if (!Config.get("TagWillRemoveTickEnabled")) return;
-            system.runTimeout(() => this.removeTag(tag), Config.hasAll("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
+            system.runTimeout(() => this.removeTag(tag), Config.has("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
         });
     },
     removeTags (tags) {tags.forEach(tag => this.removeTag(tag));},
     addTags (tags) {tags.forEach(tag => this.addTag(tag));},
     isPlayer () {
         if (!this.isValid()) return false;
-        return this.typeId === Minecraft.MinecraftEntityTypes.player.id || this instanceof Minecraft.Player;
+        return this.typeId === "minecraft:player" || this instanceof Minecraft.Player;
     },
 });
 

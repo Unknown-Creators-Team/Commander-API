@@ -16,7 +16,7 @@ import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 // import * as MinecraftVanilla from "@minecraft/vanilla-data";
 import tickEvent from "./lib/TickEvent.js";
-import { Database, ExtendedDatabase } from "./lib/Database.js";
+import { ScoreboardDatabase } from "./lib/DatabaseMC.js";
 import { easySafeParse, parsePos, safeParse, setVariable, getScore } from "./util.js";
 import Config from "./config.js";
 import ESON from "./lib/ESON.js";
@@ -118,8 +118,14 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
         if (player.isSwimming) player.addTag("Capi:swimming");
             else player.removeTag("Capi:swimming");
 
-        
-        
+        // sleeping
+        if (player.isSleeping) player.addTag("Capi:sleeping");
+            else player.removeTag("Capi:sleeping");
+
+        // emoting
+        if (player.isEmoting) player.addTag("Capi:emoting");
+            else player.removeTag("Capi:emoting");
+    
         // tshoot
         if (player.hasTag("Capi:system_tshoot")) {
             player.getTags().forEach((t) => player.removeTag(t));
@@ -439,7 +445,7 @@ world.afterEvents.itemUseOn.subscribe(async itemUseOn => {
     player.addTagWillRemove(`itemUseOn:${block.typeId}`);
 })
 
-world.afterEvents.blockPlace.subscribe(blockPlace => {
+world.afterEvents.playerPlaceBlock.subscribe(blockPlace => {
     const { player, block } = blockPlace;
 
     player.removeTags(player.getTags().filter(t => t.startsWith("blockPlace:")));
@@ -460,11 +466,11 @@ world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
     }
 });
 
-world.afterEvents.projectileHit.subscribe(projectileHit => {
+world.afterEvents.projectileHitBlock.subscribe(projectileHit => {
     const { projectile, source: player } = projectileHit;
     if (!player.isPlayer()) return;
 
-    const hit = projectileHit.getBlockHit()?.block || projectileHit.getEntityHit()?.entity;
+    const hit = projectileHit.getBlockHit().block;
 
     if (hit) {
         player.score.set("Capi:hitX", Math.floor(hit.location.x));
@@ -479,7 +485,26 @@ world.afterEvents.projectileHit.subscribe(projectileHit => {
     player.addTagWillRemove(`hitTo:${hit.typeId}`);
 });
 
-world.afterEvents.blockBreak.subscribe(async blockBreak => {
+world.afterEvents.projectileHitEntity.subscribe(projectileHit => {
+    const { projectile, source: player } = projectileHit;
+    if (!player.isPlayer()) return;
+
+    const hit = projectileHit.getEntityHit().entity;
+
+    if (hit) {
+        player.score.set("Capi:hitX", Math.floor(hit.location.x));
+        player.score.set("Capi:hitY", Math.floor(hit.location.y));
+        player.score.set("Capi:hitZ", Math.floor(hit.location.z));
+    }
+
+    player.removeTags(player.getTags().filter(t => t.startsWith("hitWith:") || t.startsWith("hitTo:")));
+
+    player.addTagWillRemove(`Capi:hit`);
+    player.addTagWillRemove(`hitWith:${projectile.typeId}`);
+    player.addTagWillRemove(`hitTo:${hit.typeId}`);
+});
+
+world.afterEvents.playerBreakBlock.subscribe(async blockBreak => {
     const { player, block, brokenBlockPermutation } = blockBreak;
 
     player.removeTags(player.getTags().filter(t => t.startsWith("blockBreak:")));

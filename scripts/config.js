@@ -12,6 +12,6 @@
  * @LINK https://github.com/191225/Commander-API
  */
 
-import { Database, ExtendedDatabase } from "./lib/Database";
-const Config = new Database("Capi:CONFIG");
+import { ScoreboardDatabase } from "./lib/DatabaseMC";
+const Config = new ScoreboardDatabase("Capi_CONFIG");
 export default Config;
