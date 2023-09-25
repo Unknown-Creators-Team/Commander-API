@@ -1,6 +1,6 @@
 {
   "name": "commander-api",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "<div align=\"center\">",
   "main": "index.js",
   "scripts": {

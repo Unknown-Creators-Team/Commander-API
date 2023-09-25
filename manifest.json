@@ -4,12 +4,12 @@
 		"name": "Commander API",
 		"description": "マインクラフト統合版のコマンドを拡張します。",
 		"uuid": "ebac7142-c210-4d32-87ba-5650be52f456",
-		"version": [ 1, 7, 0 ],
+		"version": [ 1, 7, 1 ],
 		"min_engine_version": [ 1, 19, 0 ]
 	},
 	"metadata": {
 		"authors": ["Nano191225", "arutaka1220"],
-		"url": "https://github.com/191225/Commander-API"
+		"url": "https://github.com/Unknown-Creators-Team/Commander-API"
 	},
 	"modules": [
 		{
