@@ -121,11 +121,6 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
         // sleeping
         if (player.isSleeping) player.addTag("Capi:sleeping");
             else player.removeTag("Capi:sleeping");
-
-        // emoting
-        if (player.isEmoting) player.addTag("Capi:emoting");
-            else player.removeTag("Capi:emoting");
-
     
         // tshoot
         if (player.hasTag("Capi:system_tshoot")) {

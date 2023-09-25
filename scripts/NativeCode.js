@@ -106,10 +106,12 @@ system.runInterval(() => configureNativeFunction());
 
 Object.assign(Minecraft.Entity.prototype, {
     addTagWillRemove (tag) {
+        if (!Config.has("TagWillRemoveTick"))
+            Config.set("TagWillRemoveTick", 10);
         system.run(() => {
             this.addTag(tag);
             if (!Config.get("TagWillRemoveTickEnabled")) return;
-            system.runTimeout(() => this.removeTag(tag), Config.hasAll("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
+            system.runTimeout(() => this.removeTag(tag), Config.has("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
         });
     },
     removeTags (tags) {tags.forEach(tag => this.removeTag(tag));},
