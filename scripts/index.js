@@ -407,6 +407,16 @@ world.beforeEvents.chatSend.subscribe(chat => {
         player.sendMessage(mute.length ? mute : "§cYou have been muted.");
         return chat.cancel = true;
     }
+    if (player.score.get("Capi:privatechat")) {
+        const resident = world.getPlayers()
+        .filter(p => p.score.get("Capi:privatechat") === player.score.get("Capi:privatechat"));
+        
+        resident.forEach(p => {
+            p.sendMessage(`§i【プライベート】§r §l${player.name}§r §7>>§r ${msg}`);
+        });
+
+        return chat.cancel = true;
+    }
     if (Config.get("ChatUIEnabled")) {
         chat.sendToTargets = true;
         const text = setVariable(player, String((Config.get("ChatUI"))));
@@ -462,6 +472,7 @@ world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
 
     if (initialSpawn) {
         player.join = true;
+        player.runCommandAsync("function Capi/setup");
         if (Config.hasAll("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", true);
     }
 });
@@ -587,6 +598,31 @@ world.afterEvents.targetBlockHit.subscribe(targetBlockHit => {
     player.score.set("Capi:targetPower", redstonePower);
     
     player.addTagWillRemove(`Capi:target`);
+});
+
+world.afterEvents.playerInteractWithBlock.subscribe(playerInteractWithBlock => {
+    const { player, block } = playerInteractWithBlock;
+    const { x, y, z } = block;
+
+    player.score.set("Capi:interactX", x);
+    player.score.set("Capi:interactY", y);
+    player.score.set("Capi:interactZ", z);
+    player.addTagWillRemove(`Capi:interact`);
+
+    player.removeTags(player.getTags().filter(t => t.startsWith("interact:")));
+    player.addTagWillRemove(`interact:${block.typeId}`);
+});
+
+world.afterEvents.playerInteractWithEntity.subscribe(playerInteractWithEntity => {
+    const { player, target: entity } = playerInteractWithEntity;
+
+    player.score.set("Capi:interactX", Math.floor(entity.location.x));
+    player.score.set("Capi:interactY", Math.floor(entity.location.y));
+    player.score.set("Capi:interactZ", Math.floor(entity.location.z));
+    player.addTagWillRemove(`Capi:interact`);
+
+    player.removeTags(player.getTags().filter(t => t.startsWith("interact:")));
+    player.addTagWillRemove(`interact:${entity.typeId}`);
 });
 
 system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {

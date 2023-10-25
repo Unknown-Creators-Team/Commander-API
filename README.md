@@ -57,6 +57,7 @@
 * 泳いでいるかを受け取る
 * 寝ているかを受け取る
 * エモート中かを受け取る
+* ブロックまたはエンティティに対して右クリックしたかを受け取る
 ### Script Events
 * 爆発を発生させる
 * エンティティをスポーンする
@@ -68,9 +69,11 @@
 * チャットのUIを変更する
 * 条件がそろったメッセージの送信をキャンセルする
 * 付与されたタグを何ticks後かに削除する（デフォルトで有効）
+### Others
+* プライベートチャットを送信する
 
 ## セットアップ
-① [リリース](https://github.com/191225/Commander-API/releases)からバージョンを選択し、`.mcpack`をダウンロードしてください。([最新のリリース](https://github.com/191225/Commander-API/releases/latest))<br>
+① [リリース](https://github.com/Unknown-Creators-Team/Commander-API/releases)からバージョンを選択し、`.mcpack`をダウンロードしてください。([最新のリリース](https://github.com/Unknown-Creators-Team/Commander-API/releases/latest))<br>
 ② `.mcpack`をそのままマインクラフトにインポートしてください。(インポートの方法は解説しません)<br>
 ③ Commander APIをワールドに適用しワールドを開く。<br>
 ④ `/function Capi/setup`を実行し、セットアップをする。<br>
@@ -79,7 +82,7 @@
 ## Wiki
 Commander APIには機能が分かりやすく解説されたWikiがあります！<br>
 作成例もあるのでぜひ参照してください！<br>
-[Wikiを見る](https://github.com/191225/Commander-API/wiki/Home)
+[Wikiを見る](https://github.com/Unknown-Creators-Team/Commander-API/wiki/Home)
 
 ## ドキュメント
 私たちは、Commander APIのドキュメントを作成中です。<br>

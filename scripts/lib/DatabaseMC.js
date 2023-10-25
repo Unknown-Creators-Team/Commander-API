@@ -2,9 +2,9 @@
  * DatabaseMC
  * @license MIT
  * @author @Nano191225
- * @version 1.0.1
+ * @version 1.0.2
  * Supported Minecraft Version
- * @version 1.20.30
+ * @version 1.20.40
  * @description DatabaseMC is a database that can be used in Minecraft Script API.
  * --------------------------------------------------------------------------
  * These databases are available in the Script API of the integrated version
@@ -13,7 +13,7 @@
  * be automatically truncated.)
  * --------------------------------------------------------------------------
  */
-import { world, Player, DynamicPropertiesDefinition, ItemStack, system, } from "@minecraft/server";
+import { world, Player, ItemStack, system, } from "@minecraft/server";
 const MAX_KEY_LENGTH = 512;
 const MAX_SCOREBOARD_KEYS_LENGTH = 32768;
 const MAX_SCOREBOARD_VALUE_LENGTH = 32768;
@@ -22,8 +22,6 @@ const MAX_WORLD_PROPERTY_KEYS_LENGTH = 10;
 const MAX_WORLD_PROPERTY_LENGTH = 1048576;
 const MAX_ITEM_LORE_LINE_LENGTH = 20;
 const MAX_ITEM_LORE_VALUE_LENGTH = 398;
-const PLAYER_PROPERTIES = [];
-const WORLD_PROPERTIES = [];
 class Database extends Map {
     constructor(name) {
         super();
@@ -171,8 +169,6 @@ export class PlayerPropertyDatabase extends Database {
     constructor(name) {
         super(name);
         this.#name = name.slice(0, 11) + "_dbMC";
-        if (!PLAYER_PROPERTIES.map(v => v.name).includes(this.#name))
-            throw new ReferenceError("Property is not registered");
         if (MAX_PLAYER_PROPERTY_LENGTH > 2 ** 17)
             throw new RangeError("Maximum value length must be 2^17 (131072) characters or less");
         this.reload();
@@ -245,7 +241,7 @@ export class PlayerPropertyDatabase extends Database {
      */
     delete(key) {
         this.#keyCheck(key);
-        key.removeDynamicProperty(this.#name);
+        key.setDynamicProperty(this.#name, undefined);
         return super.delete(key.id);
     }
     /**
@@ -274,24 +270,6 @@ export class PlayerPropertyDatabase extends Database {
         if (!key.isValid())
             throw new ReferenceError("Player is not valid (not online?)");
     }
-    /**
-     * Register the database and make it available.
-     * @static
-     * @param {string} name
-     * @param {number} maxValue
-     */
-    static register(name, maxValue) {
-        if (typeof name !== "string")
-            throw new TypeError("Database name must be a string");
-        if (name.search(/[^a-z0-9_]/gi) !== -1)
-            throw new TypeError("Database name must only contain alphanumeric characters and underscores");
-        if (PLAYER_PROPERTIES.map(v => v.name).includes(name))
-            throw new ReferenceError("Property is already registered");
-        if (name.length > 11)
-            console.warn(new RangeError("Database name must be 11 characters or less"));
-        name = name.slice(0, 11) + "_dbMC";
-        PLAYER_PROPERTIES.push({ name: name, max: maxValue });
-    }
 }
 export class WorldPropertyDatabase extends Database {
     #name;
@@ -301,8 +279,6 @@ export class WorldPropertyDatabase extends Database {
     constructor(name) {
         super(name);
         this.#name = name.slice(0, 11) + "_dbMC";
-        if (!WORLD_PROPERTIES.map(v => v.name).includes(this.#name))
-            throw new ReferenceError("Property is not registered");
         if ((MAX_WORLD_PROPERTY_LENGTH + MAX_KEY_LENGTH) *
             MAX_WORLD_PROPERTY_KEYS_LENGTH >
             2 ** 20)
@@ -423,24 +399,6 @@ export class WorldPropertyDatabase extends Database {
             world.setDynamicProperty(this.#name, JSON.stringify([]));
         }
         return JSON.parse(world.getDynamicProperty(this.#name));
-    }
-    /**
-     * Register the database and make it available.
-     * @static
-     * @param {string} name
-     * @param {number} maxValue
-     */
-    static register(name, maxValue) {
-        if (typeof name !== "string")
-            throw new TypeError("Database name must be a string");
-        if (name.search(/[^a-z0-9_]/gi) !== -1)
-            throw new TypeError("Database name must only contain alphanumeric characters and underscores");
-        if (WORLD_PROPERTIES.map(v => v.name).includes(name))
-            throw new ReferenceError("Property is already registered");
-        if (name.length > 11)
-            console.warn(new RangeError("Database name must be 11 characters or less"));
-        name = name.slice(0, 11) + "_dbMC";
-        WORLD_PROPERTIES.push({ name: name, max: maxValue });
     }
 }
 export class ItemDatabase extends Database {
@@ -573,15 +531,3 @@ export class ItemDatabase extends Database {
         return array;
     }
 }
-world.afterEvents.worldInitialize.subscribe(worldInitialize => {
-    const _player = new DynamicPropertiesDefinition();
-    const _world = new DynamicPropertiesDefinition();
-    PLAYER_PROPERTIES.forEach(property => {
-        _player.defineString(property.name, property.max);
-    });
-    WORLD_PROPERTIES.forEach(property => {
-        _world.defineString(property.name, property.max);
-    });
-    worldInitialize.propertyRegistry.registerEntityTypeDynamicProperties(_player, "minecraft:player");
-    worldInitialize.propertyRegistry.registerWorldDynamicProperties(_world);
-});
