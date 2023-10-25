@@ -67,5 +67,9 @@ scoreboard objectives add Capi:targetY dummy
 scoreboard objectives add Capi:targetZ dummy
 scoreboard objectives add Capi:targetPower dummy
 scoreboard objectives add Capi:fall dummy
+scoreboard objectives add Capi:interactX dummy
+scoreboard objectives add Capi:interactY dummy
+scoreboard objectives add Capi:interactZ dummy
+scoreboard objectives add Capi:privatechat dummy
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false
