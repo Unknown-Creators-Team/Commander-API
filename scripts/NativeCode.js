@@ -62,7 +62,7 @@ function createScoreboardManager(player) {
             try {
                 const objective = world.scoreboard.getObjective(objectName);
                 if (!objective) return undefined;
-                return world.scoreboard.getScore(objective, player.scoreboardIdentity) || undefined;
+                return objective.getScore(player.scoreboardIdentity);
             } catch (e) {
                 return undefined;
             }
