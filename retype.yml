@@ -3,7 +3,7 @@ output: .retype
 url: c-api.docs.un-known.xyz
 branding:
   title: Commander API
-  label: v1.6.0
+  label: v1.9.0
   # logo: images/commander_api-icon.png
   # logoAlign: right
 
