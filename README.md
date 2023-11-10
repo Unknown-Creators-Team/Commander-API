@@ -88,8 +88,9 @@ Commander APIには機能が分かりやすく解説されたWikiがあります
 私たちは、Commander APIのドキュメントを作成中です。<br>
 Wikiの内容はすべてこのドキュメントに移行予定であり、ドキュメントはより詳細な情報を提供します。<br>
 
-<img src="https://img.shields.io/github/downloads/Unknown-Creators-Team/Commander-API/total?style=for-the-badge">
 また、移行完了次第、Wikiは削除されます。<br>
 [ドキュメントを見る](https://c-api.docs.un-known.xyz/)
 ドキュメントはまだ作成中です。ぜひご協力ください！
 [ドキュメントの作成に協力](https://github.com/Unknown-Creators-Team/Commander-API/blob/docs/index.md)
+
+<img src="https://img.shields.io/github/downloads/Unknown-Creators-Team/Commander-API/total?style=for-the-badge">
