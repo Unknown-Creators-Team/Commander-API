@@ -93,4 +93,4 @@ Wikiの内容はすべてこのドキュメントに移行予定であり、ド�
 ドキュメントはまだ作成中です。ぜひご協力ください！
 [ドキュメントの作成に協力](https://github.com/Unknown-Creators-Team/Commander-API/blob/docs/index.md)
 
-<img src="https://img.shields.io/github/downloads/Unknown-Creators-Team/Commander-API/total?style=for-the-badge">
+<img src="https://img.shields.io/github/downloads/Unknown-Creators-Team/Commander-API/total?style=for-the-badge"> <img src="https://img.shields.io/github/downloads/Unknown-Creators-Team/Commander-API/latest/total?style=for-the-badge"></a>
