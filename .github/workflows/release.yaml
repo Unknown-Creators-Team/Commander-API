@@ -1,0 +1,40 @@
+name: Rename and upload release asset
+
+on:
+    release:
+        types: [created]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Get the zip asset name
+              id: get_filename
+              run: |
+                  ZIP_NAME=$(curl --header "Authorization: token ${{ secrets.MY_GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/releases/${{ github.event.release.id }}/assets | jq -r '.[] | select(.content_type=="application/zip") | .name')
+                  echo "::set-output name=zip_name::$ZIP_NAME"
+
+            - name: Download the zip asset
+              uses: i3h/download-release-asset@v1
+              with:
+                  owner: ${{ github.repository_owner }}
+                  repo: ${{ github.repository }}
+                  tag: ${{ github.ref }}
+                  file: ${{ steps.get_filename.outputs.zip_name }}
+
+            - name: Rename the zip file to mcpack
+              run: mv ${{ steps.get_filename.outputs.zip_name }} ${ZIP_NAME/zip/mcpack}
+
+            - name: Upload the mcpack file as release asset
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ github.event.release.upload_url }}
+                  asset_path: ./${ZIP_NAME/zip/mcpack}
+                  asset_name: ${ZIP_NAME/zip/mcpack}
+                  asset_content_type: application/octet-stream

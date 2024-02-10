@@ -4,5 +4,6 @@
         "spawnentity",
         "spawnitem",
         "spawnparticle"
-    ]
+    ],
+    "workbench.iconTheme": "material-icon-theme"
 }
