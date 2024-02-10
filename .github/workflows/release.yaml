@@ -19,10 +19,7 @@ jobs:
               run: zip -r source_code.zip .
 
             - name: Rename the file
-              run: |
-                  REPO_NAME=$(echo ${{ github.repository }} | awk -F / '{print $2}')
-                  TAG_NAME=${{ github.event.release.tag_name }}
-                  mv source_code.zip $REPO_NAME-$TAG_NAME.mcpack
+              run: mv source_code.zip ${{ github.repository }}-${{ github.event.release.tag_name }}.mcpack
 
             - name: Upload Release Asset
               uses: actions/upload-release-asset@v1
