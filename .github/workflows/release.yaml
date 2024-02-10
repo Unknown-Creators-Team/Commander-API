@@ -19,14 +19,17 @@ jobs:
               run: zip -r source_code.zip .
 
             - name: Rename the file
-              run: mv source_code.zip source_code.mcpack
+              run: |
+                  REPO_NAME=$(echo ${{ github.repository }} | awk -F / '{print $2}')
+                  TAG_NAME=${{ github.event.release.tag_name }}
+                  mv source_code.zip $REPO_NAME-$TAG_NAME.mcpack
 
             - name: Upload Release Asset
               uses: actions/upload-release-asset@v1
               env:
-                  GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   upload_url: ${{ github.event.release.upload_url }}
-                  asset_path: ./source_code.mcpack
-                  asset_name: source_code.mcpack
+                  asset_path: ./${{ github.repository }}-${{ github.event.release.tag_name }}.mcpack
+                  asset_name: ${{ github.repository }}-${{ github.event.release.tag_name }}.mcpack
                   asset_content_type: application/octet-stream
