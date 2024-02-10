@@ -20,7 +20,7 @@ jobs:
                       echo "Failed to get the zip file name"
                       exit 1
                   fi
-                  echo "::set-output name=zip_name::$ZIP_NAME"
+                  echo "asset_name=${ASSET_NAME}" >> $GITHUB_ENV
 
             - name: Download the zip asset
               uses: i3h/download-release-asset@v1
