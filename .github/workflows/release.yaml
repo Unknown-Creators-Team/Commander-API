@@ -19,7 +19,10 @@ jobs:
               run: zip -r source_code.zip .
 
             - name: Rename the file
-              run: mv source_code.zip ${{ github.repository_id }}-${{ github.event.release.tag_name }}.mcpack
+              run: |
+                  REPO_NAME=$(echo ${{ github.repository }} | cut -d '/' -f 2)
+                  FILE_NAME=$REPO_NAME-${{ github.event.release.tag_name }}.mcpack
+                  mv source_code.zip $FILE_NAME
 
             - name: Upload Release Asset
               uses: actions/upload-release-asset@v1
@@ -27,6 +30,6 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
               with:
                   upload_url: ${{ github.event.release.upload_url }}
-                  asset_path: ./${{ github.repository_id }}-${{ github.event.release.tag_name }}.mcpack
-                  asset_name: ${{ github.repository_id }}-${{ github.event.release.tag_name }}.mcpack
+                  asset_path: ./$(echo ${{ github.repository }} | cut -d '/' -f 2)-${{ github.event.release.tag_name }}.mcpack
+                  asset_name: $(echo ${{ github.repository }} | cut -d '/' -f 2)-${{ github.event.release.tag_name }}.mcpack
                   asset_content_type: application/octet-stream
