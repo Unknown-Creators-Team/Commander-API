@@ -26,7 +26,6 @@ jobs:
 
             - name: Rename asset
               run: |
-                  mv ${{ steps.get_asset.outputs.asset_name }} ${{ github.repository }}-${{ github.event.release.tag_name }}.zip
                   rename 's/\.zip$/.mcpack/' ${{ github.repository }}-${{ github.event.release.tag_name }}.zip
 
             - name: Upload Release Asset
