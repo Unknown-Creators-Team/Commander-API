@@ -1,26 +1,32 @@
-name: Rename Release Asset
+name: Upload Release Asset
 
 on:
     release:
         types: [created]
 
 jobs:
-    rename:
+    build:
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v2
-              with:
-                  node-version: "14"
+            - name: Install zip
+              run: sudo apt-get install zip
 
-            - name: Install dependencies
-              run: npm install axios
+            - name: Zip the code
+              run: zip -r source_code.zip .
 
-            - name: Rename asset
-              run: node ./.github/workflows/rename_asset.js
+            - name: Rename the file
+              run: mv source_code.zip source_code.mcpack
+
+            - name: Upload Release Asset
+              uses: actions/upload-release-asset@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ github.event.release.upload_url }}
+                  asset_path: ./source_code.mcpack
+                  asset_name: source_code.mcpack
+                  asset_content_type: application/octet-stream
