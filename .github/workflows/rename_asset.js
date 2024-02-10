@@ -15,8 +15,10 @@ async function main() {
         },
     });
 
+    console.log("Assets:", assets);
     const oldName = assets[0].name;
     const newName = `${repo}-${tag}${path.extname(oldName)}`;
+    console.log(`Renaming '${oldName}' to '${newName}'`);
 
     fs.renameSync(oldName, newName);
 }
