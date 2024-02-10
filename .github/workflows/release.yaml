@@ -16,6 +16,10 @@ jobs:
               id: get_filename
               run: |
                   ZIP_NAME=$(curl --header "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/releases/${{ github.event.release.id }}/assets | jq -r '.[] | select(.content_type=="application/zip") | .name')
+                  if [ -z "$ZIP_NAME" ]; then
+                      echo "Failed to get the zip file name"
+                      exit 1
+                  fi
                   echo "::set-output name=zip_name::$ZIP_NAME"
 
             - name: Download the zip asset
@@ -32,9 +36,12 @@ jobs:
             - name: Upload the mcpack file as release asset
               uses: actions/upload-release-asset@v1
               env:
-                  GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   upload_url: ${{ github.event.release.upload_url }}
                   asset_path: ./${ZIP_NAME/zip/mcpack}
                   asset_name: ${ZIP_NAME/zip/mcpack}
                   asset_content_type: application/octet-stream
+
+
+                #   ZIP_NAME=$() | .name')
