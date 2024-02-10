@@ -1,40 +1,26 @@
-name: Upload Release Asset
+name: Rename Release Asset
 
 on:
     release:
         types: [created]
 
 jobs:
-    build:
+    rename:
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            - name: Install rename and jq
-              run: sudo apt-get install rename jq
+            - name: Set up Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: "14"
 
-            - name: Get asset name
-              id: get_asset
-              run: |
-                  ASSET_JSON=$(curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' "https://api.github.com/repos/${{ github.repository }}/releases/${{ github.event.release.id }}/assets")
-                  ASSET_NAME=$(echo $ASSET_JSON | jq -r '.[0].name')
-                  echo "::set-output name=asset_name::$ASSET_NAME"
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Install dependencies
+              run: npm install axios
 
             - name: Rename asset
-              run: |
-                  rename 's/\.zip$/.mcpack/' ${{ github.repository }}-${{ github.event.release.tag_name }}.zip
-
-            - name: Upload Release Asset
-              id: upload_release_asset
-              uses: actions/upload-release-asset@v1
+              run: node rename_asset.js
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ github.event.release.upload_url }}
-                  asset_path: ./${{ github.repository }}-${{ github.event.release.tag_name }}.mcpack
-                  asset_name: ${{ github.repository }}-${{ github.event.release.tag_name }}.mcpack
-                  asset_content_type: application/octet-stream
