@@ -168,16 +168,14 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
                     item.setLore(Data.lore);
                 }
                 if (Data.enchants) {
-                    /** @type { Minecraft.EnchantmentList } */
-                    const enchantments = item.getComponent("enchantments").enchantments;
+                    const enchantments = item.getComponent("enchantable");
                     for (let i = 0; i < Data.enchants.length; i++) {
                         if (!Data.enchants[i].name) return;
                         let enchantsName = Data.enchants[i].name;
                         let enchantsLevel = 1;
                         if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
-                        enchantments.addEnchantment(new Minecraft.Enchantment(enchantsName, enchantsLevel));
+                        enchantments.addEnchantment({ type: enchantsName, level: enchantsLevel });
                     }
-                    item.getComponent("enchantments").enchantments = enchantments;
                 }
                 if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
                 if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
@@ -418,9 +416,9 @@ world.beforeEvents.chatSend.subscribe(chat => {
         return chat.cancel = true;
     }
     if (Config.get("ChatUIEnabled")) {
-        chat.sendToTargets = true;
         const text = setVariable(player, String((Config.get("ChatUI"))));
         world.sendMessage(text.replace(/({message}|{msg})/gi, msg));
+        return chat.cancel = true;
     }
 });
 
@@ -473,7 +471,7 @@ world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
     if (initialSpawn) {
         player.join = true;
         player.runCommandAsync("function Capi/setup");
-        if (Config.hasAll("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", true);
+        if (Config.has("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", true);
     }
 });
 
@@ -678,15 +676,14 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
         }
         if (object.enchants) {
             /** @type { Minecraft.EnchantmentList } */
-            const enchantments = item.getComponent("enchantments").enchantments;
+            const enchantments = item.getComponent("enchantable");
             for (let i = 0; i < object.enchants.length; i++) {
                 if (!object.enchants[i].name) return;
                 let enchantsName = object.enchants[i].name;
                 let enchantsLevel = 1;
                 if (object.enchants[i].level) enchantsLevel = Number(object.enchants[i].level);
-                enchantments.addEnchantment(new Minecraft.Enchantment(enchantsName, enchantsLevel));
+                enchantments.addEnchantment({ type: enchantsName, level: enchantsLevel });
             }
-            item.getComponent("enchantments").enchantments = enchantments;
         }
         if (object.can_place_on) item.setCanPlaceOn(object.can_place_on);
         if (object.can_destroy) item.setCanDestroy(object.can_destroy);

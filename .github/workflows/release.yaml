@@ -12,11 +12,8 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            - name: Install zip
-              run: sudo apt-get install zip
-
             - name: Zip the code
-              run: zip -r source_code.zip .
+              run: zip -r source_code.zip . -x *.git* *.github* *.vscode* *@types* *node_modules* ".gitignore" ".mcattributes" "CNAME" "package-lock.json"
 
             - name: Rename the file
               run: |
