@@ -13,7 +13,7 @@ jobs:
               uses: actions/checkout@v2
 
             - name: Zip the code
-              run: zip -r source_code.zip . -x *.git* *.github* *.vscode* *@types* *node_modules* ".gitignore" ".mcattributes" "CNAME" "package-lock.json"
+              run: zip -r source_code.zip . -x *.git* *.github* *.vscode* "*\@types*" *node_modules* .gitignore .mcattributes CNAME package-lock.json
 
             - name: Rename the file
               run: |
