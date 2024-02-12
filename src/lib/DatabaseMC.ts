@@ -398,7 +398,7 @@ export class WorldPropertyDatabase extends Database {
             console.warn("property is not string");
             world.setDynamicProperty(this.#name, JSON.stringify([]));
         }
-        return JSON.parse(world.getDynamicProperty(this.#name));
+        return JSON.parse(world.getDynamicProperty(this.#name) as string);
     }
 }
 export class ItemDatabase extends Database {
@@ -472,7 +472,7 @@ export class ItemDatabase extends Database {
      * @private
      * @deprecated
      * @throws {Error} Method is not available
-     */
+     */ //@ts-ignore
     entries() {
         throw new Error("Method is not available");
     }
@@ -481,7 +481,7 @@ export class ItemDatabase extends Database {
      * @private
      * @deprecated
      * @throws {Error} Method is not available
-     */
+     */ //@ts-ignore
     keys() {
         throw new Error("Method is not available");
     }
@@ -490,7 +490,7 @@ export class ItemDatabase extends Database {
      * @private
      * @deprecated
      * @throws {Error} Method is not available
-     */
+     */ //@ts-ignore
     values() {
         throw new Error("Method is not available");
     }
@@ -508,7 +508,7 @@ export class ItemDatabase extends Database {
      * @private
      * @deprecated
      * @throws {Error} Method is not available
-     */
+     */ //@ts-ignore
     [Symbol.iterator]() {
         throw new Error("Method is not available");
     }

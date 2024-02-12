@@ -83,7 +83,7 @@ export const safeParse = (object) => {
     return JSON.parse(object);
 }
 
-export const easySafeParse = (object) => {
+export const easySafeParse: any = (object) => {
     return ESON.parse(object);
 }
 

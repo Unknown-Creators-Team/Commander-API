@@ -169,8 +169,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                         item.setLore(Data.lore);
                     }
                     if (Data.enchants) {
-                        /** @type { Minecraft.EnchantmentList } */
-                        const enchantments = item.getComponent("enchantments").enchantments;
+                        const enchantments: Minecraft.EnchantmentList = item.getComponent("enchantments").enchantments;
                         for (let i = 0; i < Data.enchants.length; i++) {
                             if (!Data.enchants[i].name) return;
                             let enchantsName = Data.enchants[i].name;
@@ -388,8 +387,7 @@ world.beforeEvents.chatSend.subscribe(chat => {
     const player = chat.sender;
 
     let msg = chat.message;
-    /** @type { string } */
-    let mute = false;
+    let mute: string = null;
 
     player.getTags().forEach((t) => {
         t = t.replace(/"/g, "");
@@ -407,7 +405,7 @@ world.beforeEvents.chatSend.subscribe(chat => {
         const include = CancelSendMsg?.include.some(v => v.length && msg.includes(v));
         if (start || end || include) return chat.cancel = true;
     }
-    if (mute || player.hasTag("mute")) {
+    if (mute !== null || player.hasTag("mute")) {
         player.sendMessage(mute.length ? mute : "§cYou have been muted.");
         return chat.cancel = true;
     }
@@ -683,8 +681,7 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
             item.setLore(object.lore);
         }
         if (object.enchants) {
-            /** @type { Minecraft.EnchantmentList } */
-            const enchantments = item.getComponent("enchantments").enchantments;
+            const enchantments: Minecraft.EnchantmentList = item.getComponent("enchantments").enchantments;
             for (let i = 0; i < object.enchants.length; i++) {
                 if (!object.enchants[i].name) return;
                 let enchantsName = object.enchants[i].name;

@@ -70,10 +70,10 @@ function createScoreboardManager(player) {
     }
 }
 
-export function configureNativeFunction () {
+export function configureNativeFunction() {
     world.getAllPlayers().forEach(player => {
         // @ts-ignore
-        if(!player.score) player.score = createScoreboardManager(player);
+        if (!player.score) player.score = createScoreboardManager(player);
     });
 };
 
@@ -105,7 +105,7 @@ system.runInterval(() => configureNativeFunction());
 // }
 
 Object.assign(Minecraft.Entity.prototype, {
-    addTagWillRemove (tag) {
+    addTagWillRemove(tag) {
         if (!Config.has("TagWillRemoveTick"))
             Config.set("TagWillRemoveTick", 10);
         system.run(() => {
@@ -114,9 +114,9 @@ Object.assign(Minecraft.Entity.prototype, {
             system.runTimeout(() => this.removeTag(tag), Config.has("TagWillRemoveTick") ? Config.get("TagWillRemoveTick") : 10);
         });
     },
-    removeTags (tags) {tags.forEach(tag => this.removeTag(tag));},
-    addTags (tags) {tags.forEach(tag => this.addTag(tag));},
-    isPlayer () {
+    removeTags(tags) { tags.forEach(tag => this.removeTag(tag)); },
+    addTags(tags) { tags.forEach(tag => this.addTag(tag)); },
+    isPlayer() {
         if (!this.isValid()) return false;
         return this.typeId === "minecraft:player" || this instanceof Minecraft.Player;
     },
