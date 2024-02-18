@@ -7,11 +7,14 @@
         {
             "type": "minecraft-js",
             "request": "attach",
-            "name": "Attach to Minecraft",
+            "name": "listen 19144",
             "mode": "listen",
-            "localRoot": "${workspaceFolder}/scripts",
             "host": "localhost",
-            "port": 19144
+            "port": 19144,
+
+            "localRoot": "${workspaceFolder}/src",
+            "generatedSourceRoot": "${workspaceFolder}/scripts",
+            "sourceMapRoot": "${workspaceFolder}/scripts"
         }
     ]
 }
