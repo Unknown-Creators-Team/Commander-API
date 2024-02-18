@@ -12,6 +12,8 @@
  * @LINK https://github.com/191225/Commander-API
  */
 
+import "./NativeCode.js";
+
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 // import * as MinecraftVanilla from "@minecraft/vanilla-data";
@@ -21,7 +23,9 @@ import { easySafeParse, parsePos, safeParse, setVariable, getScore } from "./uti
 import Config from "./config.js";
 import ESON from "./lib/ESON.js";
 import { UI } from "./ui.js";
-import "./NativeCode.js";
+import "./scriptevents";
+
+import "./checks/checkLoader";
 
 const { world, system } = Minecraft;
 
@@ -36,11 +40,12 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
 
             player.getTags().forEach((t) => {
                 if (t.startsWith("rename:")) {
-                    player.rename = t.replace("rename:", "");
+                    const rename = t.replace("rename:", "");
+                    player.runCommandAsync(`scriptevent CApi:rename ${rename}`);
                     player.removeTag(t);
                 }
                 if (t.startsWith("resetName")) {
-                    player.resetName = true;
+                    player.runCommandAsync(`scriptevent CApi:resetName`);
                     player.removeTag(t);
                 }
                 if (t.startsWith("setItem:")) {
@@ -133,16 +138,16 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             }
 
             // Rename
-            if (player.rename) {
-                player.nameTag = setVariable(player, player.rename);
-                player.rename = false;
-            }
+            // if (player.rename) {
+            //     player.nameTag = setVariable(player, player.rename);
+            //     player.rename = false;
+            // }
 
             // Reset name
-            if (player.resetName) {
-                player.nameTag = player.name;
-                player.resetName = false;
-            }
+            // if (player.resetName) {
+            //     player.nameTag = player.name;
+            //     player.resetName = false;
+            // }
 
             // Set slot
             try {
@@ -169,15 +174,14 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                         item.setLore(Data.lore);
                     }
                     if (Data.enchants) {
-                        const enchantments: Minecraft.EnchantmentList = item.getComponent("enchantments").enchantments;
+                        const enchantments = item.getComponent("enchantable");
                         for (let i = 0; i < Data.enchants.length; i++) {
                             if (!Data.enchants[i].name) return;
                             let enchantsName = Data.enchants[i].name;
                             let enchantsLevel = 1;
                             if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
-                            enchantments.addEnchantment(new Minecraft.Enchantment(enchantsName, enchantsLevel));
+                            enchantments.addEnchantment({ "type": enchantsName, "level": enchantsLevel });
                         }
-                        item.getComponent("enchantments").enchantments = enchantments;
                     }
                     if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
                     if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
@@ -217,8 +221,8 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
 
             // Run command
             if (player.run) {
-                player.run.forEach(commands => {
-                    const Data = safeParse(commands);
+                player.run.forEach((commands: string) => {
+                    const Data = safeParse<string[]>(commands);
                     if (typeof (Data) === "object" && Data.length) Data.forEach(c => {
                         player.runCommandAsync(String(setVariable(player, c))).catch(() => { });
 
@@ -244,17 +248,24 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             // Knockback
             if (player.knockback) {
                 try {
-                    const Data = safeParse(player.knockback);
+                    const Data = safeParse<string[] | {
+                        "directionX": any,
+                        "directionZ": any,
+                        "horizontalStrength": any,
+                        "verticalStrength": any
+                    }>(player.knockback);
 
-                    const directionX = String(setVariable(player, Data.directionX || Data[0] || 0));
-                    const directionZ = String(setVariable(player, Data.directionZ || Data[1] || 0));
-                    const horizontalStrength = String(setVariable(player, Data.horizontalStrength || Data[2] || 0));
-                    const verticalStrength = String(setVariable(player, Data.verticalStrength || Data[3] || 0));
+                    const directionX = String(setVariable(player, "directionX" in Data ? Data.directionX : (Data[0] || 0)));
+                    const directionZ = String(setVariable(player, "directionZ" in Data ? Data.directionX : (Data[0] || 0)));
+                    const horizontalStrength = String(setVariable(player, "horizontalStrength" in Data ? Data.directionX : (Data[0] || 0)));
+                    const verticalStrength = String(setVariable(player, "verticalStrength" in Data ? Data.directionX : (Data[0] || 0)));
+
                     player.applyKnockback(
                         Number(directionX.search(/[^0-9-.]/) >= 0 ? 0 : directionX),
                         Number(directionZ.search(/[^0-9-.]/) >= 0 ? 0 : directionZ),
                         Number(horizontalStrength.search(/[^0-9-.]/) >= 0 ? 0 : horizontalStrength),
                         Number(verticalStrength.search(/[^0-9-.]/) >= 0 ? 0 : verticalStrength));
+
                     player.knockback = false;
                 } catch (e) { console.error(e, e.stack) }
             }
@@ -349,10 +360,11 @@ world.afterEvents.entityHurt.subscribe(entityHurt => {
     if (entity && entity.isPlayer()) {
         entity.score.set("Capi:hurt", damage);
         entity.addTagWillRemove(`Capi:hurt`);
-        player.removeTags(player.getTags().filter(t => t.startsWith("cause:")));
-        entity.addTagWillRemove(`cause:${cause}`);
+        console.warn(player);
+        if (player) player.removeTags(player.getTags().filter(t => t.startsWith("cause:")));
+        entity.addTagWillRemove(`cause:${cause.toString()}`);
     }
-    if (player && player.isPlayer()) {
+    if (player instanceof Minecraft.Player) {
         player.score.set("Capi:damage", damage);
         player.addTagWillRemove(`Capi:damage`);
     }
@@ -362,8 +374,7 @@ world.afterEvents.entityDie.subscribe(entityDie => {
     const { damageSource, deadEntity: entity } = entityDie;
     const { damagingEntity: player, cause } = damageSource;
 
-    if (player && player.isPlayer()) {
-
+    if (player instanceof Minecraft.Player) {
         if (entity && entity.isPlayer()) {
             player.score.add("Capi:killPlayer", 1);
             player.addTagWillRemove("Capi:killPlayer");
@@ -375,11 +386,9 @@ world.afterEvents.entityDie.subscribe(entityDie => {
         }
     }
 
-    if (entity.isPlayer()) {
-        if (!player.isPlayer()) {
-            entity.score.add("Capi:death", 1);
-            entity.addTagWillRemove("Capi:death");
-        }
+    if (entity instanceof Minecraft.Player && !(player instanceof Minecraft.Player)) {
+        entity.score.add("Capi:death", 1);
+        entity.addTagWillRemove("Capi:death");
     }
 });
 
@@ -420,9 +429,9 @@ world.beforeEvents.chatSend.subscribe(chat => {
         return chat.cancel = true;
     }
     if (Config.get("ChatUIEnabled")) {
-        chat.sendToTargets = true;
         const text = setVariable(player, String((Config.get("ChatUI"))));
         world.sendMessage(text.replace(/({message}|{msg})/gi, msg));
+        return chat.cancel = true;
     }
 });
 
@@ -475,7 +484,7 @@ world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
     if (initialSpawn) {
         player.join = true;
         player.runCommandAsync("function Capi/setup");
-        if (Config.hasAll("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", true);
+        if (Config.has("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", true);
     }
 });
 
@@ -538,6 +547,7 @@ world.afterEvents.buttonPush.subscribe(async buttonPush => {
     const { block, dimension, source: player } = buttonPush;
     const { x, y, z } = block;
 
+
     if (!player.isPlayer()) return;
 
     player.score.set("Capi:buttonXPos", x);
@@ -562,7 +572,7 @@ world.afterEvents.pressurePlatePop.subscribe(pressurePlatePop => {
     const { block, dimension } = pressurePlatePop;
     const { x, y, z } = block;
 
-    const distance = (location) => Math.sqrt(((location.x - x) ** 2) + ((location.y - y) ** 2) + ((location.z - z) ** 2));
+    const distance = (location: Minecraft.Vector3) => Math.sqrt(((location.x - x) ** 2) + ((location.y - y) ** 2) + ((location.z - z) ** 2));
 
     const player = world.getPlayers().reduce((a, b) => distance(a.location) < distance(b.location) ? a : b, world.getPlayers()[0]);
 
@@ -669,7 +679,6 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
         if (fire) entity.setOnFire(fire);
 
     } else if (["spawn", "item"].every(v => type.toLowerCase().includes(v))) {
-
         const object = easySafeParse(message);
         if (!object.item) return;
         const amount = object.amount ? Number(object.amount) : 1;
@@ -681,15 +690,14 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
             item.setLore(object.lore);
         }
         if (object.enchants) {
-            const enchantments: Minecraft.EnchantmentList = item.getComponent("enchantments").enchantments;
+            const enchantments = item.getComponent("enchantable");
             for (let i = 0; i < object.enchants.length; i++) {
                 if (!object.enchants[i].name) return;
                 let enchantsName = object.enchants[i].name;
                 let enchantsLevel = 1;
                 if (object.enchants[i].level) enchantsLevel = Number(object.enchants[i].level);
-                enchantments.addEnchantment(new Minecraft.Enchantment(enchantsName, enchantsLevel));
+                enchantments.addEnchantment({ type: enchantsName, level: enchantsLevel });
             }
-            item.getComponent("enchantments").enchantments = enchantments;
         }
         if (object.can_place_on) item.setCanPlaceOn(object.can_place_on);
         if (object.can_destroy) item.setCanDestroy(object.can_destroy);
