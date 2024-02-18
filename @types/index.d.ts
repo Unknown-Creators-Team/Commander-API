@@ -2,34 +2,24 @@ import * as MC from "@minecraft/server";
 import * as MCUI from "@minecraft/server-ui";
 
 declare module "@minecraft/server" {
-    interface EntityComponentMap {
-        "inventory": MC.EntityInventoryComponent;
-        "health": MC.EntityHealthComponent
-    }
-
-    interface ItemComponentMap {
-        "enchantments": MC.ItemEnchantsComponent;
-    }
-
-    interface Entity { // getComponentNew("inventory") -> Inventory index.jsの41行目
-        getComponent<T extends keyof EntityComponentMap>(componentId: T): EntityComponentMap[T]
+    interface Entity {
         isPlayer(): this is Player;
+        isEntity(): this is Entity;
+        isBlock(): this is Block;
 
         addTags(tags: string[]): void;
         removeTags(tags: string[]): void;
         addTagWillRemove(tag: string): void;
     }
 
-    interface ItemStack {
-        getComponent<T extends keyof ItemComponentMap>(componentId: T): ItemComponentMap[T];
-    }
-
     interface Player {
+        typeId: "minecraft:player";
+
         /** @deprecated moved to <Player>.score */
         setScore(objectName: string, score: number, type?: "set" | "reset" | "remove" | "add"): void;
 
         score: ScoreboardManager;
-        
+
         rename?: string | false;
         resetName?: boolean;
         setItem?: any | false;
@@ -43,8 +33,12 @@ declare module "@minecraft/server" {
         formJson?: any | false;
 
         pushedTime?: number;
+    }
 
-        
+    interface Block {
+        isBlock(): this is Block;
+        isPlayer(): this is Player;
+        isEntity(): this is Entity;
     }
 
     export interface ScoreboardManager {
