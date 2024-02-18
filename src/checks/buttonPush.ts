@@ -19,8 +19,6 @@ GameTest.register("commander_api", "buttonPush", (test) => {
             player.interact();
 
             system.runTimeout(() => {
-                console.warn(player.getTags().join(", "));
-
                 const hasPushed = player.hasTag("Capi:pushed");
 
                 const buttonXPos = player.score.get("Capi:buttonXPos");

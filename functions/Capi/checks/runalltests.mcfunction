@@ -1,0 +1,14 @@
+execute @s ~0~~ gametest run commander_api:setSlot
+execute @s ~8~~ gametest run commander_api:setitem
+execute @s ~16~~ gametest run commander_api:run
+execute @s ~24~~ gametest run commander_api:resetName
+execute @s ~32~~ gametest run commander_api:rename
+execute @s ~40~~ gametest run commander_api:knockback
+execute @s ~48~~ gametest run commander_api:kill
+execute @s ~56~~ gametest run commander_api:entityHurt
+execute @s ~64~~ gametest run commander_api:entityHit
+execute @s ~72~~ gametest run commander_api:entityDie
+execute @s ~80~~ gametest run commander_api:buttonPush
+execute @s ~88~~ gametest run commander_api:blockPlace
+execute @s ~96~~ gametest run commander_api:blockBreak
+execute @s ~104~~ gametest run commander_api:beforeChat

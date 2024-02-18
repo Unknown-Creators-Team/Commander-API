@@ -49,8 +49,8 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     player.removeTag(t);
                 }
                 if (t.startsWith("setItem:")) {
-                    if (!player.setItemJson) player.setItemJson = [];
-                    player.setItemJson.push(t.replace("setItem:", ""));
+                    const setItemJson = t.replace("setItem:", "");
+                    player.runCommandAsync(`scriptevent CApi:setItem ${setItemJson}`);
                     player.removeTag(t);
                 }
                 if (t.startsWith("form:")) {
@@ -159,65 +159,65 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             } catch { }
 
             // Set item
-            const container = player.getComponent('inventory').container;
-            if (player.setItemJson) player.setItemJson.forEach(setItemJson => {
-                try {
-                    const Data = easySafeParse(setItemJson);
-                    if (!Data.item) return;
-                    const amount = Data.amount ? Number(Data.amount) : 1;
-                    const slot = Data.slot ? Number(Data.slot) : false;
-                    const itemName = Data.item.replace("minecraft:", "");
-                    const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
-                    if (Data.name) item.nameTag = setVariable(player, Data.name);
-                    if (Data.lore) {
-                        for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
-                        item.setLore(Data.lore);
-                    }
-                    if (Data.enchants) {
-                        const enchantments = item.getComponent("enchantable");
-                        for (let i = 0; i < Data.enchants.length; i++) {
-                            if (!Data.enchants[i].name) return;
-                            let enchantsName = Data.enchants[i].name;
-                            let enchantsLevel = 1;
-                            if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
-                            enchantments.addEnchantment({ "type": enchantsName, "level": enchantsLevel });
-                        }
-                    }
-                    if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
-                    if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
-                    if (Data.lock) item.lockMode = Minecraft.ItemLockMode[Data.lock];
-                    if (Data.keep_on_death) item.keepOnDeath = Data.keep_on_death === "true" ? true : false;
-                    if (typeof slot == "number") container.setItem(slot, item);
-                    else container.addItem(item);
-                } catch (e) {
-                    console.error(e, e.stack);
-                    player.sendMessage(`§c${e}`);
-                    for (const ply of world.getPlayers({ tags: ["Capi:hasOp"] })) ply.sendMessage(`§c${e}`);
-                }
-            });
-            player.setItemJson = [];
+            // const container = player.getComponent('inventory').container;
+            // if (player.setItemJson) player.setItemJson.forEach(setItemJson => {
+            //     try {
+            //         const Data = easySafeParse(setItemJson);
+            //         if (!Data.item) return;
+            //         const amount = Data.amount ? Number(Data.amount) : 1;
+            //         const slot = Data.slot ? Number(Data.slot) : false;
+            //         const itemName = Data.item.replace("minecraft:", "");
+            //         const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
+            //         if (Data.name) item.nameTag = setVariable(player, Data.name);
+            //         if (Data.lore) {
+            //             for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
+            //             item.setLore(Data.lore);
+            //         }
+            //         if (Data.enchants) {
+            //             const enchantments = item.getComponent("enchantable");
+            //             for (let i = 0; i < Data.enchants.length; i++) {
+            //                 if (!Data.enchants[i].name) return;
+            //                 let enchantsName = Data.enchants[i].name;
+            //                 let enchantsLevel = 1;
+            //                 if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
+            //                 enchantments.addEnchantment({ "type": enchantsName, "level": enchantsLevel });
+            //             }
+            //         }
+            //         if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
+            //         if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
+            //         if (Data.lock) item.lockMode = Minecraft.ItemLockMode[Data.lock];
+            //         if (Data.keep_on_death) item.keepOnDeath = Data.keep_on_death === "true" ? true : false;
+            //         if (typeof slot == "number") container.setItem(slot, item);
+            //         else container.addItem(item);
+            //     } catch (e) {
+            //         console.error(e, e.stack);
+            //         player.sendMessage(`§c${e}`);
+            //         for (const ply of world.getPlayers({ tags: ["Capi:hasOp"] })) ply.sendMessage(`§c${e}`);
+            //     }
+            // });
+            // player.setItemJson = [];
 
             // Show form
-            if (player.formJson) {
-                const Data = easySafeParse(player.formJson);
-                player.formJson = false;
-                const Form = new MinecraftUI.ActionFormData();
-                if (Data.title) Form.title(String(setVariable(player, Data.title)));
-                if (Data.body) Form.body(String(setVariable(player, Data.body)));
+            // if (player.formJson) {
+            //     const Data = easySafeParse(player.formJson);
+            //     player.formJson = false;
+            //     const Form = new MinecraftUI.ActionFormData();
+            //     if (Data.title) Form.title(String(setVariable(player, Data.title)));
+            //     if (Data.body) Form.body(String(setVariable(player, Data.body)));
 
-                Data.buttons.forEach((b, index) => {
-                    if (!b.text) throw TypeError(`The button text is not passed.`);
-                    const text = setVariable(player, b.text);
-                    if (b.textures) Form.button(text, String(b.textures));
-                    else Form.button(text);
+            //     Data.buttons.forEach((b, index) => {
+            //         if (!b.text) throw TypeError(`The button text is not passed.`);
+            //         const text = setVariable(player, b.text);
+            //         if (b.textures) Form.button(text, String(b.textures));
+            //         else Form.button(text);
 
-                    if (text && Data.buttons.length - 1 === index) {
-                        Form.show(player).then(response => {
-                            if (Data.buttons[response.selection]?.tag) player.addTagWillRemove((Data.buttons[response.selection].tag));
-                        });
-                    }
-                });
-            }
+            //         if (text && Data.buttons.length - 1 === index) {
+            //             Form.show(player).then(response => {
+            //                 if (Data.buttons[response.selection]?.tag) player.addTagWillRemove((Data.buttons[response.selection].tag));
+            //             });
+            //         }
+            //     });
+            // }
 
             // Run command
             if (player.run) {
