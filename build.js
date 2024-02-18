@@ -122,6 +122,8 @@ function getDate() {
 
     console.log(`${getDate().cyan} 初期ビルドが完了しました。`.green);
 
+    if (!isWatch) return process.exit(0);
+
     if (isWatch) {
         const watcher = chokidar.watch("src/**/*.ts", {
             persistent: true,
@@ -139,7 +141,7 @@ function getDate() {
             watcher.on("change", async (path) => {
                 console.log(`${getDate().cyan} ${path} が変更されました。`.yellow);
 
-                const status = await build(path);
+                const status = await build();
 
                 if (status) {
                     console.log(`${getDate().cyan} ${path} のリビルドが完了しました。`.green);
