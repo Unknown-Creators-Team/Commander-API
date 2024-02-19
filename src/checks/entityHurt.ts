@@ -1,6 +1,5 @@
-import { GameMode, Vector3, system, world } from "@minecraft/server";
+import { GameMode, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { getScore } from "../util";
 
 GameTest.registerAsync("commander_api", "entityHurt", async (test) => {
     const pA = test.spawnSimulatedPlayer({ "x": 1, "y": 3, "z": 1 }, "Test-entityHurt-master", GameMode.survival);

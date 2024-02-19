@@ -1,4 +1,4 @@
-import { GameMode, Player, ScriptEventCommandMessageAfterEvent, system } from "@minecraft/server";
+import { GameMode } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 
 const DIAMOND_SWORD_TAG = "setItem:{item=minecraft:diamond_sword}";

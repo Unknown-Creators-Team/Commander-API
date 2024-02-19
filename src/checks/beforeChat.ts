@@ -1,4 +1,4 @@
-import { GameMode, system, world } from "@minecraft/server";
+import { GameMode, system } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 
 GameTest.register("commander_api", "beforeChat", (test) => {
