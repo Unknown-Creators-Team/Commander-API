@@ -13,3 +13,4 @@ import "./entityDie";
 import "./entityHit";
 import "./entityHurt";
 import "./itemUse";
+import "./itemUseOn";
