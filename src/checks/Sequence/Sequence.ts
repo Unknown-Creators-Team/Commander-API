@@ -48,23 +48,29 @@ export class Sequence {
             let sequenceId = 0;
 
             for await (const sequence of this.sequences) {
-                const result = await sequence.execute();
+                try {
+                    const result = await sequence.execute();
 
-                if (result !== true && (result === false || result.reason)) {
-                    this.test.fail(`シーケンス §b${sequence.name} [sequenceId: ${sequenceId}]§c が失敗しました${result !== false ? "\n" + result.reason : ""}`);
+                    if (result !== true && (result === false || result.reason)) {
+                        this.test.fail(`シーケンス §b${sequence.name} [sequenceId: ${sequenceId}]§c が失敗しました${result !== false ? "\n" + result.reason : ""}`);
+                        return;
+                    }
+
+                    if (sequence.awaitTicks > 0) {
+                        await checkUtils.wait(sequence.awaitTicks);
+                    }
+
+                    if (sequence.endAfterSucceed) {
+                        this.test.succeed();
+                        return;
+                    }
+
+                    sequenceId++;
+                } catch (e) {
+                    console.warn(e + e.stack);
+                    this.test.fail(`シーケンス §b${sequence.name} [sequenceId: ${sequenceId}]§c が失敗しました\n${e}`);
                     return;
                 }
-
-                if (sequence.awaitTicks > 0) {
-                    await checkUtils.wait(sequence.awaitTicks);
-                }
-
-                if (sequence.endAfterSucceed) {
-                    this.test.succeed();
-                    return;
-                }
-
-                sequenceId++;
             }
         })();
     }
