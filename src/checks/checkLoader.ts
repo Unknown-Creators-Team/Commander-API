@@ -12,3 +12,4 @@ import "./blockPlace";
 import "./entityDie";
 import "./entityHit";
 import "./entityHurt";
+import "./itemUse";
