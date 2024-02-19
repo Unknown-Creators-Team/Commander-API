@@ -15,3 +15,4 @@ import "./entityHurt";
 import "./itemUse";
 import "./itemUseOn";
 import "./join";
+import "./projectileHit";
