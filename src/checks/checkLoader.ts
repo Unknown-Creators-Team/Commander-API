@@ -14,3 +14,4 @@ import "./entityHit";
 import "./entityHurt";
 import "./itemUse";
 import "./itemUseOn";
+import "./join";
