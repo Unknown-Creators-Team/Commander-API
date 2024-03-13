@@ -25,6 +25,8 @@ import "./NativeCode.js";
 
 const { world, system } = Minecraft;
 
+world
+
 system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => beforeWatchdogTerminate.cancel = true);
 
 tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
@@ -262,6 +264,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
             player.score.set("Capi:playerJoinZ", Math.floor(player.location.z));
             player.score.add("Capi:joinCount", 1);
             player.addTagWillRemove("Capi:join");
+
             player.join = false;
         }
 
