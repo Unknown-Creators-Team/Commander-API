@@ -1,5 +1,16 @@
 import { system, world } from '@minecraft/server';
+
+type TickEventCallback = (data: { deltaTime: number, currentTick: number, tps: number }) => any;
+
 class TickEvent {
+    subscriptions: Record<string, () => any>;
+    lastTickDate: number;
+    deltaTime: number;
+    currentTick: number;
+    tickCheck: (() => void);
+    avgDeltaTime: number[];
+    tps: number;
+
     constructor() {
         this.subscriptions = {};
         this.lastTickDate;
@@ -9,6 +20,7 @@ class TickEvent {
         this.avgDeltaTime = [];
         this.tps;
     }
+
     __checkTicks() {
         if (this.tickCheck) return;
         this.tickCheck = () => {
@@ -24,12 +36,11 @@ class TickEvent {
         };
         system.run(this.tickCheck);
     }
+
     /**
      * @method subscribe
-     * @param {String} key 
-     * @param {Function} callback 
      */
-    subscribe(key, callback) {
+    subscribe(key: string, callback: TickEventCallback) {
         this.__checkTicks();
         this.subscriptions[key] = () => {
             const { deltaTime = 0, currentTick = 0, tps = 20 } = this;
@@ -38,12 +49,12 @@ class TickEvent {
         };
         system.run(this.subscriptions[key]);
     }
+
     /**
      * @method unsubscribe
-     * @param {String} key
      */
-    unsubscribe(key) {
-        console.warn(Object.keys(this.subscriptions).length); 
+    unsubscribe(key: string) {
+        console.warn(Object.keys(this.subscriptions).length);
         if (Object.keys(this.subscriptions).length <= 1) {
             system.run(() => { this.__checkTicks = false; });
         }
