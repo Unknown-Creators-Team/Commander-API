@@ -1,10 +1,10 @@
-import { GameMode, Player, system, world } from "@minecraft/server";
+import { EntityDieAfterEvent, GameMode, Player, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 
 GameTest.registerAsync("commander_api", "kill", async (test) => {
     const player = test.spawnSimulatedPlayer({ "x": 2, "y": 3, "z": 2 }, "Test-kill", GameMode.survival);
 
-    const callback = (ev) => {
+    const callback = (ev: EntityDieAfterEvent) => {
         const entity = ev.deadEntity;
 
         if (entity instanceof Player && entity.name === player.name) {

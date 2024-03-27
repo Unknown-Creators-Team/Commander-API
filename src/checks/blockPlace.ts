@@ -1,51 +1,36 @@
 import { GameMode, ItemStack, Vector, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
+import { checkUtils } from "./checkUtils";
 
-GameTest.register("commander_api", "blockPlace", (test) => {
+GameTest.register("commander_api", "blockPlace", async (test) => {
     const player = test.spawnSimulatedPlayer({ "x": 2, "y": 3, "z": 2 }, "Test-blockPlace", GameMode.survival);
 
     world.sendMessage(`§a${player.name} §bにOP権限を付与してください。`);
 
-    let time = 0;
+    await checkUtils.waitOp(player, test);
 
     const relativeLocation = { "x": 2, "y": 3, "z": 4 };
     const location = test.worldBlockLocation(relativeLocation);
 
-    player.runCommand("function Capi/checks/op");
+    world.sendMessage(`§aテストを開始します。`);
 
-    const i = system.runInterval(() => {
-        if (player.isOp()) {
-            system.clearRun(i);
+    const item = new ItemStack("planks", 1);
+    player.useItemOnBlock(item, relativeLocation);
 
-            world.sendMessage(`§aテストを開始します。`);
+    system.runTimeout(() => {
+        const hasPlace = player.hasTag("Capi:blockPlace");
+        const hasBlockID = player.hasTag(`blockPlace:minecraft:oak_planks`);
 
-            const item = new ItemStack("planks", 1);
-            player.useItemOnBlock(item, relativeLocation);
+        const resultLocation = Vector.add(location, { x: 0, y: 1, z: 0 });
 
-            system.runTimeout(() => {
-                const hasPlace = player.hasTag("Capi:blockPlace");
-                const hasBlockID = player.hasTag(`blockPlace:minecraft:oak_planks`);
+        const scoreX = player.score.get("Capi:blockPlaceX") == resultLocation.x;
+        const scoreY = player.score.get("Capi:blockPlaceY") == resultLocation.y;
+        const scoreZ = player.score.get("Capi:blockPlaceZ") == resultLocation.z;
 
-                const resultLocation = Vector.add(location, { x: 0, y: 1, z: 0 });
-
-                const scoreX = player.score.get("Capi:blockPlaceX") == resultLocation.x;
-                const scoreY = player.score.get("Capi:blockPlaceY") == resultLocation.y;
-                const scoreZ = player.score.get("Capi:blockPlaceZ") == resultLocation.z;
-
-                if (hasPlace && hasBlockID && scoreX && scoreY && scoreZ) {
-                    test.succeed();
-                } else {
-                    test.fail(`すべてのチェックが完了しませんでした: ${hasPlace}, ${hasBlockID}, ${scoreX}, ${scoreY}, ${scoreZ}`);
-                }
-            }, 20);
+        if (hasPlace && hasBlockID && scoreX && scoreY && scoreZ) {
+            test.succeed();
         } else {
-            time++;
-
-            if (time > 10) {
-                test.fail(`権限が付与されませんでした。`);
-
-                system.clearRun(i);
-            }
+            test.fail(`すべてのチェックが完了しませんでした: ${hasPlace}, ${hasBlockID}, ${scoreX}, ${scoreY}, ${scoreZ}`);
         }
     }, 20);
 })

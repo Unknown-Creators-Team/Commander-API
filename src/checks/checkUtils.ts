@@ -9,10 +9,12 @@ class TimeoutError extends Error {
 
 export namespace checkUtils {
     export function waitOp(player: SimulatedPlayer, test: Test, timeout: number = 10000): Promise<boolean> {
+        const timeoutSec = (timeout / 1000).toFixed(2);
+
         return new Promise((resolve, reject) => {
             const start = Date.now();
 
-            world.sendMessage(`§b${player.name} §aにOP権限を付与してください (タイムアウト: ${(timeout / 1000).toFixed(2)}秒)`);
+            world.sendMessage(`§b${player.name} §aにOP権限を付与してください (タイムアウト: ${timeoutSec}秒)`);
 
             const interval = system.runInterval(() => {
                 if (player.isOp()) {
@@ -20,7 +22,7 @@ export namespace checkUtils {
                     resolve(true);
                 } else if (Date.now() - start > timeout) {
                     system.clearRun(interval);
-                    test.fail(`${(timeout / 1000).toFixed(2)}秒以内にOP権限が付与されませんでした`);
+                    test.fail(`${timeoutSec}秒以内にOP権限が付与されませんでした`);
 
                     reject(new TimeoutError(timeout));
                 }

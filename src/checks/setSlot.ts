@@ -1,4 +1,4 @@
-import { GameMode, Player, system, world } from "@minecraft/server";
+import { GameMode } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 
 GameTest.registerAsync("commander_api", "setSlot", async (test) => {

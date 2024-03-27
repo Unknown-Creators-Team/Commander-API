@@ -2,8 +2,6 @@ import { GameMode, ItemStack } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 import { Sequence } from "./Sequence/Sequence";
 
-const DIRT_ITEMSTACK = new ItemStack("minecraft:dirt");
-
 GameTest.registerAsync("commander_api", "join", async (test) => {
     const player = test.spawnSimulatedPlayer({ "x": 2, "y": 2, "z": 2 }, "Test-join", GameMode.survival);
     const sequence = new Sequence(test);

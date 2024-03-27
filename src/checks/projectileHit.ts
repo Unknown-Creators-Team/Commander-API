@@ -1,4 +1,4 @@
-import { Entity, GameMode, ItemStack, world } from "@minecraft/server";
+import { GameMode, ItemStack } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 import { Sequence } from "./Sequence/Sequence";
 import { checkUtils } from "./checkUtils";
