@@ -295,7 +295,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
         player.score.set("Capi:ry", Math.floor(player.getRotation().y));
 
         // selected slot
-        player.score.set("Capi:slot", player.selectedSlot);
+        player.score.set("Capi:slot", player.selectedSlotIndex);
 
         // timestamp
         player.score.set("Capi:timestamp", Math.floor( Date.now() / 1000 ));
@@ -345,13 +345,13 @@ world.afterEvents.entityHurt.subscribe(entityHurt => {
     const { cause, damagingEntity: player } = damageSource;
     
     if (entity && entity.isPlayer()) {
-        entity.score.set("Capi:hurt", damage);
+        entity.score.set("Capi:hurt", Math.round(damage));
         entity.addTagWillRemove(`Capi:hurt`);
         player.removeTags(player.getTags().filter(t => t.startsWith("cause:")));
         entity.addTagWillRemove(`cause:${cause}`);
     }
     if (player && player.isPlayer()) {
-        player.score.set("Capi:damage", damage);
+        player.score.set("Capi:damage", Math.round(damage));
         player.addTagWillRemove(`Capi:damage`);
     }
 });
