@@ -48,17 +48,19 @@ export function setVariable(player, text) {
             const score = text.split("{score:")[1].split(/(}|,})/i)[0];
             const str = `${score}}`;
             const object = easySafeParse(str);
+            console.warn(JSON.stringify(object));
             if (Object.values(object).length === 0) {
-                if (score)
+                if (score) {
                     text = text.replace(
                         new RegExp(`({score:${score}}|{score:${score},})`, "i"),
                         getScore(player, score).toString()
                     );
+                }
             } else if (Object.values(object).length > 0) {
                 const playerName = object.name || player;
                 const objectName = object.object;
                 text = text.replace(
-                    new RegExp(`({score:${score}}|{score:${score},})`, "i"),
+                    new RegExp(`({score:${str}}|{score:${str},})`, "i"),
                     getScore(playerName, objectName).toString()
                 );
             }
@@ -268,9 +270,9 @@ export function getScore(target, objective) {
         // get all scores in the objective
         const scores = world.scoreboard.getObjective(objective).getScores();
         // find the score with the matching name
-        const score = scores.find(({ participant }) => participant.displayName === target);
+        const score = scores.find(({ participant }) => participant.displayName === target)?.score;
         // return the score value
-        if (typeof score === "number") return score.score;
+        if (typeof score === "number") return score;
             else return undefined;
     } else {
         // if target is a player, get the score by player
