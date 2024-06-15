@@ -46,13 +46,9 @@ export function setVariable(player, text) {
         // score
         try {
             const score = text.split("{score:")[1].split(/(}|,})/i)[0];
-            console.warn(score);
             const str = `${score}}`;
             const object = easySafeParse(str);
             if (Object.values(object).length === 0) {
-                console.warn("object", object);
-                console.warn("score", getScore(player, score));
-
                 if (score)
                     text = text.replace(
                         new RegExp(`({score:${score}}|{score:${score},})`, "i"),
