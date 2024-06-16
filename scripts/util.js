@@ -48,7 +48,6 @@ export function setVariable(player, text) {
             const score = text.split("{score:")[1].split(/(}|,})/i)[0];
             const str = `${score}}`;
             const object = easySafeParse(str);
-            console.warn(JSON.stringify(object));
             if (Object.values(object).length === 0) {
                 if (score) {
                     text = text.replace(
