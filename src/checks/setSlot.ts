@@ -9,8 +9,8 @@ GameTest.registerAsync("commander_api", "setSlot", async (test) => {
             player.runCommand("scoreboard players set @s Capi:setSlot 4");
         })
         .thenExecuteAfter(5, () => {
-            if (player.selectedSlot !== 4) {
-                test.fail(`スロットが一致しませんでした。予定されているスロット: 4, 現在のスロット: ${player.selectedSlot}`);
+            if (player.selectedSlotIndex !== 4) {
+                test.fail(`スロットが一致しませんでした。予定されているスロット: 4, 現在のスロット: ${player.selectedSlotIndex}`);
                 return;
             }
         })

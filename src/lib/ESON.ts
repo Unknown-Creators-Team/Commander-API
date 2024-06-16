@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * An intrinsic object that provides functions to convert JavaScript values to and from the Easy JSON (ESON) format.
  */

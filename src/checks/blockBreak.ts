@@ -14,7 +14,7 @@ GameTest.register("commander_api", "blockBreak", (test) => {
 
             world.sendMessage(`§aテストを開始します。`);
 
-            const { block: viewBlock } = player.getBlockFromViewDirection();
+            const { block: viewBlock } = player.getBlockFromViewDirection()!;
 
             player.breakBlock({ "x": 2, "y": 3, "z": 4 });
 

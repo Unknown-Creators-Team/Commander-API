@@ -1,4 +1,4 @@
-import { GameMode, ItemStack, Vector, system, world } from "@minecraft/server";
+import { GameMode, ItemStack, Vector3, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 
 GameTest.register("commander_api", "blockPlace", (test) => {
@@ -26,7 +26,7 @@ GameTest.register("commander_api", "blockPlace", (test) => {
                 const hasPlace = player.hasTag("Capi:blockPlace");
                 const hasBlockID = player.hasTag(`blockPlace:minecraft:oak_planks`);
 
-                const resultLocation = Vector.add(location, { x: 0, y: 1, z: 0 });
+                const resultLocation = addVector(location, { x: 0, y: 1, z: 0 });
 
                 const scoreX = player.score.get("Capi:blockPlaceX") == resultLocation.x;
                 const scoreY = player.score.get("Capi:blockPlaceY") == resultLocation.y;
@@ -51,3 +51,7 @@ GameTest.register("commander_api", "blockPlace", (test) => {
 })
     .structureName("Capi:test_blockBreak")
     .maxTicks(20 * 30);
+
+function addVector(vec1: Vector3, vec2: Vector3): Vector3 {
+    return { x: vec1.x + vec2.x, y: vec1.y + vec2.y, z: vec1.z + vec2.z };
+}

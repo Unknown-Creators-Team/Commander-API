@@ -152,8 +152,8 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             // Set slot
             try {
                 const setSlot = getScore(player, "Capi:setSlot");
-                if (setSlot >= 0) {
-                    player.selectedSlot = setSlot;
+                if (setSlot && setSlot >= 0) {
+                    player.selectedSlotIndex = setSlot;
                     player.score.reset("Capi:setSlot");
                 }
             } catch { }
@@ -267,7 +267,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                         Number(verticalStrength.search(/[^0-9-.]/) >= 0 ? 0 : verticalStrength));
 
                     player.knockback = false;
-                } catch (e) { console.error(e, e.stack) }
+                } catch (e) { console.error(e, (e as Error).stack) }
             }
 
             // Join
@@ -294,7 +294,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             player.score.set("Capi:vectorZ", Math.round(player.getViewDirection().z * 100));
 
             // health
-            const health = Math.round(player.getComponent("health").currentValue);
+            const health = Math.round(player.getComponent("health")?.currentValue ?? -1);
             player.score.set("Capi:health", health);
 
             // pos
@@ -307,7 +307,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             player.score.set("Capi:ry", Math.floor(player.getRotation().y));
 
             // selected slot
-            player.score.set("Capi:slot", player.selectedSlot);
+            player.score.set("Capi:slot", player.selectedSlotIndex);
 
             // timestamp
             player.score.set("Capi:timestamp", Math.floor(Date.now() / 1000));
@@ -327,7 +327,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             }
         })
     } catch (e) {
-        console.error(e, e.stack)
+        console.error(e, (e as Error).stack)
     }
 });
 
@@ -396,8 +396,7 @@ world.beforeEvents.chatSend.subscribe(chat => {
     const player = chat.sender;
 
     let msg = chat.message;
-    let mute: string = null;
-
+    let mute: string | undefined = undefined;
     player.getTags().forEach((t) => {
         t = t.replace(/"/g, "");
         if (t.startsWith("chat:")) system.run(() => player.removeTag(t));
@@ -408,14 +407,14 @@ world.beforeEvents.chatSend.subscribe(chat => {
     player.score.set("Capi:chatLength", msg.length);
     player.score.add("Capi:chatCount", 1);
     if (Config.get("CancelSendMsgEnabled")) {
-        const CancelSendMsg = Config.get("CancelSendMsg");
+        const CancelSendMsg = Config.get("CancelSendMsg") as { start: string[], end: string[], include: string[] };
         const start = CancelSendMsg?.start.some(v => v.length && msg.startsWith(v));
         const end = CancelSendMsg?.end.some(v => v.length && msg.endsWith(v));
         const include = CancelSendMsg?.include.some(v => v.length && msg.includes(v));
         if (start || end || include) return chat.cancel = true;
     }
-    if (mute !== null || player.hasTag("mute")) {
-        player.sendMessage(mute.length ? mute : "§cYou have been muted.");
+    if (mute !== undefined || player.hasTag("mute")) {
+        player.sendMessage(mute ? mute : "§cYou have been muted.");
         return chat.cancel = true;
     }
     if (player.score.get("Capi:privatechat")) {
@@ -430,7 +429,7 @@ world.beforeEvents.chatSend.subscribe(chat => {
     }
     if (Config.get("ChatUIEnabled")) {
         const text = setVariable(player, String((Config.get("ChatUI"))));
-        world.sendMessage(text.replace(/({message}|{msg})/gi, msg));
+        text ? world.sendMessage(text.replace(/({message}|{msg})/gi, msg)) : 0;
         return chat.cancel = true;
     }
 });
@@ -490,7 +489,7 @@ world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
 
 world.afterEvents.projectileHitBlock.subscribe(projectileHit => {
     const { projectile, source: player } = projectileHit;
-    if (!player.isPlayer()) return;
+    if (!player?.isPlayer()) return;
 
     const hit = projectileHit.getBlockHit().block;
 
@@ -509,7 +508,7 @@ world.afterEvents.projectileHitBlock.subscribe(projectileHit => {
 
 world.afterEvents.projectileHitEntity.subscribe(projectileHit => {
     const { projectile, source: player } = projectileHit;
-    if (!player.isPlayer()) return;
+    if (!player?.isPlayer()) return;
 
     const hit = projectileHit.getEntityHit().entity;
 
@@ -523,7 +522,7 @@ world.afterEvents.projectileHitEntity.subscribe(projectileHit => {
 
     player.addTagWillRemove(`Capi:hit`);
     player.addTagWillRemove(`hitWith:${projectile.typeId}`);
-    player.addTagWillRemove(`hitTo:${hit.typeId}`);
+    player.addTagWillRemove(`hitTo:${hit?.typeId}`);
 });
 
 world.afterEvents.playerBreakBlock.subscribe(async blockBreak => {
@@ -641,7 +640,7 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
     const { id, initiator, message, sourceBlock, sourceEntity, sourceType } = scriptEventReceive;
     const type = id.split(":")[1];
     const player = sourceBlock || sourceEntity;
-
+    if (!player) throw new Error("The player is not found.");
     if (type.toLowerCase() === "explosion") {
         try {
             const object = easySafeParse(message);
@@ -659,7 +658,7 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
 
             player.dimension.createExplosion(loc, radius, options);
 
-        } catch (e) { console.error(e, e.stack) }
+        } catch (e) { console.error(e, (e as Error).stack) }
     } else if (["spawn", "entity"].every(v => type.toLowerCase().includes(v))) {
 
         const object = easySafeParse(message);
@@ -682,8 +681,8 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
         const object = easySafeParse(message);
         if (!object.item) return;
         const amount = object.amount ? Number(object.amount) : 1;
-        const itemName = object.item.replace("minecraft:", "");
-        const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
+        const itemName = object.item;//.replace("minecraft:", "");
+        const item = new Minecraft.ItemStack(itemName, amount);
         if (object.name) item.nameTag = setVariable(player, object.name);
         if (object.lore) {
             for (let v in object.lore) object.lore[v] = setVariable(player, object.lore[v]);
@@ -696,12 +695,12 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
                 let enchantsName = object.enchants[i].name;
                 let enchantsLevel = 1;
                 if (object.enchants[i].level) enchantsLevel = Number(object.enchants[i].level);
-                enchantments.addEnchantment({ type: enchantsName, level: enchantsLevel });
+                enchantments?.addEnchantment({ type: enchantsName, level: enchantsLevel });
             }
         }
         if (object.can_place_on) item.setCanPlaceOn(object.can_place_on);
         if (object.can_destroy) item.setCanDestroy(object.can_destroy);
-        if (object.lock) item.lockMode = Minecraft.ItemLockMode[object.lock];
+        if (object.lock) item.lockMode = Minecraft.ItemLockMode[object.lock as keyof typeof Minecraft.ItemLockMode];
         if (object.keep_on_death) item.keepOnDeath = object.keep_on_death === "true" ? true : false;
         const x = parsePos(object.x, player, "x");
         const y = parsePos(object.y, player, "y");
@@ -710,8 +709,8 @@ system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
         player.dimension.spawnItem(item, loc);
     } else if (type.toLowerCase() === "say") {
 
-        if (player instanceof Minecraft.Player) world.sendMessage(setVariable(player, message));
-        else world.sendMessage(setVariable({}, message));
+        if (player.isPlayer()) world.sendMessage(setVariable(player, message) ?? "");
+        else world.sendMessage(setVariable(undefined, message) ?? "");
 
     } else if (["teleport", "tp"].includes(type.toLowerCase()) && player instanceof Minecraft.Player) {
 

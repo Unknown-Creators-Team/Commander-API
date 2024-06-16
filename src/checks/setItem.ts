@@ -11,7 +11,9 @@ const DIRT_AMOUNT_64_SLOT_2 = "setItem:{item=minecraft:dirt,amount=64,slot=2}";
 GameTest.registerAsync("commander_api", "setitem", async (test) => {
     const player = test.spawnSimulatedPlayer({ "x": 2, "y": 3, "z": 2 }, "Test-setItem", GameMode.survival);
 
-    const { container } = player.getComponent("inventory");
+    const { container } = player.getComponent("inventory")!;
+
+    if (!container) return test.fail("プレイヤーのインベントリが見つかりませんでした。");
 
     test.startSequence()
         .thenWaitAfter(10, () => {

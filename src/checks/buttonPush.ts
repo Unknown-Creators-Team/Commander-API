@@ -14,7 +14,7 @@ GameTest.register("commander_api", "buttonPush", (test) => {
 
             world.sendMessage(`§aテストを開始します。`);
 
-            const { block: viewBlock } = player.getBlockFromViewDirection();
+            const { block: viewBlock } = player.getBlockFromViewDirection()!;
 
             player.interact();
 

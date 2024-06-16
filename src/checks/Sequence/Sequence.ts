@@ -67,7 +67,7 @@ export class Sequence {
 
                     sequenceId++;
                 } catch (e) {
-                    console.warn(e + e.stack);
+                    console.warn(e, (e as Error).stack);
                     this.test.fail(`シーケンス §b${sequence.name} [sequenceId: ${sequenceId}]§c が失敗しました\n${e}`);
                     return;
                 }

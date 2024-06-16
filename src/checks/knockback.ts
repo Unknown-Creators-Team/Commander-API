@@ -1,4 +1,4 @@
-import { GameMode, Player, Vector, system, world } from "@minecraft/server";
+import { GameMode, Player, Vector3, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 
 GameTest.registerAsync("commander_api", "knockback", async (test) => {
@@ -9,7 +9,7 @@ GameTest.registerAsync("commander_api", "knockback", async (test) => {
 
         system.runTimeout(() => {
             const endLocation = test.worldLocation({ x: 3, y: 2, z: 3 });
-            const distance = Vector.distance(player.location, endLocation);
+            const distance = calcDistance(player.location, endLocation);
 
             if (distance <= 0.5) {
                 test.succeed();
@@ -21,3 +21,7 @@ GameTest.registerAsync("commander_api", "knockback", async (test) => {
 })
     .structureName("Capi:test_box")
     .maxTicks(20 * 30);
+
+function calcDistance(vec1: Vector3, vec2: Vector3): number {
+    return Math.hypot(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
+}

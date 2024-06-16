@@ -11,6 +11,7 @@
  * @AUTHORS Nano, arutaka
  * @LINK https://github.com/191225/Commander-API
  */
+// @ts-nocheck
 
 import * as Minecraft from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";

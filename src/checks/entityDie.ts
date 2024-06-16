@@ -23,7 +23,7 @@ GameTest.registerAsync("commander_api", "entityDie", async (test) => {
         function pAKillpB() {
             const health = pB.getComponent("health");
 
-            health.setCurrentValue(1);
+            health?.setCurrentValue(1);
 
             pA.attackEntity(pB);
 
@@ -52,7 +52,7 @@ GameTest.registerAsync("commander_api", "entityDie", async (test) => {
             const entity = pA.dimension.spawnEntity("minecraft:cow", spawnLocation);
             const health = entity.getComponent("health");
 
-            health.setCurrentValue(1);
+            health?.setCurrentValue(1);
 
             pA.attackEntity(entity);
 
@@ -79,7 +79,7 @@ GameTest.registerAsync("commander_api", "entityDie", async (test) => {
             const i = system.runInterval(() => {
                 const health = pA.getComponent("health");
 
-                if (health.currentValue <= 0) {
+                if ((health?.currentValue ?? 0) <= 0) {
                     system.runTimeout(() => {
                         const hasDeath = pA.hasTag("Capi:death");
                         const pADeathScoreNow = pA.score.get("Capi:death");
