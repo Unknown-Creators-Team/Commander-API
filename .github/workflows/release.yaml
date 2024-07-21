@@ -15,7 +15,7 @@ jobs:
             - name: Zip the code
             #   run: zip -r source_code.zip . -x src/* *.git* *.github* *.vscode* "*\@types*" *node_modules* .gitignore .mcattributes CNAME package-lock.json build.js createTestFunction.js tsconfig.json
             # 上記のrunのファイルやフォルダをexcludeするのではなく、includeするように変更
-              run: zip -r source_code.zip . -i functions/* 
+              run: zip -r source_code.zip . -i functions/* scripts/* structures/* LICENSE manifest.json pack_icon.png package.json README.md
 
             - name: Rename the file
               run: |

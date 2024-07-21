@@ -16,7 +16,7 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
     world.sendMessage(`Received event ${id} from ${source instanceof Minecraft.Player ? source.name : "block"}: ${message}`);
 
     try {
-        switch (id) {
+        switch (id.toLowerCase()) {
             case "rename": {
                 if (!source.isPlayer()) throw new Error("Cannot rename a non-player entity.");
                 source.nameTag = setVariable(source, message) ?? message;
@@ -24,14 +24,13 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
             }
             case "resetname":
             case "reset_name":
-            case "reset":
-            case "resetName": {
+            case "reset": {
                 if (!source.isPlayer()) throw new Error("Cannot rename a non-player entity.");
                 source.nameTag = source.name;
                 break;
             }
             case "setitem":
-            case "setItem": {
+            case "set_item": {
                 if (!source.isPlayer()) throw new Error("Cannot set item to a non-player entity.");
                 const container = source.getComponent("inventory")?.container;
                 if (!container) throw new Error("Player does not have an inventory container.");
@@ -134,16 +133,13 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
                                 const label = setVariable(source, content.label) ?? content.label;
                                 const options = content.options.map((v) => setVariable(source, v) ?? v).filter(Boolean);
                                 form.dropdown(label, options, content.default ? Number(content.default) : undefined);
-                            }
-                            if (content.type === "slider") {
+                            } else if (content.type === "slider") {
                                 const label = setVariable(source, content.label) ?? content.label;
                                 form.slider(label, Number(content.min), Number(content.max), Number(content.step), content.default ? Number(content.default) : undefined);
-                            }
-                            if (content.type === "textField") {
+                            } else if (content.type === "textField") {
                                 const label = setVariable(source, content.label) ?? content.label;
                                 form.textField(label, setVariable(source, content.placeholder) ?? content.placeholder, content.default);
-                            }
-                            if (content.type === "toggle") {
+                            } else if (content.type === "toggle") {
                                 const label = setVariable(source, content.label) ?? content.label;
                                 form.toggle(label, content.default);
                             }
