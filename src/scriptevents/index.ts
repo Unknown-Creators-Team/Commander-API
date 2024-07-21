@@ -11,10 +11,10 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
 
     if (!source?.isPlayer() && !block?.isBlock()) return;
 
-    const module = modules.scriptevents.find(module => module.toLowerCase() === id.toLowerCase());
+    const module = modules.scriptevents.find(module => sanitize(module) === sanitize(id));
     if (!module) throw new Error(`Module '${id}' not found.`);
 
-    const path = `./${id}`;
+    const path = `./${sanitize(id)}`;
 
     if (cache.has(path)) {
         cache.get(path)!(source, message);
@@ -34,3 +34,7 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
         });
     }
 });
+
+function sanitize(str: string) {
+    return str.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+}

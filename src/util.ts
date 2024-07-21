@@ -120,16 +120,18 @@ export function bothParse (object: string): any {
     }
 }
 
-export const parsePos = (pos: string, player: Minecraft.Entity | Minecraft.Block, type: "x" | "y" | "z" | "rx" | "ry"): number => {
+export const parsePos = (pos: string, player: Minecraft.Entity | Minecraft.Block | undefined, type: "x" | "y" | "z" | "rx" | "ry"): number => {
     let resultPos = 0;
     if (pos) {
         if (pos?.startsWith("~")) {
             const num = Number(pos.replace(/~/g, ""));
-            if (type.startsWith("r") && player.isEntity()) resultPos = player.getRotation()[type.replace("r", "") as "x" | "y"] + num;
-            else resultPos = player.location[type as keyof Minecraft.Vector2] + num;
+            if (type.startsWith("r") && player?.isEntity()) resultPos = player.getRotation()[type.replace("r", "") as "x" | "y"] + num;
+            else if (player?.isEntity() || player?.isBlock()) resultPos = player.location[type as keyof Minecraft.Vector2] + num;
+            else resultPos = num;
         } else resultPos = Number(pos);
-    } else if (type.startsWith("r") && player.isEntity()) resultPos = player.getRotation()[type.replace("r", "") as "x" | "y"];
-    else resultPos = player.location[type as keyof Minecraft.Vector2];
+    } else if (type.startsWith("r") && player?.isEntity()) resultPos = player.getRotation()[type.replace("r", "") as "x" | "y"];
+    else if (player?.isEntity() || player?.isBlock()) resultPos = player.location[type as keyof Minecraft.Vector2];
+    else resultPos = 0;
 
     return resultPos;
 }
@@ -268,4 +270,11 @@ export function getScore(target: Minecraft.Entity | string, objective: string): 
             else return undefined;
         } catch (e) { return undefined; }
     }
+}
+
+export function isTrue(value: any): boolean {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") return value.toLowerCase() === "true";
+    if (typeof value === "number") return value === 1;
+    return false;
 }

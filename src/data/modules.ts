@@ -4,7 +4,12 @@ export default
         "rename",
         "resetName",
         "setItem",
-        "form"
+        "form",
+        "explosion",
+        "spawnentity",
+        "spawnitem",
+        "say",
+        "tp"
     ],
     events: [
         "buttonPush",
