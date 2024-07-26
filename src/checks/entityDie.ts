@@ -1,31 +1,32 @@
-import { GameMode, Vector3, system, world } from "@minecraft/server";
+import { Entity, EntityHealthComponent, GameMode, Vector3, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 import { getScore } from "../util";
+import { checkUtils } from "./checkUtils";
 
 GameTest.registerAsync("commander_api", "entityDie", async (test) => {
     const pA = test.spawnSimulatedPlayer({ "x": 1, "y": 3, "z": 1 }, "Test-entityDie-master", GameMode.survival);
     const pB = test.spawnSimulatedPlayer({ "x": 3, "y": 3, "z": 3 }, "Test-entityDie", GameMode.survival);
-
-    system.runTimeout(() => {
+    
+    system.runTimeout(async () => {
         const pAKillPlayerScore = pA.score.get("Capi:killPlayer") || 0;
         const pBDeathPlayerScore = pB.score.get("Capi:deathPlayer") || 0;
 
-        const pAKillScore = getScore(pA, "Capi:kill") || 0;
-        const pADeathScore = getScore(pA, "Capi:death") || 0;
+        const pAKillScore = getScore(pA as unknown as Entity, "Capi:kill") || 0;
+        const pADeathScore = getScore(pA as unknown as Entity, "Capi:death") || 0;
 
-        pA.lookAtEntity(pB);
-        pB.lookAtEntity(pA);
+        pA.lookAtEntity(pB as unknown as Entity);
+        pB.lookAtEntity(pA as unknown as Entity);
 
-        world.sendMessage(`§a${pA.name} §bにOP権限を付与してください。`);
+        await checkUtils.waitOp(pA, test);
 
-        let time = 0;
+        pAKillpB();
 
         function pAKillpB() {
             const health = pB.getComponent("health");
 
             health?.setCurrentValue(1);
 
-            pA.attackEntity(pB);
+            pA.attackEntity(pB as unknown as Entity);
 
             system.runTimeout(() => {
                 const hasKill = pA.hasTag("Capi:killPlayer");
@@ -50,7 +51,7 @@ GameTest.registerAsync("commander_api", "entityDie", async (test) => {
             }
 
             const entity = pA.dimension.spawnEntity("minecraft:cow", spawnLocation);
-            const health = entity.getComponent("health");
+            const health = entity.getComponent("health") as EntityHealthComponent;
 
             health?.setCurrentValue(1);
 
@@ -96,22 +97,6 @@ GameTest.registerAsync("commander_api", "entityDie", async (test) => {
                 }
             }, 20);
         }
-
-        const i = system.runInterval(() => {
-            if (pA.isOp()) {
-                system.clearRun(i);
-
-                world.sendMessage(`§aテストを開始します。`);
-
-                pAKillpB();
-            } else {
-                time++;
-
-                if (time > 10) {
-                    test.fail("OP権限が付与されていません。");
-                }
-            }
-        }, 20);
     }, 20);
 })
     .structureName("Capi:test_box")
