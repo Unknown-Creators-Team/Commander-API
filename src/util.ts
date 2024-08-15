@@ -71,6 +71,23 @@ export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecr
             }
         } catch (e) {}
 
+        // velocity
+        try {
+            if (player?.isEntity()) {
+                const { x, y, z } = player.getVelocity();
+                const v = {
+                    x, y, z,
+                    xy: Math.hypot(x, y),
+                    xz: Math.hypot(x, z),
+                    yz: Math.hypot(y, z),
+                    xyz: Math.hypot(x, y, z)
+                }
+
+                const velocity = [...text.split("{velocity:")[1].split(/(}|,})/i)[0]].sort((a, b) => a.localeCompare(b)).join("");
+                text = text.replace(new RegExp(`({velocity:${velocity}}|{velocity:${velocity},})`, "i"), v[velocity as keyof typeof v]?.toString() ?? "null");
+            }
+        } catch {}
+
         // calc
         try {
             const calc = text.split("{calc:")[1].split(/(}|,})/i)[0];
@@ -136,13 +153,16 @@ export const parsePos = (pos: string, player: Minecraft.Entity | Minecraft.Block
     return resultPos;
 }
 
-function calculate(expression: string): number {
-    const operatorPrecedence = {
+export function calculate(expression: string): number {
+    const operatorPrecedence: { [key: string]: number } = {
         "+": 1,
         "-": 1,
         "*": 2,
         "/": 2,
+        "%": 2,
+        "//": 2,
         "**": 3,
+        "^": 3,
         sqrt: 4,
         sin: 4,
         cos: 4,
@@ -158,50 +178,54 @@ function calculate(expression: string): number {
         log2: 4,
     };
 
-    const operators = {
-        "+": (a: number, b: number) => a + b,
-        "-": (a: number, b: number) => a - b,
-        "*": (a: number, b: number) => a * b,
-        "/": (a: number, b: number) => a / b,
-        "**": (a: number, b: number) => Math.pow(a, b),
-        sqrt: (a: number) => Math.sqrt(a),
-        sin: (a: number) => Math.sin(a),
-        cos: (a: number) => Math.cos(a),
-        tan: (a: number) => Math.tan(a),
-        asin: (a: number) => Math.asin(a),
-        acos: (a: number) => Math.acos(a),
-        atan: (a: number) => Math.atan(a),
-        abs: (a: number) => Math.abs(a),
-        round: (a: number) => Math.round(a),
-        floor: (a: number) => Math.floor(a),
-        ceil: (a: number) => Math.ceil(a),
-        log10: (a: number) => Math.log10(a),
-        log2: (a: number) => Math.log2(a),
+    const operators: { [key: string]: (a: number, b?: number) => number } = {
+        "+": (a, b = 0) => a + b,
+        "-": (a, b = 0) => a - b,
+        "*": (a, b = 0) => a * b,
+        "/": (a, b = 1) => a / b,
+        "%": (a, b = 1) => a % b,
+        "//": (a, b = 1) => Math.floor(a / b),
+        "**": (a, b = 1) => Math.pow(a, b),
+        "^": (a, b = 1) => Math.pow(a, b),
+        sqrt: (a) => Math.sqrt(a),
+        sin: (a) => Math.sin(a),
+        cos: (a) => Math.cos(a),
+        tan: (a) => Math.tan(a),
+        asin: (a) => Math.asin(a),
+        acos: (a) => Math.acos(a),
+        atan: (a) => Math.atan(a),
+        abs: (a) => Math.abs(a),
+        round: (a) => Math.round(a),
+        floor: (a) => Math.floor(a),
+        ceil: (a) => Math.ceil(a),
+        log10: (a) => Math.log10(a),
+        log2: (a) => Math.log2(a),
     };
 
-    // Add 0 before - at the start of the expression or after (
     expression = expression.replace(/^-\d+|\(-\d+/g, (match) => "0" + match);
+    const tokens = expression.match(/\/\/|sqrt|abs|asin|acos|atan|sin|cos|tan|round|floor|ceil|log10|log2|\*\*|\^|\d*\.?\d+|\S/g);
+    if (!tokens) {
+        throw new Error("Invalid expression");
+    }
+    const outputQueue: (number | string)[] = [];
+    const operatorStack: string[] = [];
 
-    const tokens = expression.match(/sqrt|abs|asin|acos|atan|sin|cos|tan|round|floor|ceil|log10|log2|\*\*|\d+|\S/g);
-    const outputQueue: any[] = [];
-    const operatorStack: any[] = [];
-
-    tokens?.forEach((token) => {
+    tokens.forEach((token) => {
         if (!isNaN(Number(token))) {
             outputQueue.push(Number(token));
         } else if (token in operatorPrecedence) {
             while (
                 operatorStack.length &&
-                operatorPrecedence[token as keyof typeof operatorPrecedence] <= operatorPrecedence[operatorStack[operatorStack.length - 1] as keyof typeof operatorPrecedence]
+                operatorPrecedence[token] <= operatorPrecedence[operatorStack[operatorStack.length - 1]]
             ) {
-                outputQueue.push(operatorStack.pop());
+                outputQueue.push(operatorStack.pop()!);
             }
             operatorStack.push(token);
         } else if (token === "(") {
             operatorStack.push(token);
         } else if (token === ")") {
             while (operatorStack.length && operatorStack[operatorStack.length - 1] !== "(") {
-                outputQueue.push(operatorStack.pop());
+                outputQueue.push(operatorStack.pop()!);
             }
             if (operatorStack.pop() !== "(") {
                 throw new Error("Mismatched parentheses");
@@ -216,38 +240,26 @@ function calculate(expression: string): number {
         if (operator === "(" || operator === ")") {
             throw new Error("Mismatched parentheses");
         }
-        outputQueue.push(operator);
+        outputQueue.push(operator!);
     }
 
-    const calculationStack: any[] = [];
+    const calculationStack: number[] = [];
 
     outputQueue.forEach((token) => {
         if (typeof token === "number") {
             calculationStack.push(token);
         } else {
             const b = calculationStack.pop();
-            const a = [
-                "sqrt",
-                "abs",
-                "asin",
-                "acos",
-                "atan",
-                "sin",
-                "cos",
-                "tan",
-                "round",
-                "floor",
-                "ceil",
-                "log10",
-                "log2",
-            ].includes(token)
-                ? b
-                : calculationStack.pop();
-            calculationStack.push(operators[token as keyof typeof operators](a, b));
+            const a = calculationStack.pop();
+            if (b === undefined || (a === undefined && !["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token))) {
+                throw new Error("Invalid operation");
+            }
+            const result = operators[token](a ?? b, b);
+            calculationStack.push(result);
         }
     });
 
-    return calculationStack.pop();
+    return calculationStack.pop()!;
 }
 
 export function getScore(target: Minecraft.Entity | string, objective: string): number | undefined {
