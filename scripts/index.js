@@ -25,8 +25,6 @@ import "./NativeCode.js";
 
 const { world, system } = Minecraft;
 
-world
-
 system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => beforeWatchdogTerminate.cancel = true);
 
 tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
@@ -307,7 +305,7 @@ tickEvent.subscribe("main", ({currentTick, deltaTime, tps}) => { try {
             else player.score.set("Capi:dimension", -2);
 
         // fall distance
-        player.score.set("Capi:fall", Math.round(player.fallDistance));
+        // player.score.set("Capi:fall", Math.round(player.fallDistance));
 
         if (player.hasTag("Capi:open_config_gui")) {
             const ui = new UI(player);
