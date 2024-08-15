@@ -8,7 +8,7 @@ declare module "@minecraft/server" {
     }
 
     interface ItemComponentMap {
-        "enchantments": MC.ItemEnchantsComponent;
+        "enchantments": MC.ItemEnchantableComponent;
     }
 
     interface Entity { // getComponentNew("inventory") -> Inventory index.jsの41行目
