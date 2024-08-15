@@ -1,6 +1,6 @@
 import { GameMode, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { checkUtils } from "./checkUtils";
+import { checkUtils } from "./checkUtils.js";
 
 GameTest.register("commander_api", "buttonPush", async (test) => {
     const player = test.spawnSimulatedPlayer({ "x": 2, "y": 3, "z": 2 }, "Test-buttonPush", GameMode.survival);
@@ -11,9 +11,14 @@ GameTest.register("commander_api", "buttonPush", async (test) => {
 
     world.sendMessage(`§aテストを開始します。`);
 
-    const { block: viewBlock } = player.getBlockFromViewDirection();
+    const view = player.getBlockFromViewDirection();
 
-    player.interact();
+    if(!view) {
+        test.fail("プレイヤーの視線先にブロックがありません。");
+        return;
+    }
+
+    const { block: viewBlock } = view;
 
     system.runTimeout(() => {
         const hasPushed = player.hasTag("Capi:pushed");

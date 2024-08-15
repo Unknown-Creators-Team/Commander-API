@@ -1,6 +1,6 @@
-import { GameMode, system, world } from "@minecraft/server";
+import { Entity, GameMode, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { checkUtils } from "./checkUtils";
+import { checkUtils } from "./checkUtils.js";
 
 GameTest.registerAsync("commander_api", "entityHurt", async (test) => {
     const pA = test.spawnSimulatedPlayer({ "x": 1, "y": 3, "z": 1 }, "Test-entityHurt-master", GameMode.survival);
@@ -10,11 +10,9 @@ GameTest.registerAsync("commander_api", "entityHurt", async (test) => {
         const pAdamageScore = pA.score.get("Capi:damage") || 0;
         const pBhurtScore = pB.score.get("Capi:hurt") || 0;
 
-        world.sendMessage(`§a${pA.name} §bにOP権限を付与してください。`);
-
         await checkUtils.waitOp(pA, test);
 
-        pA.attackEntity(pB);
+        pA.attackEntity(pB as unknown as Entity);
 
         system.runTimeout(() => {
             const hasDamageTag = pA.hasTag("Capi:damage");

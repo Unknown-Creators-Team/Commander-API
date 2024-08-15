@@ -1,7 +1,7 @@
 import { GameMode, ItemStack } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { Sequence } from "./Sequence/Sequence";
-import { checkUtils } from "./checkUtils";
+import { Sequence } from "./Sequence/Sequence.js";
+import { checkUtils } from "./checkUtils.js";
 
 const SPLASH_POTION_ITEMSTACK = new ItemStack("minecraft:splash_potion");
 

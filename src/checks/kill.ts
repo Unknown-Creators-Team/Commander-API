@@ -1,4 +1,4 @@
-import { EntityDieAfterEvent, GameMode, Player, system, world } from "@minecraft/server";
+import { GameMode, Player, system, world, EntityDieAfterEvent } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 
 GameTest.registerAsync("commander_api", "kill", async (test) => {

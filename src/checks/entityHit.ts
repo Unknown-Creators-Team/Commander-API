@@ -1,6 +1,6 @@
 import { GameMode, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { checkUtils } from "./checkUtils";
+import { checkUtils } from "./checkUtils.js";
 
 GameTest.registerAsync("commander_api", "entityHit", async (test) => {
     const pA = test.spawnSimulatedPlayer({ "x": 1, "y": 3, "z": 1 }, "Test-entityHit-master", GameMode.survival);

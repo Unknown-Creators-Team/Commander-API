@@ -1,5 +1,6 @@
 import * as MC from "@minecraft/server";
 import * as MCUI from "@minecraft/server-ui";
+import * as Gametest from "@minecraft/gametest";
 
 declare module "@minecraft/server" {
     interface Entity {
@@ -61,5 +62,19 @@ declare module "@minecraft/server-ui" {
 
     interface MessageFormData {
         show(player: MC.Player): Promise<MCUI.MessageFormResponse>;
+    }
+}
+
+declare module "@minecraft/gametest" {
+    interface SimulatedPlayer {
+        score: ScoreboardManager;
+    }
+
+    export interface ScoreboardManager {
+        set: (objectName: string, score: number) => void;
+        reset: (objectName: string) => void;
+        add: (objectName: string, score: number) => void;
+        remove: (objectName: string, score: number) => void;
+        get: (objectName: string) => number;
     }
 }

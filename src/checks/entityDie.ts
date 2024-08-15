@@ -1,36 +1,32 @@
-import { GameMode, Vector3, system, world } from "@minecraft/server";
+import { Entity, EntityHealthComponent, GameMode, Vector3, system, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { getScore } from "../util";
-import { checkUtils } from "./checkUtils";
+import { getScore } from "../util.js";
+import { checkUtils } from "./checkUtils.js";
 
 GameTest.registerAsync("commander_api", "entityDie", async (test) => {
     const pA = test.spawnSimulatedPlayer({ "x": 1, "y": 3, "z": 1 }, "Test-entityDie-master", GameMode.survival);
     const pB = test.spawnSimulatedPlayer({ "x": 3, "y": 3, "z": 3 }, "Test-entityDie", GameMode.survival);
-
+    
     system.runTimeout(async () => {
         const pAKillPlayerScore = pA.score.get("Capi:killPlayer") || 0;
         const pBDeathPlayerScore = pB.score.get("Capi:deathPlayer") || 0;
 
-        const pAKillScore = getScore(pA, "Capi:kill") || 0;
-        const pADeathScore = getScore(pA, "Capi:death") || 0;
+        const pAKillScore = getScore(pA as unknown as Entity, "Capi:kill") || 0;
+        const pADeathScore = getScore(pA as unknown as Entity, "Capi:death") || 0;
 
-        pA.lookAtEntity(pB);
-        pB.lookAtEntity(pA);
-
-        world.sendMessage(`§a${pA.name} §bにOP権限を付与してください。`);
+        pA.lookAtEntity(pB as unknown as Entity);
+        pB.lookAtEntity(pA as unknown as Entity);
 
         await checkUtils.waitOp(pA, test);
-
-        world.sendMessage(`§aテストを開始します。`);
 
         pAKillpB();
 
         function pAKillpB() {
             const health = pB.getComponent("health");
 
-            health.setCurrentValue(1);
+            health?.setCurrentValue(1);
 
-            pA.attackEntity(pB);
+            pA.attackEntity(pB as unknown as Entity);
 
             system.runTimeout(() => {
                 const hasKill = pA.hasTag("Capi:killPlayer");
@@ -55,9 +51,9 @@ GameTest.registerAsync("commander_api", "entityDie", async (test) => {
             }
 
             const entity = pA.dimension.spawnEntity("minecraft:cow", spawnLocation);
-            const health = entity.getComponent("health");
+            const health = entity.getComponent("health") as EntityHealthComponent;
 
-            health.setCurrentValue(1);
+            health?.setCurrentValue(1);
 
             pA.attackEntity(entity);
 
@@ -84,7 +80,7 @@ GameTest.registerAsync("commander_api", "entityDie", async (test) => {
             const i = system.runInterval(() => {
                 const health = pA.getComponent("health");
 
-                if (health.currentValue <= 0) {
+                if ((health?.currentValue ?? 0) <= 0) {
                     system.runTimeout(() => {
                         const hasDeath = pA.hasTag("Capi:death");
                         const pADeathScoreNow = pA.score.get("Capi:death");
