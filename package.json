@@ -1,23 +1,23 @@
 {
-  "name": "commander-api",
-  "version": "1.14.0",
-  "description": "<div align=\"center\">",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Unknown-Creators-Team/Commander-API.git"
-  },
-  "author": "Nano191225, arutaka1220",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/Unknown-Creators-Team/Commander-API/issues"
-  },
-  "homepage": "https://github.com/Unknown-Creators-Team/Commander-API#readme",
-  "devDependencies": {
-    "@minecraft/server": "^1.12.0-beta.1.21.0-stable",
-    "@minecraft/server-ui": "^1.2.0-beta.1.21.0-stable"
-  }
+    "name": "commander-api",
+    "version": "1.14.0",
+    "description": "<div align=\"center\">",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Unknown-Creators-Team/Commander-API.git"
+    },
+    "author": "Nano191225, arutaka1220",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/Unknown-Creators-Team/Commander-API/issues"
+    },
+    "homepage": "https://github.com/Unknown-Creators-Team/Commander-API#readme",
+    "devDependencies": {
+        "@minecraft/server": "^1.15.0-beta.1.21.30-stable",
+        "@minecraft/server-ui": "^1.4.0-beta.1.21.30-stable"
+    }
 }
