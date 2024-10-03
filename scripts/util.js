@@ -286,3 +286,12 @@ export function getScore(target, objective) {
         }
     }
 }
+
+/**
+ * beforeEventで発生する「does not have required privilege」エラーを回避するための関数
+ */
+export function passingPrivilegeError(func) {
+    Promise.resolve().then(() => {
+        func();
+    });
+}

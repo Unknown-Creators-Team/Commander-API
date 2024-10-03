@@ -17,7 +17,7 @@ import * as MinecraftUI from "@minecraft/server-ui";
 // import * as MinecraftVanilla from "@minecraft/vanilla-data";
 import tickEvent from "./lib/TickEvent.js";
 import { ScoreboardDatabase } from "./lib/DatabaseMC.js";
-import { easySafeParse, parsePos, safeParse, setVariable, getScore } from "./util.js";
+import { easySafeParse, parsePos, safeParse, setVariable, getScore, passingPrivilegeError } from "./util.js";
 import Config from "./config.js";
 import ESON from "./lib/ESON.js";
 import { UI } from "./ui.js";
@@ -599,29 +599,36 @@ world.afterEvents.targetBlockHit.subscribe(targetBlockHit => {
     player.addTagWillRemove(`Capi:target`);
 });
 
-world.afterEvents.playerInteractWithBlock.subscribe(playerInteractWithBlock => {
+// 1.21.30のアップデートにより、afterEventsでは素手の右クリックを検知できなくなったため
+// beforeEventsに移行しました。
+world.beforeEvents.playerInteractWithBlock.subscribe(playerInteractWithBlock => {
     const { player, block } = playerInteractWithBlock;
     const { x, y, z } = block;
 
-    player.score.set("Capi:interactX", x);
-    player.score.set("Capi:interactY", y);
-    player.score.set("Capi:interactZ", z);
-    player.addTagWillRemove(`Capi:interact`);
+    passingPrivilegeError(() => {
+        player.score.set("Capi:interactX", x);
+        player.score.set("Capi:interactY", y);
+        player.score.set("Capi:interactZ", z);
+        player.addTagWillRemove(`Capi:interact`);
 
-    player.removeTags(player.getTags().filter(t => t.startsWith("interact:")));
-    player.addTagWillRemove(`interact:${block.typeId}`);
+    
+        player.removeTags(player.getTags().filter(t => t.startsWith("interact:")));
+        player.addTagWillRemove(`interact:${block.typeId}`);
+    });
 });
 
-world.afterEvents.playerInteractWithEntity.subscribe(playerInteractWithEntity => {
+world.beforeEvents.playerInteractWithEntity.subscribe(playerInteractWithEntity => {
     const { player, target: entity } = playerInteractWithEntity;
 
-    player.score.set("Capi:interactX", Math.floor(entity.location.x));
-    player.score.set("Capi:interactY", Math.floor(entity.location.y));
-    player.score.set("Capi:interactZ", Math.floor(entity.location.z));
-    player.addTagWillRemove(`Capi:interact`);
-
-    player.removeTags(player.getTags().filter(t => t.startsWith("interact:")));
-    player.addTagWillRemove(`interact:${entity.typeId}`);
+    passingPrivilegeError(() => {
+        player.score.set("Capi:interactX", Math.floor(entity.location.x));
+        player.score.set("Capi:interactY", Math.floor(entity.location.y));
+        player.score.set("Capi:interactZ", Math.floor(entity.location.z));
+        player.addTagWillRemove(`Capi:interact`);
+    
+        player.removeTags(player.getTags().filter(t => t.startsWith("interact:")));
+        player.addTagWillRemove(`interact:${entity.typeId}`);
+    });
 });
 
 system.afterEvents.scriptEventReceive.subscribe(scriptEventReceive => {
