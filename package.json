@@ -21,5 +21,8 @@
     "devDependencies": {
         "@minecraft/server": "^1.16.0-beta.1.21.42-stable",
         "@minecraft/server-ui": "^1.4.0-beta.1.21.42-stable"
+    },
+    "dependencies": {
+        "typescript": "^5.6.3"
     }
 }
