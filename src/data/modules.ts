@@ -11,6 +11,7 @@ export default
             "say",
             "tp",
             "knockback",
+            "kick"
         ],
         events: [
             "buttonPush",
