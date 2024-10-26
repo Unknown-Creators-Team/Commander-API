@@ -15,13 +15,12 @@
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 // import * as MinecraftVanilla from "@minecraft/vanilla-data";
-import tickEvent from "./lib/TickEvent.js";
-import { ScoreboardDatabase } from "./lib/DatabaseMC.js";
-import { easySafeParse, parsePos, safeParse, setVariable, getScore, passingPrivilegeError } from "./util.js";
 import Config from "./config.js";
 import ESON from "./lib/ESON.js";
-import { UI } from "./ui.js";
+import tickEvent from "./lib/TickEvent.js";
 import "./NativeCode.js";
+import { UI } from "./ui.js";
+import { easySafeParse, getScore, parsePos, passingPrivilegeError, safeParse, setVariable } from "./util.js";
 
 const { world, system } = Minecraft;
 
