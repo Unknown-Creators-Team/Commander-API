@@ -9,7 +9,9 @@ export default
         "spawnentity",
         "spawnitem",
         "say",
-        "tp"
+        "tp",
+        "kill",
+        "kick"
     ],
     events: [
         "buttonPush",
