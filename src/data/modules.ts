@@ -1,38 +1,39 @@
 export default
-{
-    scriptevents: [
-        "rename",
-        "resetName",
-        "setItem",
-        "form",
-        "explosion",
-        "spawnentity",
-        "spawnitem",
-        "say",
-        "tp"
-    ],
-    events: [
-        "buttonPush",
-        "chatSend",
-        "entityDie",
-        "entityHitBlock",
-        "entityHitEntity",
-        "entityHurt",
-        "itemUse",
-        "itemUseOn",
-        "playerBreakBlock",
-        "playerInteractWithBlock",
-        "playerInteractWithEntity",
-        "playerLeave",
-        "playerPlaceBlock",
-        "playerSpawn",
-        "pressurePlatePop",
-        "pressurePlatePush",
-        "projectileHitBlock",
-        "projectileHitEntity",
-        "scores",
-        "tags",
-        "targetBlockHit",
-        "tripWireTrip"
-    ]
-}
+    {
+        scriptevents: [
+            "rename",
+            "resetName",
+            "setItem",
+            "form",
+            "explosion",
+            "spawnentity",
+            "spawnitem",
+            "say",
+            "tp",
+            "knockback",
+        ],
+        events: [
+            "buttonPush",
+            "chatSend",
+            "entityDie",
+            "entityHitBlock",
+            "entityHitEntity",
+            "entityHurt",
+            "itemUse",
+            "itemUseOn",
+            "playerBreakBlock",
+            "playerInteractWithBlock",
+            "playerInteractWithEntity",
+            "playerLeave",
+            "playerPlaceBlock",
+            "playerSpawn",
+            "pressurePlatePop",
+            "pressurePlatePush",
+            "projectileHitBlock",
+            "projectileHitEntity",
+            "scores",
+            "tags",
+            "targetBlockHit",
+            "tripWireTrip"
+        ]
+    }

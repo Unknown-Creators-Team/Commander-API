@@ -14,7 +14,6 @@
 // @ts-nocheck
 
 import * as Minecraft from "@minecraft/server";
-import * as GameTest from "@minecraft/server-gametest";
 import Config from "./config.js";
 
 const { world, system } = Minecraft;
@@ -33,7 +32,7 @@ Object.assign(Minecraft.Entity.prototype, {
     addTags(tags: string[]) { tags.forEach(tag => this.addTag(tag)); },
     isPlayer() {
         if (!this.isValid()) return false;
-        return this instanceof Minecraft.Player || this instanceof GameTest.SimulatedPlayer;
+        return this instanceof Minecraft.Player;
     },
     isEntity() {
         if (!this.isValid()) return false;

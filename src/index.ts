@@ -70,10 +70,6 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     player.kick = t.replace("kick:", "").replace(/'/g, '"');
                     player.removeTag(t);
                 }
-                if (t.startsWith("knockback:")) {
-                    player.knockback = t.replace("knockback:", "").replace(/'/g, '"');
-                    player.removeTag(t);
-                }
                 if (t.startsWith("kill:")) {
                     player.kill();
                     player.removeTag(t);
@@ -193,37 +189,6 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     .runCommandAsync(`kick "${player.name}" ${setVariable(player, player.kick)}`)
                     .catch((e) => world.sendMessage(`[${player.name}] §c${e}`));
                 player.kick = false;
-            }
-
-            // Knockback
-            if (player.knockback) {
-                try {
-                    const Data = safeParse<
-                        | string[]
-                        | {
-                            directionX: any;
-                            directionZ: any;
-                            horizontalStrength: any;
-                            verticalStrength: any;
-                        }
-                    >(player.knockback);
-
-                    const directionX = String(setVariable(player, "directionX" in Data ? Data.directionX : Data[0] || 0));
-                    const directionZ = String(setVariable(player, "directionZ" in Data ? Data.directionX : Data[0] || 0));
-                    const horizontalStrength = String(setVariable(player, "horizontalStrength" in Data ? Data.directionX : Data[0] || 0));
-                    const verticalStrength = String(setVariable(player, "verticalStrength" in Data ? Data.directionX : Data[0] || 0));
-
-                    player.applyKnockback(
-                        Number(directionX.search(/[^0-9-.]/) >= 0 ? 0 : directionX),
-                        Number(directionZ.search(/[^0-9-.]/) >= 0 ? 0 : directionZ),
-                        Number(horizontalStrength.search(/[^0-9-.]/) >= 0 ? 0 : horizontalStrength),
-                        Number(verticalStrength.search(/[^0-9-.]/) >= 0 ? 0 : verticalStrength)
-                    );
-
-                    player.knockback = false;
-                } catch (e) {
-                    console.error(e, (e as Error).stack);
-                }
             }
 
             // Join
