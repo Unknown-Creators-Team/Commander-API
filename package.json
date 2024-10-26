@@ -4,7 +4,10 @@
     "description": "",
     "main": "index.js",
     "type": "module",
-    "scripts": {},
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/Unknown-Creators-Team/Commander-API.git"
