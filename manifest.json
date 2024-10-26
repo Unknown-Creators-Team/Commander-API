@@ -5,14 +5,14 @@
         "description": "マインクラフト統合版のコマンドを拡張します。",
         "uuid": "ebac7142-c210-4d32-87ba-5650be52f456",
         "version": [
-            1,
-            9,
+            2,
+            0,
             0
         ],
         "min_engine_version": [
             1,
-            19,
-            0
+            21,
+            40
         ]
     },
     "metadata": {
