@@ -18,17 +18,12 @@ import "./lib/Logger.js";
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 // import * as MinecraftVanilla from "@minecraft/vanilla-data";
-import tickEvent from "./lib/TickEvent.js";
-import { ScoreboardDatabase } from "./lib/DatabaseMC.js";
-import { easySafeParse, parsePos, safeParse, setVariable, getScore } from "./util.js";
-import Config from "./config.js";
-import ESON from "./lib/ESON.js";
 import loadEvents from "./events/index.js";
-import { UI } from "./ui.js";
-import "./scriptevents/index.js";
+import tickEvent from "./lib/TickEvent.js";
 import "./playground";
-
-import "./checks/checkLoader";
+import "./scriptevents/index.js";
+import { UI } from "./ui.js";
+import { easySafeParse, getScore, safeParse, setVariable } from "./util.js";
 
 const { world, system } = Minecraft;
 
@@ -59,7 +54,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                 if (t.startsWith("_form:")) {
                     try {
                         player.formJson = t.replace("form:", "");
-                    } catch {}
+                    } catch { }
                     player.removeTag(t);
                 }
                 if (t.startsWith("run:")) {
@@ -109,7 +104,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     player.selectedSlotIndex = setSlot;
                     player.score.reset("Capi:setSlot");
                 }
-            } catch {}
+            } catch { }
 
             // Set item
             const container = player.getComponent("inventory")?.container;
@@ -179,7 +174,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     const Data = safeParse<string[]>(commands);
                     if (typeof Data === "object" && Data.length)
                         Data.forEach((c) => {
-                            player.runCommandAsync(String(setVariable(player, c))).catch(() => {});
+                            player.runCommandAsync(String(setVariable(player, c))).catch(() => { });
                         });
                 });
             }
@@ -206,11 +201,11 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     const Data = safeParse<
                         | string[]
                         | {
-                              directionX: any;
-                              directionZ: any;
-                              horizontalStrength: any;
-                              verticalStrength: any;
-                          }
+                            directionX: any;
+                            directionZ: any;
+                            horizontalStrength: any;
+                            verticalStrength: any;
+                        }
                     >(player.knockback);
 
                     const directionX = String(setVariable(player, "directionX" in Data ? Data.directionX : Data[0] || 0));
