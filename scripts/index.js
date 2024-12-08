@@ -147,7 +147,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             try {
                 const setSlot = getScore(player, "Capi:setSlot");
                 if (setSlot >= 0) {
-                    player.selectedSlot = setSlot;
+                    player.selectedSlotIndex = setSlot;
                     player.score.reset("Capi:setSlot");
                 }
             } catch { }
