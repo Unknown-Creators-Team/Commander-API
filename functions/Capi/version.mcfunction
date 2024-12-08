@@ -1,1 +1,1 @@
-tellraw @s {"rawtext":[{"text":"Commander API >> Version 1.16.1 (Stable Official Release)"}]}
+tellraw @s {"rawtext":[{"text":"Commander API >> Version 1.17.0 (Stable Official Release)"}]}
