@@ -588,20 +588,6 @@ world.afterEvents.tripWireTrip.subscribe(tripWireTrip => {
     });
 });
 
-world.afterEvents.targetBlockHit.subscribe(targetBlockHit => {
-    const { block, dimension, source: player, previousRedstonePower, redstonePower } = targetBlockHit;
-    const { x, y, z } = block;
-
-    if (!player.isPlayer()) return;
-
-    player.score.set("Capi:targetX", x);
-    player.score.set("Capi:targetY", y);
-    player.score.set("Capi:targetZ", z);
-    player.score.set("Capi:targetPower", redstonePower);
-
-    player.addTagWillRemove(`Capi:target`);
-});
-
 // 1.21.30のアップデートにより、afterEventsでは素手の右クリックを検知できなくなったため
 // beforeEventsに移行しました。
 world.beforeEvents.playerInteractWithBlock.subscribe(playerInteractWithBlock => {
