@@ -71,5 +71,11 @@ scoreboard objectives add Capi:interactX dummy
 scoreboard objectives add Capi:interactY dummy
 scoreboard objectives add Capi:interactZ dummy
 scoreboard objectives add Capi:privatechat dummy
+scoreboard objectives add Capi:inputX dummy
+scoreboard objectives add Capi:inputY dummy
+scoreboard objectives add Capi:view dummy
+scoreboard objectives add Capi:viewX dummy
+scoreboard objectives add Capi:viewY dummy
+scoreboard objectives add Capi:viewZ dummy
 gamerule sendcommandfeedback false
 gamerule commandblockoutput false

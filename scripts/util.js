@@ -147,7 +147,10 @@ function calculate(expression) {
         "-": 1,
         "*": 2,
         "/": 2,
+        "%": 2,
+        "//": 2,
         "**": 3,
+        "^": 3,
         sqrt: 4,
         sin: 4,
         cos: 4,
@@ -164,11 +167,14 @@ function calculate(expression) {
     };
 
     const operators = {
-        "+": (a, b) => a + b,
-        "-": (a, b) => a - b,
-        "*": (a, b) => a * b,
-        "/": (a, b) => a / b,
-        "**": (a, b) => Math.pow(a, b),
+        "+": (a, b = 0) => a + b,
+        "-": (a, b = 0) => a - b,
+        "*": (a, b = 0) => a * b,
+        "/": (a, b = 1) => a / b,
+        "%": (a, b = 1) => a % b,
+        "//": (a, b = 1) => Math.floor(a / b),
+        "**": (a, b = 1) => Math.pow(a, b),
+        "^": (a, b = 1) => Math.pow(a, b),
         sqrt: (a) => Math.sqrt(a),
         sin: (a) => Math.sin(a),
         cos: (a) => Math.cos(a),
@@ -184,10 +190,11 @@ function calculate(expression) {
         log2: (a) => Math.log2(a),
     };
 
-    // Add 0 before - at the start of the expression or after (
     expression = expression.replace(/^-\d+|\(-\d+/g, (match) => "0" + match);
-
-    const tokens = expression.match(/sqrt|abs|asin|acos|atan|sin|cos|tan|round|floor|ceil|log10|log2|\*\*|\d+|\S/g);
+    const tokens = expression.match(/\/\/|sqrt|abs|asin|acos|atan|sin|cos|tan|round|floor|ceil|log10|log2|\*\*|\^|\d*\.?\d+|\S/g);
+    if (!tokens) {
+        throw new Error("Invalid expression");
+    }
     const outputQueue = [];
     const operatorStack = [];
 
@@ -211,6 +218,13 @@ function calculate(expression) {
             if (operatorStack.pop() !== "(") {
                 throw new Error("Mismatched parentheses");
             }
+            if (
+                operatorStack.length &&
+                operatorStack[operatorStack.length - 1] in operatorPrecedence &&
+                operatorPrecedence[operatorStack[operatorStack.length - 1]] >= 4
+            ) {
+                outputQueue.push(operatorStack.pop());
+            }
         } else {
             throw new Error(`Unknown token: ${token}`);
         }
@@ -229,26 +243,21 @@ function calculate(expression) {
     outputQueue.forEach((token) => {
         if (typeof token === "number") {
             calculationStack.push(token);
+        } else if (["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token)) {
+            const a = calculationStack.pop();
+            if (a === undefined) {
+                throw new Error("Invalid operation");
+            }
+            const result = operators[token](a);
+            calculationStack.push(result);
         } else {
             const b = calculationStack.pop();
-            const a = [
-                "sqrt",
-                "abs",
-                "asin",
-                "acos",
-                "atan",
-                "sin",
-                "cos",
-                "tan",
-                "round",
-                "floor",
-                "ceil",
-                "log10",
-                "log2",
-            ].includes(token)
-                ? b
-                : calculationStack.pop();
-            calculationStack.push(operators[token](a, b));
+            const a = calculationStack.pop();
+            if (b === undefined || (a === undefined && !["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token))) {
+                throw new Error("Invalid operation");
+            }
+            const result = operators[token](a ?? b, b);
+            calculationStack.push(result);
         }
     });
 
