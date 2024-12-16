@@ -1,10 +1,31 @@
 import { system, world } from "@minecraft/server";
 import Config from "../config.js";
-import { setVariable } from "../util.js";
+import { addScore, format, promiseDelay, setScore } from "../util.js";
 
 world.beforeEvents.chatSend.subscribe(chat => {
-    const player = chat.sender;
+    const { sender: player, message } = chat;
 
+    for (const tag of player.getTags()) {
+        if (tag.startsWith("chat:")) promiseDelay(() => player.removeTag(tag));
+        if (tag.startsWith("mute")) {
+            chat.cancel = true;
+            if (tag.length > 5) player.sendMessage(tag.slice(5));
+            else player.sendMessage("§cYou have been muted.");
+            return;
+        }
+    }
+
+    promiseDelay(() => {
+        player.addTagWillRemove(`capi:chat`);
+        player.addTagWillRemove(`chat:${message}`);
+        setScore(player, "capi:chat_length", message.length);
+        addScore(player, "capi:chat_count", 1);
+    });
+
+
+
+
+    return;
     let msg = chat.message;
     let mute: string | undefined = undefined;
     player.getTags().forEach((t) => {
@@ -24,7 +45,7 @@ world.beforeEvents.chatSend.subscribe(chat => {
         if (start || end || include) return chat.cancel = true;
     }
     if (mute !== undefined || player.hasTag("mute")) {
-        player.sendMessage(mute ? mute : "§cYou have been muted.");
+        // player.sendMessage(mute ? mute : "§cYou have been muted.");
         return chat.cancel = true;
     }
     if (player.score.get("Capi:privatechat")) {
@@ -38,8 +59,8 @@ world.beforeEvents.chatSend.subscribe(chat => {
         return chat.cancel = true;
     }
     if (Config.get("ChatUIEnabled")) {
-        const text = setVariable(player, String((Config.get("ChatUI"))));
-        text ? world.sendMessage(text.replace(/({message}|{msg})/gi, msg)) : 0;
+        const text = format(player, String((Config.get("ChatUI"))));
+        // text ? world.sendMessage(text.replace(/({message}|{msg})/gi, msg)) : 0;
         return chat.cancel = true;
     }
 });

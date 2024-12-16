@@ -1,20 +1,20 @@
 import { world } from "@minecraft/server";
+import { removeTagsStartsWith, setScore } from "util.js";
 
 world.afterEvents.projectileHitBlock.subscribe(projectileHit => {
     const { projectile, source: player } = projectileHit;
-    if (!player?.isPlayer()) return;
 
-    const hit = projectileHit.getBlockHit().block;
+    if (player?.isPlayer()) {
+        const { block } = projectileHit.getBlockHit();
 
-    if (hit) {
-        player.score.set("Capi:hitX", Math.floor(hit.location.x));
-        player.score.set("Capi:hitY", Math.floor(hit.location.y));
-        player.score.set("Capi:hitZ", Math.floor(hit.location.z));
+        setScore(player, "capi:hit_x", block.x);
+        setScore(player, "capi:hit_y", block.y);
+        setScore(player, "capi:hit_z", block.z);
+
+        removeTagsStartsWith(player, "hit_with:", "hit_to:");
+
+        player.addTagWillRemove("capi:hit");
+        player.addTagWillRemove(`hit_with:${projectile.typeId}`);
+        player.addTagWillRemove(`hit_to:${block.typeId}`);
     }
-
-    player.removeTags(player.getTags().filter(t => t.startsWith("hitWith:") || t.startsWith("hitTo:")));
-
-    player.addTagWillRemove(`Capi:hit`);
-    player.addTagWillRemove(`hitWith:${projectile.typeId}`);
-    player.addTagWillRemove(`hitTo:${hit.typeId}`);
 });

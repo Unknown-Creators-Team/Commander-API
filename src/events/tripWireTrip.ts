@@ -1,15 +1,14 @@
 import { world } from "@minecraft/server";
+import { setScore } from "util.js";
 
-world.afterEvents.tripWireTrip.subscribe(tripWireTrip => {
-    const { block, dimension, sources: players } = tripWireTrip;
-    const { x, y, z } = block;
+world.afterEvents.tripWireTrip.subscribe((tripWireTrip) => {
+    const { block, sources: players } = tripWireTrip;
 
-    players.forEach(player => {
-        if (!player.isPlayer()) return;
-
-        player.score.set("Capi:tripX", x);
-        player.score.set("Capi:tripY", y);
-        player.score.set("Capi:tripZ", z);
-        player.addTagWillRemove(`Capi:trip`);
-    });
+    for (const player of players)
+        if (player.isPlayer()) {
+            setScore(player, "capi:trip_x", block.x);
+            setScore(player, "capi:trip_y", block.y);
+            setScore(player, "capi:trip_z", block.z);
+            player.addTagWillRemove("capi:trip");
+        }
 });

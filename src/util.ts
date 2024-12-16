@@ -1,12 +1,12 @@
 /**
- * 
+ *
  * ░█████╗░░█████╗░███╗░░░███╗███╗░░░███╗░█████╗░███╗░░██╗██████╗░███████╗██████╗░  ░█████╗░██████╗░██╗
  * ██╔══██╗██╔══██╗████╗░████║████╗░████║██╔══██╗████╗░██║██╔══██╗██╔════╝██╔══██╗  ██╔══██╗██╔══██╗██║
  * ██║░░╚═╝██║░░██║██╔████╔██║██╔████╔██║███████║██╔██╗██║██║░░██║█████╗░░██████╔╝  ███████║██████╔╝██║
  * ██║░░██╗██║░░██║██║╚██╔╝██║██║╚██╔╝██║██╔══██║██║╚████║██║░░██║██╔══╝░░██╔══██╗  ██╔══██║██╔═══╝░██║
  * ╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░╚═╝░██║██║░░██║██║░╚███║██████╔╝███████╗██║░░██║  ██║░░██║██║░░░░░██║
  * ░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝  ╚═╝░░╚═╝╚═╝░░░░░╚═╝
- * 
+ *
  * @LICENSE GNU General Public License v3.0
  * @AUTHOR Nano
  * @AUTHOR arutaka1220
@@ -15,13 +15,14 @@
 
 import * as Minecraft from "@minecraft/server";
 import ESON from "./lib/ESON.js";
+import { FMath } from "lib/FastMath.js";
 
 const { world, system } = Minecraft;
 
-export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecraft.Block | undefined, text: string) {
+export function format(player: Minecraft.Player | Minecraft.Entity | Minecraft.Block | undefined, text: string) {
     // if (!(player instanceof Minecraft.Player)) throw Error("player needs Player Class");
     if (!text?.length) return text;
-    const dataLength = text.split("").filter(t => t === "{").length;
+    const dataLength = text.split("").filter((t) => t === "{").length;
 
     if (!dataLength) return text;
 
@@ -31,7 +32,7 @@ export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecr
         } else if (player?.isBlock() || player?.isEntity()) {
             text = text.replace(/({name}|{name,})/i, player.typeId);
         }
-        
+
         if (player?.isPlayer() || player?.isEntity()) {
             text = text.replace(/({nametag}|{nametag,})/i, player.nameTag);
         } else if (player?.isBlock()) {
@@ -44,7 +45,7 @@ export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecr
         try {
             if (player?.isPlayer() || player?.isEntity()) {
                 const tag = text.split("{tag:")[1].split(/(}|,})/i)[0];
-                const hasTag = player.getTags().find(t => t.split(":")[0] === tag);
+                const hasTag = player.getTags().find((t) => t.split(":")[0] === tag);
                 if (tag) text = text.replace(new RegExp(`({tag:${tag}}|{tag:${tag},})`, "i"), hasTag?.slice(tag.length + 1) ?? "null");
             }
         } catch {}
@@ -56,18 +57,12 @@ export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecr
             const object = easySafeParse(str);
             if (Object.values(object).length === 0 && (player?.isPlayer() || player?.isEntity())) {
                 if (score) {
-                    text = text.replace(
-                        new RegExp(`({score:${score}}|{score:${score},})`, "i"),
-                        getScore(player, score)?.toString() ?? "null"
-                    );
+                    text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(player, score)?.toString() ?? "null");
                 }
             } else if (Object.values(object).length > 0) {
                 const playerName = object.name || player;
                 const objectName = object.object;
-                text = text.replace(
-                    new RegExp(`({score:${str}}|{score:${str},})`, "i"),
-                    getScore(playerName, objectName)?.toString() ?? "null"
-                );
+                text = text.replace(new RegExp(`({score:${str}}|{score:${str},})`, "i"), getScore(playerName, objectName)?.toString() ?? "null");
             }
         } catch (e) {}
 
@@ -76,15 +71,20 @@ export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecr
             if (player?.isEntity()) {
                 const { x, y, z } = player.getVelocity();
                 const v = {
-                    x, y, z,
-                    xy: Math.hypot(x, y),
-                    xz: Math.hypot(x, z),
-                    yz: Math.hypot(y, z),
-                    xyz: Math.hypot(x, y, z)
-                }
+                    x,
+                    y,
+                    z,
+                    xy: FMath.hypot(x, y),
+                    xz: FMath.hypot(x, z),
+                    yz: FMath.hypot(y, z),
+                    xyz: FMath.hypot(x, y, z),
+                };
 
                 const velocity = [...text.split("{velocity:")[1].split(/(}|,})/i)[0]].sort((a, b) => a.localeCompare(b)).join("");
-                text = text.replace(new RegExp(`({velocity:${velocity}}|{velocity:${velocity},})`, "i"), v[velocity as keyof typeof v]?.toString() ?? "null");
+                text = text.replace(
+                    new RegExp(`({velocity:${velocity}}|{velocity:${velocity},})`, "i"),
+                    v[velocity as keyof typeof v]?.toString() ?? "null"
+                );
             }
         } catch {}
 
@@ -94,24 +94,24 @@ export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecr
             const answer = calculate(calc);
             if (calc && !isNaN(answer)) {
                 text = text.replace(new RegExp(`({calc:${escapeRegExp(calc)}}|{calc:${escapeRegExp(calc)},})`), answer.toString());
-                
+
                 function escapeRegExp(string: string): string {
-                  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
                 }
             }
-                
         } catch {}
 
         // dimension
         try {
             const dimension = Number(text.split("{dimension:")[1].split(/(}|,})/i)[0]);
-            if (typeof (dimension) === "number") {
+            if (typeof dimension === "number") {
                 if (dimension === 0) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "overworld");
                 if (dimension === -1) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "nether");
                 if (dimension === 1) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "end");
-                if (![-1, 0, 1].includes(dimension)) text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "null");
+                if (![-1, 0, 1].includes(dimension))
+                    text = text.replace(new RegExp(`({dimension:${dimension}}|{dimension:${dimension},})`, "i"), "null");
             }
-        } catch { }
+        } catch {}
 
         if (dataLength - i === 1) return text;
     }
@@ -119,13 +119,13 @@ export function setVariable(player: Minecraft.Player | Minecraft.Entity | Minecr
 
 export const safeParse = <T extends Object>(object: string): T => {
     return JSON.parse(object);
-}
+};
 
 export const easySafeParse = (object: string): any => {
     return ESON.parse(object);
-}
+};
 
-export function bothParse (object: string): any {
+export function bothParse(object: string): any {
     try {
         return safeParse(object);
     } catch {
@@ -151,9 +151,9 @@ export const parsePos = (pos: string, player: Minecraft.Entity | Minecraft.Block
     else resultPos = 0;
 
     return resultPos;
-}
+};
 
-export function calculate(expression: string): number {
+function calculate(expression: string): number {
     const operatorPrecedence: { [key: string]: number } = {
         "+": 1,
         "-": 1,
@@ -214,10 +214,7 @@ export function calculate(expression: string): number {
         if (!isNaN(Number(token))) {
             outputQueue.push(Number(token));
         } else if (token in operatorPrecedence) {
-            while (
-                operatorStack.length &&
-                operatorPrecedence[token] <= operatorPrecedence[operatorStack[operatorStack.length - 1]]
-            ) {
+            while (operatorStack.length && operatorPrecedence[token] <= operatorPrecedence[operatorStack[operatorStack.length - 1]]) {
                 outputQueue.push(operatorStack.pop()!);
             }
             operatorStack.push(token);
@@ -248,10 +245,21 @@ export function calculate(expression: string): number {
     outputQueue.forEach((token) => {
         if (typeof token === "number") {
             calculationStack.push(token);
+        } else if (["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token)) {
+            const a = calculationStack.pop();
+            if (a === undefined) {
+                throw new Error("Invalid operation");
+            }
+            const result = operators[token](a);
+            calculationStack.push(result);
         } else {
             const b = calculationStack.pop();
             const a = calculationStack.pop();
-            if (b === undefined || (a === undefined && !["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token))) {
+            if (
+                b === undefined ||
+                (a === undefined &&
+                    !["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token))
+            ) {
                 throw new Error("Invalid operation");
             }
             const result = operators[token](a ?? b, b);
@@ -264,7 +272,7 @@ export function calculate(expression: string): number {
 
 export function getScore(target: Minecraft.Entity | string, objective: string): number | undefined {
     // if target is a string, get the score by name
-    if (typeof (target) === "string") {
+    if (typeof target === "string") {
         // get all scores in the objective
         const scores = world.scoreboard.getObjective(objective)?.getScores();
         // find the score with the matching name
@@ -280,8 +288,31 @@ export function getScore(target: Minecraft.Entity | string, objective: string): 
             // return the score value
             if (typeof score === "number") return score;
             else return undefined;
-        } catch (e) { return undefined; }
+        } catch (e) {
+            return undefined;
+        }
     }
+}
+
+export function setScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
+    const object = world.scoreboard.getObjective(objective);
+    if (!object) {
+        world.scoreboard.addObjective(objective);
+        return setScore(target, objective, score);
+    }
+
+    score = FMath.max(FMath.min(score, 2 ** 31 - 1), (-2) ** 31);
+    object.setScore(target, score);
+}
+
+export function addScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
+    const object = world.scoreboard.getObjective(objective);
+    if (!object) {
+        world.scoreboard.addObjective(objective);
+        return addScore(target, objective, score);
+    }
+
+    object.addScore(target, score);
 }
 
 export function isTrue(value: any): boolean {
@@ -289,4 +320,16 @@ export function isTrue(value: any): boolean {
     if (typeof value === "string") return value.toLowerCase() === "true";
     if (typeof value === "number") return value === 1;
     return false;
+}
+
+export function promiseDelay(callback: (...value: any[]) => any, ...value: any[]): void {
+    Promise.resolve().then(() => callback(...value));
+}
+
+export function removeTagsStartsWith(player: Minecraft.Player, ...tags: string[]): void {
+    for (const t of player.getTags()) {
+        for (const tag of tags) {
+            if (t.startsWith(tag)) player.removeTag(t);
+        }
+    }
 }

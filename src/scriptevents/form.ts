@@ -1,6 +1,6 @@
 import { Block, Entity, Player, world } from "@minecraft/server";
 import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
-import { bothParse, setVariable } from "../util.js";
+import { bothParse, format } from "../util.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot use this script event in non-player entity.");
@@ -15,14 +15,14 @@ export default function main(source: Entity | Block | undefined, message: string
             const is = (v: any): v is Form.Message => true;
             if (!is(object)) throw new Error("Invalid form object.");
             const form = new MessageFormData();
-            if (object.title) form.title(setVariable(source, object.title) ?? object.title);
-            if (object.body) form.body(setVariable(source, object.body) ?? object.body);
+            if (object.title) form.title(format(source, object.title) ?? object.title);
+            if (object.body) form.body(format(source, object.body) ?? object.body);
             if (object.button1.text) {
-                const text = setVariable(source, object.button1.text) ?? object.button1.text;
+                const text = format(source, object.button1.text) ?? object.button1.text;
                 form.button2(text);
             }
             if (object.button2.text) {
-                const text = setVariable(source, object.button2.text) ?? object.button2.text;
+                const text = format(source, object.button2.text) ?? object.button2.text;
                 form.button1(text);
             }
 
@@ -38,14 +38,14 @@ export default function main(source: Entity | Block | undefined, message: string
             const is = (v: any): v is Form.Modal => true;
             if (!is(object)) throw new Error("Invalid form object.");
             const form = new ModalFormData();
-            if (object.title) form.title(setVariable(source, object.title) ?? object.title);
+            if (object.title) form.title(format(source, object.title) ?? object.title);
             object.content.forEach((content) => {
                 if (content.type === "dropdown") {
-                    const label = setVariable(source, content.label) ?? content.label;
-                    const options = content.options.map((v) => setVariable(source, v) ?? v).filter(Boolean);
+                    const label = format(source, content.label) ?? content.label;
+                    const options = content.options.map((v) => format(source, v) ?? v).filter(Boolean);
                     form.dropdown(label, options, content.default ? Number(content.default) : undefined);
                 } else if (content.type === "slider") {
-                    const label = setVariable(source, content.label) ?? content.label;
+                    const label = format(source, content.label) ?? content.label;
                     form.slider(
                         label,
                         Number(content.min),
@@ -54,10 +54,10 @@ export default function main(source: Entity | Block | undefined, message: string
                         content.default ? Number(content.default) : undefined
                     );
                 } else if (content.type === "textField") {
-                    const label = setVariable(source, content.label) ?? content.label;
-                    form.textField(label, setVariable(source, content.placeholder) ?? content.placeholder, content.default);
+                    const label = format(source, content.label) ?? content.label;
+                    form.textField(label, format(source, content.placeholder) ?? content.placeholder, content.default);
                 } else if (content.type === "toggle") {
-                    const label = setVariable(source, content.label) ?? content.label;
+                    const label = format(source, content.label) ?? content.label;
                     form.toggle(label, content.default);
                 }
             });
@@ -91,11 +91,11 @@ function actionForm(source: Player, object: Form.Action) {
     const is = (v: any): v is Form.Action => true;
     if (!is(object)) throw new Error("Invalid form object.");
     const form = new ActionFormData();
-    if (object.title) form.title(setVariable(source, object.title) ?? object.title);
-    if (object.body) form.body(setVariable(source, object.body) ?? object.body);
+    if (object.title) form.title(format(source, object.title) ?? object.title);
+    if (object.body) form.body(format(source, object.body) ?? object.body);
     object.buttons.forEach((btn) => {
         if (!btn.text) throw TypeError("Button text is required.");
-        const text = setVariable(source, btn.text) ?? btn.text;
+        const text = format(source, btn.text) ?? btn.text;
         if (btn.image) form.button(text, btn.image);
         else form.button(text);
     });
@@ -116,17 +116,17 @@ function actionForm(source: Player, object: Form.Action) {
 function runAction (source: Player, action: Form.actions) {
     switch (action.type) {
         case "add_tag": {
-            source.addTag(setVariable(source, action.value) ?? action.value);
+            source.addTag(format(source, action.value) ?? action.value);
             break;
         }
         case "remove_tag": {
-            source.removeTag(setVariable(source, action.value) ?? action.value);
+            source.removeTag(format(source, action.value) ?? action.value);
             break;
         }
         case "set_score": {
             const data = action.value;
             const object = data.object;
-            const target = data.target ? setVariable(source, data.target) ?? data.target : source;
+            const target = data.target ? format(source, data.target) ?? data.target : source;
             const value = data.value;
             world.scoreboard.getObjective(object)?.setScore(target, value);
             break;
@@ -134,13 +134,13 @@ function runAction (source: Player, action: Form.actions) {
         case "add_score": {
             const data = action.value;
             const object = data.object;
-            const target = data.target ? setVariable(source, data.target) ?? data.target : source;
+            const target = data.target ? format(source, data.target) ?? data.target : source;
             const value = data.value;
             world.scoreboard.getObjective(object)?.addScore(target, value);
             break;
         }
         case "run_cmd": {
-            const cmd = setVariable(source, action.value) ?? action.value;
+            const cmd = format(source, action.value) ?? action.value;
             source.runCommandAsync(cmd);
             break;
         }

@@ -1,57 +1,42 @@
 {
     "format_version": 2,
     "header": {
-        "name": "Commander API",
+        "name": "Commander API V2",
         "description": "マインクラフト統合版のコマンドを拡張します。",
-        "uuid": "ebac7142-c210-4d32-87ba-5650be52f456",
-        "version": [
-            1,
-            9,
-            0
-        ],
-        "min_engine_version": [
-            1,
-            19,
-            0
-        ]
+        "uuid": "d3ed9253-d2e1-4e06-9899-be30754cc44d",
+        "version": [2, 0, 0],
+        "min_engine_version": [1, 19, 0]
     },
     "metadata": {
-        "authors": [
-            "Nano191225",
-            "arutaka1220"
-        ],
+        "authors": ["Nano191225", "arutaka1220"],
         "url": "https://github.com/Unknown-Creators-Team/Commander-API"
     },
     "modules": [
         {
             "type": "data",
-            "uuid": "36f425e9-10c9-466d-a620-0362a30c9b6f",
-            "version": [
-                1,
-                0,
-                0
-            ]
+            "uuid": "693bd912-8427-4b8e-82cf-3961aabad0f8",
+            "version": [1, 0, 0]
         },
         {
             "language": "javascript",
             "type": "script",
-            "uuid": "0d1f29e1-417f-48fb-b5fe-5a980830885a",
-            "version": [
-                1,
-                0,
-                0
-            ],
+            "uuid": "21e93e66-928c-4f5b-a552-9b3709fd58f7",
+            "version": [1, 0, 0],
             "entry": "scripts/index.js"
         }
     ],
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "2.0.0-alpha"
+            "version": "1.17.0-beta"
         },
         {
             "module_name": "@minecraft/server-ui",
-            "version": "2.0.0-alpha"
+            "version": "1.4.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-gametest",
+            "version": "1.0.0-beta"
         }
     ]
 }

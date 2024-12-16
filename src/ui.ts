@@ -1,12 +1,12 @@
 /**
- * 
+ *
  * ░█████╗░░█████╗░███╗░░░███╗███╗░░░███╗░█████╗░███╗░░██╗██████╗░███████╗██████╗░  ░█████╗░██████╗░██╗
  * ██╔══██╗██╔══██╗████╗░████║████╗░████║██╔══██╗████╗░██║██╔══██╗██╔════╝██╔══██╗  ██╔══██╗██╔══██╗██║
  * ██║░░╚═╝██║░░██║██╔████╔██║██╔████╔██║███████║██╔██╗██║██║░░██║█████╗░░██████╔╝  ███████║██████╔╝██║
  * ██║░░██╗██║░░██║██║╚██╔╝██║██║╚██╔╝██║██╔══██║██║╚████║██║░░██║██╔══╝░░██╔══██╗  ██╔══██║██╔═══╝░██║
  * ╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░╚═╝░██║██║░░██║██║░╚███║██████╔╝███████╗██║░░██║  ██║░░██║██║░░░░░██║
  * ░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝  ╚═╝░░╚═╝╚═╝░░░░░╚═╝
- * 
+ *
  * @LICENSE GNU General Public License v3.0
  * @AUTHORS Nano, arutaka
  * @LINK https://github.com/191225/Commander-API
@@ -16,7 +16,7 @@ import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 import tickEvent from "./lib/TickEvent.js";
 import { ScoreboardDatabase } from "./lib/DatabaseMC.js";
-import { setVariable, getScore } from "./util.js";
+import { format, getScore } from "./util.js";
 import Config from "./config.js";
 
 export class UI {
@@ -38,14 +38,17 @@ export class UI {
                 .button("§lタグ削除までのTick")
                 .button("§l§4リセット")
                 .button("§l§c閉じる")
-                .show(this.player).then(response => {
+                .show(this.player)
+                .then((response) => {
                     if (response.selection === 0) this.LeaveMsg();
                     if (response.selection === 1) this.ChatUI();
                     if (response.selection === 2) this.CancelSendMsg();
                     if (response.selection === 3) this.TagWillRemoveTick();
                     if (response.selection === 4) Config.clear();
                 });
-        } catch (e) { console.error(e) }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     LeaveMsg() {
@@ -59,7 +62,8 @@ export class UI {
 
             Form.button("§l戻る")
                 .button("§l§c閉じる")
-                .show(this.player).then(response => {
+                .show(this.player)
+                .then((response) => {
                     if (response.selection === 0) this.LeaveMsgConfig();
                     if (response.selection === 1) {
                         if (Config.get("LeaveMsgEnabled")) Config.set("LeaveMsgEnabled", false);
@@ -68,14 +72,17 @@ export class UI {
                     }
                     if (response.selection === 2) this.Menu();
                 });
-        } catch (e) { console.error(e) }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     LeaveMsgConfig() {
         const Form = new MinecraftUI.ModalFormData()
             .title("§lCommander API")
-            .textField("メッセージ", "(例) {name} がサーバーから抜けた！", Config.get("LeaveMsg") || null)
-            .show(this.player).then(response => {
+            .textField("メッセージ", "(例) {name} がサーバーから抜けた！", Config.get("LeaveMsg") ?? "")
+            .show(this.player)
+            .then((response) => {
                 if (response.formValues && response.formValues[0]) Config.set("LeaveMsg", String(response.formValues[0]));
                 else if (!response.canceled) Config.set("LeaveMsg", null);
                 this.LeaveMsg();
@@ -92,7 +99,8 @@ export class UI {
 
         Form.button("§l戻る")
             .button("§l§c閉じる")
-            .show(this.player).then(response => {
+            .show(this.player)
+            .then((response) => {
                 if (response.selection === 0) this.ChatUIConfig();
                 if (response.selection === 1) {
                     if (Config.get("ChatUIEnabled")) Config.set("ChatUIEnabled", false);
@@ -104,11 +112,11 @@ export class UI {
     }
 
     ChatUIConfig() {
-
         const Form = new MinecraftUI.ModalFormData()
             .title("§lCommander API")
-            .textField("UI", "(例) {name} >> {message}", Config.get("ChatUI") || null)
-            .show(this.player).then(response => {
+            .textField("UI", "(例) {name} >> {message}", Config.get("ChatUI") ?? "")
+            .show(this.player)
+            .then((response) => {
                 if (response.formValues && response.formValues[0]) Config.set("ChatUI", String(response.formValues[0]));
                 else if (!response.canceled) Config.set("ChatUI", null);
                 this.ChatUI();
@@ -118,14 +126,21 @@ export class UI {
     CancelSendMsg() {
         const Form = new MinecraftUI.ActionFormData()
             .title("§lCommander API")
-            .body(`ステータス: ${Config.get("CancelSendMsgEnabled") ? "有効" : "無効"}\nで始まっているか: "§a${Config.get("CancelSendMsg")?.start.join("§r, §a")}§r"\nで終わっているか: "§a${Config.get("CancelSendMsg")?.end.join("§r, §a")}§r"\nが含まれているか: "§a${Config.get("CancelSendMsg")?.include.join("§r, §a")}§r"`)
+            .body(
+                `ステータス: ${Config.get("CancelSendMsgEnabled") ? "有効" : "無効"}\nで始まっているか: "§a${Config.get("CancelSendMsg").start.join(
+                    "§r, §a"
+                )}§r"\nで終わっているか: "§a${Config.get("CancelSendMsg")?.end.join("§r, §a")}§r"\nが含まれているか: "§a${Config.get(
+                    "CancelSendMsg"
+                )?.include.join("§r, §a")}§r"`
+            )
             .button("§l設定する");
         if (Config.get("CancelSendMsgEnabled")) Form.button("§l§c無効にする");
         else Form.button("§l§2有効にする");
 
         Form.button("§l戻る")
             .button("§l§c閉じる")
-            .show(this.player).then(response => {
+            .show(this.player)
+            .then((response) => {
                 if (response.selection === 0) this.CancelSendMsgConfig();
                 if (response.selection === 1) {
                     if (Config.get("CancelSendMsgEnabled")) Config.set("CancelSendMsgEnabled", false);
@@ -142,14 +157,15 @@ export class UI {
             .textField("で始まっているか", "(例) !, ?, #", Config.get("CancelSendMsg")?.start.join(", ") || null)
             .textField("で終わっているか", "(例) ,, ., :)", Config.get("CancelSendMsg")?.end.join(", ") || null)
             .textField("が含まれているか", "(例) help, !Form", Config.get("CancelSendMsg")?.include.join(", ") || null)
-            .show(this.player).then(response => {
+            .show(this.player)
+            .then((response) => {
                 const is = (value: any): value is [string, string, string] => true;
                 if (is(response.formValues)) {
                     const object = {
                         start: response.formValues[0]?.split(", "),
                         end: response.formValues[1]?.split(", "),
-                        include: response.formValues[2]?.split(", ")
-                    }
+                        include: response.formValues[2]?.split(", "),
+                    };
                     Config.set("CancelSendMsg", object);
                 }
 
@@ -167,7 +183,8 @@ export class UI {
 
         Form.button("§l戻る")
             .button("§l§c閉じる")
-            .show(this.player).then(response => {
+            .show(this.player)
+            .then((response) => {
                 if (response.selection === 0) this.TagWillRemoveTickConfig();
                 if (response.selection === 1) {
                     if (Config.get("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", false);
@@ -182,7 +199,8 @@ export class UI {
         const Form = new MinecraftUI.ModalFormData()
             .title("§lCommander API")
             .textField("Tick", "(例) 20", String(Config.get("TagWillRemoveTick")) || "20")
-            .show(this.player).then(response => {
+            .show(this.player)
+            .then((response) => {
                 if (response.formValues && response.formValues[0]) Config.set("TagWillRemoveTick", Number(response.formValues[0]));
                 else if (!response.canceled) Config.set("TagWillRemoveTick", null);
                 this.TagWillRemoveTick();

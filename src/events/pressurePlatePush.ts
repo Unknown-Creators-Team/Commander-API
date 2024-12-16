@@ -1,13 +1,14 @@
 import { world } from "@minecraft/server";
+import { setScore } from "util.js";
 
 world.afterEvents.pressurePlatePush.subscribe(pressurePlatePush => {
-    const { block, dimension, source: player } = pressurePlatePush;
-    const { x, y, z } = block;
+    const { block, source: player } = pressurePlatePush;
+    
+    if (player.isPlayer()) {
+        setScore(player, "capi:plate_x", block.location.x);
+        setScore(player, "capi:plate_y", block.location.y);
+        setScore(player, "capi:plate_z", block.location.z);
 
-    if (!player.isPlayer()) return;
-
-    player.score.set("Capi:plateX", x);
-    player.score.set("Capi:plateY", y);
-    player.score.set("Capi:plateZ", z);
-    player.addTagWillRemove(`Capi:pushed`);
+        player.addTagWillRemove("capi:plate_push");
+    }
 });

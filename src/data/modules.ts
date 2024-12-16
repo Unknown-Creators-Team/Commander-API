@@ -9,7 +9,8 @@ export default
         "spawnentity",
         "spawnitem",
         "say",
-        "tp"
+        "tp",
+        "run"
     ],
     events: [
         "buttonPush",
@@ -32,7 +33,6 @@ export default
         "projectileHitEntity",
         "scores",
         "tags",
-        "targetBlockHit",
         "tripWireTrip"
     ]
 }

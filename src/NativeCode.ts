@@ -19,6 +19,8 @@ import Config from "./config.js";
 
 const { world, system } = Minecraft;
 
+Config.set("TagWillRemoveTickEnabled", true);
+
 Object.assign(Minecraft.Entity.prototype, {
     addTagWillRemove(tag: string) {
         if (!Config.has("TagWillRemoveTick"))

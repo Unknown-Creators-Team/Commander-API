@@ -1,9 +1,9 @@
 import { Block, Entity, ExplosionOptions, world } from "@minecraft/server";
-import { bothParse, isTrue, parsePos, setVariable } from "../util.js";
+import { bothParse, isTrue, parsePos, format } from "../util.js";
 
 
 export default function main(source: Entity | Block | undefined, message: string) {    
-    const object: Explosion = bothParse(message);
+    const object: Explosion = bothParse(format(source, message) ?? "{}");
 
     if (object.radius === undefined) throw new Error("Radius is required.");
 
@@ -20,7 +20,9 @@ export default function main(source: Entity | Block | undefined, message: string
         source: source?.isEntity() ? source : undefined
     }
 
-    world.getDimension(dimension).createExplosion(location, radius, options);
+    try {
+        world.getDimension(dimension).createExplosion(location, radius, options);
+    } catch {}
 }
 
 interface Explosion {

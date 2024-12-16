@@ -1,5 +1,5 @@
 import { Block, Entity, ItemStack, ItemLockMode, EnchantmentType } from "@minecraft/server";
-import { bothParse, setVariable } from "../util.js";
+import { bothParse, format } from "../util.js";
 
 
 export default function main(source: Entity | Block | undefined, message: string) {
@@ -13,8 +13,8 @@ export default function main(source: Entity | Block | undefined, message: string
     const slot = object.slot !== undefined ? Number(object.slot) : false;
     const item = new ItemStack(object.item, amount);
 
-    if (object.name) item.nameTag = setVariable(source, object.name) ?? object.name;
-    if (object.lore) item.setLore(object.lore.map((line) => setVariable(source, line) ?? line));
+    if (object.name) item.nameTag = format(source, object.name) ?? object.name;
+    if (object.lore) item.setLore(object.lore.map((line) => format(source, line) ?? line));
     if (object.enchants) {
         const enchantments = item.getComponent("enchantable");
         for (const { name, level } of object.enchants) {

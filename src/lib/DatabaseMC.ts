@@ -2,9 +2,9 @@
  * DatabaseMC
  * @license MIT
  * @author @Nano191225
- * @version 1.0.2
+ * @version 1.2.0
  * Supported Minecraft Version
- * @version 1.20.40
+ * @version 1.21.50
  * @description DatabaseMC is a database that can be used in Minecraft Script API.
  * --------------------------------------------------------------------------
  * These databases are available in the Script API of the integrated version
@@ -14,648 +14,446 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-    world,
-    ScoreboardObjective,
-    Player,
-    ItemStack,
-    system,
-} from "@minecraft/server";
+import { ScoreboardObjective, world } from "@minecraft/server";
 
-const MAX_KEY_LENGTH = 512;
-const MAX_SCOREBOARD_KEYS_LENGTH = 32768;
-const MAX_SCOREBOARD_VALUE_LENGTH = 32768;
-const MAX_PLAYER_PROPERTY_LENGTH = 131072;
-const MAX_WORLD_PROPERTY_KEYS_LENGTH = 10;
-const MAX_WORLD_PROPERTY_LENGTH = 1048576;
-const MAX_ITEM_LORE_LINE_LENGTH = 20;
-const MAX_ITEM_LORE_VALUE_LENGTH = 398;
-class Database extends Map {
-    constructor(name: string) {
-        super();
-
-        if (typeof name !== "string")
-            throw new TypeError("Database name must be a string");
-        if (name.search(/[^a-z0-9_]/gi) !== -1)
-            throw new TypeError(
-                "Database name must only contain alphanumeric characters and underscores"
-            );
-        if (name.length > 11)
-            console.warn(
-                new RangeError("Database name must be 11 characters or less")
-            );
-    }
-}
-
-export class ScoreboardDatabase extends Database {
-    #name: string;
-    /**
-     * @param {string} name
-     */
-    constructor(name: string) {
-        super(name);
-        this.#name = name.slice(0, 11) + "_dbMC";
-
-        this.reload();
-    }
-
-    /**
-     * @returns {ScoreboardDatabase}
-     */
-    public reload(): ScoreboardDatabase {
-        const object = this.#getObject();
-        const participants = object.getParticipants();
-        for (const participant of participants) {
-            const display = participant.displayName;
-            const key = display.split("§:")[0];
-            const value = display.slice(key.length + 2);
-            super.set(key, JSON.parse(value));
-        }
-        return this;
-    }
-
-    /**
-     * @returns {Promise<ScoreboardDatabase>}
-     */
-    public reloadAsync(): Promise<ScoreboardDatabase> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.reload());
-            });
-        });
-    }
-
-    /**
-     * @param {string} key
-     * @returns {any | undefined}
-     */
-    public get(key: string): any | undefined {
-        this.#keyCheck(key);
-        return super.get(key);
-    }
-
-    /**
-     * @param {string} key
-     * @param {any} value
-     * @returns {ScoreboardDatabase}
-     */
-    public set(key: string, value: any): this {
-        if (this.size >= MAX_SCOREBOARD_KEYS_LENGTH)
-            throw new RangeError(
-                "The maximum number of entries has been exceeded"
-            );
-
-        this.#keyCheck(key);
-        const string = JSON.stringify(value);
-
-        if (string.length > MAX_SCOREBOARD_VALUE_LENGTH)
-            throw new RangeError(
-                `Value must be ${MAX_SCOREBOARD_VALUE_LENGTH} (now ${string.length}) characters or less (after JSON.stringify)`
-            );
-
-        this.delete(key);
-
-        const object = this.#getObject();
-        object.setScore(key + "§:" + string, 0);
-        super.set(key, value);
-
-        return this;
-    }
-
-    /**
-     * @param {string} key
-     * @param {any} value
-     * @returns {Promise<ScoreboardDatabase>}
-     */
-    public setAsync(key: string, value: any): Promise<this> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.set(key, value));
-            });
-        });
-    }
-
-    /**
-     * @param {string} key
-     * @returns {boolean}
-     */
-    public delete(key: string): boolean {
-        const object = this.#getObject();
-        const participants = object.getParticipants();
-        const participant = participants.find(
-            participant => participant.displayName.split("§:")[0] === key
-        );
-        if (!participant) return false;
-        return object.removeParticipant(participant);
-    }
-
-    /**
-     * @param {string} key
-     * @returns {Promise<boolean>}
-     */
-    public deleteAsync(key: string): Promise<boolean> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.delete(key));
-            });
-        });
-    }
-
-    public clear(): void {
-        const object = this.#getObject();
-        world.scoreboard.removeObjective(object);
-
-        super.clear();
-    }
-
-    public clearAsync(): Promise<void> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.clear());
-            });
-        });
-    }
-
-    #keyCheck(key: string): void {
-        if (typeof key !== "string")
-            throw new TypeError("Key must be a string");
-        if (key.search(/[^a-z0-9_]/gi) !== -1)
-            throw new TypeError(
-                "Key must only contain alphanumeric characters and underscores"
-            );
-        if (key.length > MAX_KEY_LENGTH)
-            throw new RangeError(
-                `Key must be ${MAX_KEY_LENGTH} characters or less`
-            );
-    }
-
-    #getObject(): ScoreboardObjective {
-        const object = world.scoreboard.getObjective(this.#name);
-        if (object) return object;
-        try {
-            world.scoreboard.addObjective(this.#name, this.#name);
-            return this.#getObject();
-        } catch (error) {
-            throw error;
-        }
-    }
-}
-
-export class PlayerPropertyDatabase extends Database {
-    #name: string;
-    /**
-     * @param {string} name
-     */
-    constructor(name: string) {
-        super(name);
-        this.#name = name.slice(0, 11) + "_dbMC";
-
-        if (MAX_PLAYER_PROPERTY_LENGTH > 2 ** 17)
-            throw new RangeError(
-                "Maximum value length must be 2^17 (131072) characters or less"
-            );
-
-        this.reload();
-    }
-
-    /**
-     * @returns {PlayerPropertyDatabase}
-     */
-    public reload(): PlayerPropertyDatabase {
-        for (const player of world.getAllPlayers()) {
-            const value = player.getDynamicProperty(this.#name) as string;
-            if (typeof value !== "string" && typeof value !== "undefined")
-                throw new ReferenceError("Value must be string or undefined");
-            if (value) super.set(player.id, JSON.parse(value));
-        }
-        return this;
-    }
-
-    /**
-     * @returns {Promise<PlayerPropertyDatabase>}
-     */
-    public reloadAsync(): Promise<PlayerPropertyDatabase> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.reload());
-            });
-        });
-    }
-
-    /**
-     * @param {Player} key
-     * @returns {any | undefined}
-     */
-    public get(key: Player): any | undefined {
-        this.#keyCheck(key);
-        return super.get(key.id);
-    }
-
-    /**
-     * @param {Player} key
-     * @param {any} value
-     * @returns {PlayerPropertyDatabase}
-     */
-    public set(key: Player, value: any): this {
-        this.#keyCheck(key);
-        key.setDynamicProperty(this.#name, JSON.stringify(value));
-        super.set(key.id, value);
-        return this;
-    }
-
-    /**
-     * @param {Player} key
-     * @param {any} value
-     * @returns {Promise<PlayerPropertyDatabase>}
-     */
-    public setAsync(key: Player, value: any): Promise<this> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.set(key, value));
-            });
-        });
-    }
-
-    /**
-     * @param {Player} key
-     * @returns {boolean}
-     */
-    public has(key: Player): boolean {
-        this.#keyCheck(key);
-        return super.has(key.id);
-    }
-
-    /**
-     * @param {Player} key
-     * @returns {boolean}
-     */
-    public delete(key: Player): boolean {
-        this.#keyCheck(key);
-        key.setDynamicProperty(this.#name, undefined);
-        return super.delete(key.id);
-    }
-
-    /**
-     * @param {Player} key
-     * @returns {Promise<boolean>}
-     */
-    public deleteAsync(key: Player): Promise<boolean> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.delete(key));
-            });
-        });
-    }
-
-    /**
-     * Method is not available
-     * @private
-     * @deprecated Use delete method
-     * @throws {Error} Method is not available
-     */
-    clear(): void {
-        throw new Error("Method is not available");
-    }
-
-    #keyCheck(key: Player): void {
-        if (!(key instanceof Player))
-            throw new TypeError("Key must be a Player");
-
-        if (!key.isValid())
-            throw new ReferenceError("Player is not valid (not online?)");
-    }
-}
-
-export class WorldPropertyDatabase extends Database {
-    #name: string;
-    /**
-     * @param {string} name
-     */
-    constructor(name: string) {
-        super(name);
-        this.#name = name.slice(0, 11) + "_dbMC";
-
-        if (
-            (MAX_WORLD_PROPERTY_LENGTH + MAX_KEY_LENGTH) *
-                MAX_WORLD_PROPERTY_KEYS_LENGTH >
-            2 ** 20
-        )
-            throw new RangeError(
-                "Maximum value length must be 2^20 (1048576) characters or less"
-            );
-
-        this.reload();
-    }
-
-    /**
-     * @returns {WorldPropertyDatabase}
-     */
-    public reload(): WorldPropertyDatabase {
-        const object = this.#getObject();
-        for (const [key, value] of object) {
-            super.set(key, JSON.parse(value));
-        }
-        return this;
-    }
-
-    /**
-     * @returns {Promise<WorldPropertyDatabase>}
-     */
-    public reloadAsync(): Promise<WorldPropertyDatabase> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.reload());
-            });
-        });
-    }
-
-    /**
-     * @param {string} key
-     * @returns {any | undefined}
-     */
-    public get(key: string): any | undefined {
-        this.#keyCheck(key);
-        return super.get(key);
-    }
-
-    /**
-     * @param {string} key
-     * @param {any} value
-     * @returns {WorldPropertyDatabase}
-     */
-    public set(key: string, value: any): this {
-        this.#keyCheck(key);
-
-        if (this.size >= MAX_WORLD_PROPERTY_KEYS_LENGTH)
-            throw new RangeError(
-                "The maximum number of entries has been exceeded"
-            );
-
-        const string = JSON.stringify(value);
-
-        if (string.length > MAX_WORLD_PROPERTY_LENGTH)
-            throw new RangeError(
-                `Value must be ${MAX_WORLD_PROPERTY_LENGTH} (now ${string.length}) characters or less (after JSON.stringify)`
-            );
-
-        this.delete(key);
-
-        const object = this.#getObject();
-        object.push([key, string]);
-        world.setDynamicProperty(this.#name, JSON.stringify(object));
-
-        super.set(key, value);
-
-        return this;
-    }
-
-    /**
-     * @param {string} key
-     * @param {any} value
-     * @returns {Promise<WorldPropertyDatabase>}
-     */
-    public setAsync(key: string, value: any): Promise<this> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.set(key, value));
-            });
-        });
-    }
-
-    /**
-     * @param {string} key
-     * @returns {boolean}
-     */
-    public has(key: string): boolean {
-        this.#keyCheck(key);
-        return super.has(key);
-    }
-
-    /**
-     * @param {string} key
-     * @returns {boolean}
-     */
-    public delete(key: string): boolean {
-        let object = this.#getObject();
-        object = object.filter(([_key]) => _key !== key);
-        world.setDynamicProperty(this.#name, JSON.stringify(object));
-        return super.delete(key);
-    }
-
-    /**
-     * @param {string} key
-     * @returns {Promise<boolean>}
-     */
-    public deleteAsync(key: string): Promise<boolean> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.delete(key));
-            });
-        });
-    }
-
-    public clear(): void {
-        world.setDynamicProperty(this.#name, JSON.stringify([]));
-        super.clear();
-    }
-    
-    public clearAsync(): Promise<void> {
-        return new Promise((resolve) => {
-            system.run(() => {
-                resolve(this.clear());
-            });
-        });
-    }
-
-    #keyCheck(key: string): void {
-        if (typeof key !== "string")
-            throw new TypeError("Key must be a string");
-        if (key.search(/[^a-z0-9_]/gi) !== -1)
-            throw new TypeError(
-                "Key must only contain alphanumeric characters and underscores"
-            );
-        if (key.length > MAX_KEY_LENGTH)
-            throw new RangeError(
-                `Key must be ${MAX_KEY_LENGTH} characters or less`
-            );
-    }
-
-    #getObject(): any[] {
-        const property = world.getDynamicProperty(this.#name);
-        if (typeof property !== "string") {
-            console.warn("property is not string");
-            world.setDynamicProperty(this.#name, JSON.stringify([]));
-        }
-        return JSON.parse(world.getDynamicProperty(this.#name) as string);
-    }
-}
-
-export class ItemDatabase extends Database {
-    constructor() {
-        super("item");
-
-        if (MAX_ITEM_LORE_VALUE_LENGTH / MAX_ITEM_LORE_LINE_LENGTH > 20)
-            throw new RangeError(
-                "Maximum value length must be 20 characters or less"
-            );
-    }
-
-    /**
-     * @param {ItemStack} key
-     * @returns {any | undefined}
-     */
-    public get(key: ItemStack): any | undefined {
-        this.#keyCheck(key);
-        const value = key.getLore().join("");
-        if (!value) return undefined;
-        if (!value.startsWith("§:")) return undefined;
-        return JSON.parse(value.slice(2));
-    }
-
-    /**
-     * @param {ItemStack} key
-     * @param {any} value
-     * @returns {ItemDatabase}
-     */
-    public set(key: ItemStack, value: any): this {
-        this.#keyCheck(key);
-        const string = "§:" + JSON.stringify(value);
-        if (string.length - 2 > MAX_ITEM_LORE_VALUE_LENGTH)
-            throw new RangeError(
-                `Value must be ${MAX_ITEM_LORE_VALUE_LENGTH} (now ${string.length - 2}) characters or less (after JSON.stringify)`
-            );
-        const array = this.#splitString(string);
-        key.setLore(array);
-        console.warn(JSON.stringify(array, null, 4));
-        return this;
-    }
-
-    /**
-     * @param {ItemStack} key
-     * @returns {boolean}
-     */
-    public has(key: ItemStack): boolean {
-        this.#keyCheck(key);
-        const value = key.getLore().join("");
-        if (!value) return false;
-        if (!value.startsWith("§:")) return false;
-        return true;
-    }
-
-    /**
-     * 
-     * @param {ItemStack} key
-     * @returns {boolean}
-     */
-    public delete(key: ItemStack): boolean {
-        this.#keyCheck(key);
-        key.setLore(undefined);
-        return true;
-    }
-
-    /**
-     * Method is not available
-     * @private
-     * @deprecated Use delete method
-     * @throws {Error} Method is not available
-     */
-    clear(): void {
-        throw new Error("Method is not available");
-    }
-
-    /**
-     * Method is not available
-     * @private
-     * @deprecated
-     * @throws {Error} Method is not available
-     */
-    entries(): IterableIterator<[any, any]> {
-        throw new Error("Method is not available");
-    }
-
-    /**
-     * Method is not available
-     * @private
-     * @deprecated
-     * @throws {Error} Method is not available
-     */
-    keys(): IterableIterator<any> {
-        throw new Error("Method is not available");
-    }
-
-    /**
-     * Method is not available
-     * @private
-     * @deprecated
-     * @throws {Error} Method is not available
-     */
-    values(): IterableIterator<any> {
-        throw new Error("Method is not available");
-    }
-
-    /**
-     * Method is not available
-     * @private
-     * @deprecated
-     * @throws {Error} Method is not available
-     */
-    forEach(): void {
-        throw new Error("Method is not available");
-    }
-
-    /**
-     * Method is not available
-     * @private
-     * @deprecated
-     * @throws {Error} Method is not available
-     */
-    [Symbol.iterator](): IterableIterator<[any, any]> {
-        throw new Error("Method is not available");
-    }
-
-    /**
-     * Property is not available
-     * @private
-     * @deprecated
-     * @returns {NaN}
-     */
-    size: number = NaN;
-
-    #keyCheck(key: ItemStack): void {
-        if (!(key instanceof ItemStack))
-            throw new TypeError("Key must be a ItemStack");
-    }
-
-    #splitString(string: string): string[] {
-        const array: string[] = [];
-        for (let i = 0; i < string.length; i += 20) {
-            array.push(string.slice(i, i + 20));
-        }
-        return array;
-    }
-}
-
-// world.afterEvents.worldInitialize.subscribe(worldInitialize => {
-//     const _player = new DynamicPropertiesDefinition();
-//     const _world = new DynamicPropertiesDefinition();
-
-//     PLAYER_PROPERTIES.forEach(property => {
-//         _player.defineString(property.name, property.max);
-//     });
-
-//     WORLD_PROPERTIES.forEach(property => {
-//         _world.defineString(property.name, property.max);
-//     });
-
-//     worldInitialize.propertyRegistry.registerEntityTypeDynamicProperties(
-//         _player,
-//         "minecraft:player"
-//     );
-
-//     worldInitialize.propertyRegistry.registerWorldDynamicProperties(_world);
-// });
-
-interface Property {
+interface Meta<K extends string | number | symbol> {
+    id: string;
     name: string;
-    max: number;
+    keys: Record<K, number>;
+}
+
+/**
+ * Abstract class representing a Database.
+ *
+ * @template K - The type of the keys in the database. Must be a string, number, or symbol.
+ * @template V - The type of the values in the database.
+ *
+ * @implements {Map<K, V>}
+ */
+abstract class Database<K extends string | number | symbol, V> implements Map<K, V> {
+    protected abstract readonly MAX_KEY_LENGTH: number;
+    protected abstract readonly MAX_VALUE_LENGTH: number;
+    protected abstract readonly MAX_KEYS_LENGTH: number;
+    protected name!: string;
+    protected rawName!: string;
+    protected meta!: Meta<K>;
+
+    /**
+     * Creates an instance of the DatabaseMC class.
+     *
+     * @param name - The name of the database. Must be a string containing only alphanumeric characters and underscores, and must be 11 characters or less.
+     *
+     * @throws {TypeError} If the name is not a string.
+     * @throws {TypeError} If the name contains invalid characters.
+     * @throws {RangeError} If the name is longer than 11 characters (a warning is logged).
+     */
+    constructor(name: string) {
+        if (typeof name !== "string") throw new TypeError("Database name must be a string");
+        if (name.search(/[^a-z0-9_ -]/gi) !== -1) throw new TypeError("Database name must only contain alphanumeric characters and underscores");
+        if (name.length > 11) console.warn(new RangeError("Database name must be 11 characters or less"));
+
+        this.rawName = name;
+        this.name = name.slice(0, 11) + "_dbMC";
+
+        this.getMeta();
+    }
+
+    /**
+     * Sets a value for a specific key in the database.
+     *
+     * @param key - The key to set. Must be a string, number, or symbol containing only alphanumeric characters and underscores.
+     * @param value - The value to associate with the key.
+     * @returns This database instance for method chaining.
+     *
+     * @throws {TypeError} If the key is not a string, number, or symbol.
+     * @throws {TypeError} If the key contains invalid characters.
+     * @throws {RangeError} If the key exceeds maximum length.
+     *
+     * @example
+     * ```typescript
+     * db.set("user_1", { name: "John", age: 30 });
+     * ```
+     */
+    public abstract set(key: K, value: V): this;
+
+    /**
+     * Asynchronously sets a key-value pair in the database.
+     * @param key - The key to set in the database
+     * @param value - The value to associate with the key
+     * @returns A Promise that resolves to the database instance (this) when the operation completes
+     * @throws Will reject the promise if the set operation fails
+     */
+    public setAsync(key: K, value: V): Promise<this> {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(this.set(key, value));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Retrieves the value associated with the specified key.
+     *
+     * @param key - The key to retrieve. Must be a string, number, or symbol containing only alphanumeric characters and underscores.
+     * @returns The value associated with the key, or `undefined` if the key does not exist.
+     *
+     * @throws {TypeError} If the key is not a string, number, or symbol.
+     * @throws {TypeError} If the key contains invalid characters.
+     * @throws {RangeError} If the key exceeds maximum length.
+     *
+     * @example
+     * ```typescript
+     * const user = db.get("user_1");
+     * console.log(user); // { name: "John", age: 30 }
+     * ```
+     */
+    public abstract get(key: K): V | undefined;
+
+    /**
+     * Asynchronously retrieves the value associated with the specified key.
+     * @param key - The key to retrieve
+     * @returns A Promise that resolves to the value associated with the key, or `undefined` if the key does not exist
+     * @throws Will reject the promise if the get operation fails
+     */
+    public getAsync(key: K): Promise<V | undefined> {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(this.get(key));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Checks if a key exists in the database.
+     *
+     * @param key - The key to check for existence. Must be a string, number, or symbol containing only alphanumeric characters and underscores.
+     * @returns `true` if the key exists in the database, `false` otherwise.
+     *
+     * @throws {TypeError} If the key is not a string, number, or symbol.
+     * @throws {TypeError} If the key contains invalid characters.
+     * @throws {RangeError} If the key exceeds maximum length.
+     *
+     * @example
+     * ```typescript
+     * if (db.has("user_1")) {
+     *     console.log("User 1 exists");
+     * }
+     * ```
+     */
+    public abstract has(key: K): boolean;
+
+    /**
+     * Asynchronously checks if a key exists in the database.
+     * @param key - The key to check for existence
+     * @returns A Promise that resolves to `true` if the key exists in the database, `false` otherwise
+     * @throws Will reject the promise if the has operation fails
+     */
+    public hasAsync(key: K): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(this.has(key));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Deletes a key from the database.
+     *
+     * @param key - The key to delete. Must be a string, number, or symbol containing only alphanumeric characters and underscores.
+     * @returns `true` if the key was successfully deleted, `false` otherwise.
+     *
+     * @throws {TypeError} If the key is not a string, number, or symbol.
+     * @throws {TypeError} If the key contains invalid characters.
+     * @throws {RangeError} If the key exceeds maximum length.
+     *
+     * @example
+     * ```typescript
+     * db.delete("user_1");
+     * ```
+     */
+    public abstract delete(key: K): boolean;
+
+    /**
+     * Asynchronously deletes a key from the database.
+     * @param key - The key to delete
+     * @returns A Promise that resolves to `true` if the key was successfully deleted, `false` otherwise
+     * @throws Will reject the promise if the delete operation fails
+     */
+    public deleteAsync(key: K): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(this.delete(key));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Removes all key-value pairs from the database.
+     */
+    public abstract clear(): void;
+
+    /**
+     * Asynchronously removes all key-value pairs from the database.
+     * @returns A Promise that resolves when the operation completes
+     * @throws Will reject the promise if the clear operation fails
+     */
+    public clearAsync(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(this.clear());
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Returns an iterator over all keys in the map.
+     * @returns {IterableIterator<K>} An iterator that yields all keys in the map.
+     */
+    public keys(): IterableIterator<K> {
+        const keys = Object.keys(this.meta.keys);
+        return keys[Symbol.iterator]() as IterableIterator<K>;
+    }
+
+    /**
+     * Returns an iterator over all values in the map.
+     * @returns {IterableIterator<V>} An iterator that yields all values in the map.
+     */
+    public values(): IterableIterator<V> {
+        const values: V[] = [];
+        for (const key of this.keys()) {
+            values.push(this.get(key) as V);
+        }
+        return values[Symbol.iterator]();
+    }
+
+    /**
+     * Returns an iterator over all entries in the map.
+     * @returns {IterableIterator<[K, V]>} An iterator that yields all entries in the map.
+     */
+    public entries(): IterableIterator<[K, V]> {
+        const entries: [K, V][] = [];
+        for (const key of this.keys()) {
+            entries.push([key, this.get(key) as V]);
+        }
+        return entries[Symbol.iterator]();
+    }
+
+    /**
+     * Executes a provided function once for each key-value pair in the map.
+     * @param callbackfn - A function that accepts up to three arguments. The `forEach` method calls the callbackfn function one time for each key-value pair in the map.
+     * @param thisArg - An object to which `this` can refer in the callbackfn function. If `thisArg` is omitted, `undefined` is used as the `this` value.
+     */
+    public forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
+        for (const key of this.keys()) {
+            callbackfn.call(thisArg, this.get(key) as V, key, this);
+        }
+    }
+
+    /**
+     * Returns the number of key-value pairs in the map.
+     * @returns The number of key-value pairs in the map.
+     */
+    public get size(): number {
+        return Object.keys(this.meta.keys).length;
+    }
+
+    /**
+     * Removes all key-value pairs from the map.
+     */
+    public [Symbol.iterator](): IterableIterator<[K, V]> {
+        return this.entries();
+    }
+
+    /**
+     * Returns a string representation of the object.
+     * @returns The string representation of the object.
+     */
+    public get [Symbol.toStringTag](): string {
+        return "DatabaseMC";
+    }
+
+    /**
+     * Checks if the key is valid.
+     * @param key - The key to check
+     */
+    protected keyCheck(key: K): void {
+        if (typeof key !== "string" && typeof key !== "number" && typeof key !== "symbol")
+            throw new TypeError("Key must be a string, number, or symbol");
+        if (typeof key === "string" && key.length > this.MAX_KEY_LENGTH)
+            throw new RangeError(`Key length must be ${this.MAX_KEY_LENGTH} characters or less`);
+        if (typeof key === "string" && key.search(/[^a-z0-9_ -]/gi) !== -1)
+            throw new TypeError("Key must only contain alphanumeric characters and underscores");
+    }
+
+    /**
+     * Retrieves the metadata for the current database instance.
+     */
+    protected getMeta(): void {
+        try {
+            this.meta = JSON.parse(world.getDynamicProperty(this.name) as string) || {
+                id: this.name,
+                name: this.rawName,
+                keys: {} as Record<K, number>,
+            };
+        } catch {
+            this.meta = {
+                id: this.name,
+                name: this.rawName,
+                keys: {} as Record<K, number>,
+            };
+        }
+    }
+
+    /**
+     * Sets metadata for the current database instance by converting it to a JSON string and storing it as a dynamic property.
+     * The metadata is stored using the database name as the property key.
+     * @returns void
+     */
+    protected setMeta(): void {
+        world.setDynamicProperty(this.name, JSON.stringify(this.meta));
+    }
+
+    /**
+     * Updates the metadata by setting and then retrieving it.
+     * This method first calls `setMeta` to update the metadata,
+     * and then calls `getMeta` to retrieve the updated metadata.
+     *
+     * @protected
+     */
+    protected updateMeta(): void {
+        this.setMeta();
+        this.getMeta();
+    }
+}
+
+export class ScoreboardDatabase<K, V> extends Database<string, V> {
+    protected readonly MAX_KEY_LENGTH: number = 512;
+    protected readonly MAX_VALUE_LENGTH: number = 32768;
+    protected readonly MAX_KEYS_LENGTH: number = 32768;
+
+    private getObject(): ScoreboardObjective {
+        const object = world.scoreboard.getObjective(this.meta.id);
+        if (object) return object;
+        world.scoreboard.addObjective(this.meta.id, this.meta.name);
+        return this.getObject();
+    }
+
+    public set(key: string, value: V): this {
+        this.keyCheck(key);
+
+        const string = JSON.stringify(value);
+        if (string.length > this.MAX_VALUE_LENGTH) throw new RangeError(`Value length must be ${this.MAX_VALUE_LENGTH} characters or less`);
+
+        this.delete(key);
+
+        this.meta.keys[key] = string.length;
+        this.updateMeta();
+
+        this.getObject().setScore(key + "§;" + string, 0);
+
+        return this;
+    }
+
+    public get(key: string): V | undefined {
+        this.keyCheck(key);
+
+        const value = this.getObject()
+            .getParticipants()
+            .find((participant) => participant.displayName.startsWith(key + "§;"));
+        if (!value) return undefined;
+
+        return JSON.parse(value.displayName.split("§;").slice(1).join("§;"));
+    }
+
+    public has(key: string): boolean {
+        this.keyCheck(key);
+        return this.getObject()
+            .getParticipants()
+            .some((participant) => participant.displayName.startsWith(key + "§;"));
+    }
+
+    public delete(key: string): boolean {
+        this.keyCheck(key);
+
+        if (!this.has(key)) return false;
+
+        const object = this.getObject();
+        const participant = object.getParticipants().find((participant) => participant.displayName.startsWith(key + "§;"));
+        if (!participant) return false;
+        object.removeParticipant(participant);
+        delete this.meta.keys[key];
+        this.updateMeta();
+
+        return true;
+    }
+
+    public clear(): void {
+        world.scoreboard.removeObjective(this.meta.id);
+        this.meta.keys = {} as Record<string, number>;
+        this.updateMeta();
+    }
+}
+
+export class WorldPropertyDatabase<K, V> extends Database<string, V> {
+    protected readonly MAX_KEY_LENGTH: number = 512;
+    protected readonly MAX_VALUE_LENGTH: number = 32768;
+    protected readonly MAX_KEYS_LENGTH: number = 32768;
+
+    public set(key: string, value: V): this {
+        this.keyCheck(key);
+
+        const string = JSON.stringify(value);
+        if (string.length > this.MAX_VALUE_LENGTH) throw new RangeError(`Value length must be ${this.MAX_VALUE_LENGTH} characters or less`);
+
+        this.meta.keys[key] = string.length;
+        this.updateMeta();
+
+        world.setDynamicProperty(this.meta.id + "@" + key, string);
+
+        return this;
+    }
+
+    public get(key: string): V | undefined {
+        this.keyCheck(key);
+
+        const value = world.getDynamicProperty(this.meta.id + "@" + key) as string;
+        if (!value) return undefined;
+
+        return JSON.parse(value);
+    }
+
+    public has(key: string): boolean {
+        this.keyCheck(key);
+        return world.getDynamicProperty(this.meta.id + "@" + key) !== undefined;
+    }
+
+    public delete(key: string): boolean {
+        this.keyCheck(key);
+
+        if (!this.has(key)) return false;
+
+        world.setDynamicProperty(this.meta.id + "@" + key, undefined);
+        delete this.meta.keys[key];
+        this.updateMeta();
+
+        return true;
+    }
+
+    public clear(): void {
+        for (const key of this.keys()) {
+            world.setDynamicProperty(this.meta.id + "@" + key, undefined);
+        }
+        this.meta.keys = {} as Record<string, number>;
+        this.updateMeta();
+    }
 }

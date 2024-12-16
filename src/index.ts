@@ -17,228 +17,43 @@ import "./lib/Logger.js";
 
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
-// import * as MinecraftVanilla from "@minecraft/vanilla-data";
-import loadEvents from "./events/index.js";
+
 import tickEvent from "./lib/TickEvent.js";
-import "./playground";
-import "./scriptevents/index.js";
 import { UI } from "./ui.js";
-import { easySafeParse, getScore, safeParse, setVariable } from "./util.js";
+
+import "./playground";
+import "./events/index.js";
+import "./scriptevents/index.js";
 
 const { world, system } = Minecraft;
 
-system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => (beforeWatchdogTerminate.cancel = true));
+system.run(() => {
+    const msg = [
+        "§r",
+        "§lCommander API をご利用いただきありがとうございます。§r",
+        "§r",
+        "このアドオンは Commander API V2 の §l開発版§r です。",
+        "予期しないエラーや予告なく仕様が変更される可能性があります。",
+        "特別な事情が無い限り、本番環境での使用はお控えください。",
+        "§r",
+    ].join("\n");
+    world.sendMessage(msg);
+});
 
-loadEvents();
+system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => (beforeWatchdogTerminate.cancel = true));
 
 tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
     try {
         for (const player of world.getAllPlayers()) {
             if (!player.isValid()) return;
 
-            player.getTags().forEach((t) => {
-                if (t.startsWith("rename:")) {
-                    const rename = t.replace("rename:", "");
-                    player.runCommandAsync(`scriptevent CApi:rename ${rename}`);
-                    player.removeTag(t);
-                }
-                if (t.startsWith("resetName")) {
-                    player.runCommandAsync(`scriptevent CApi:resetName`);
-                    player.removeTag(t);
-                }
-                if (t.startsWith("setItem:")) {
-                    const setItemJson = t.replace("setItem:", "");
-                    player.runCommandAsync(`scriptevent CApi:setItem ${setItemJson}`);
-                    player.removeTag(t);
-                }
-                if (t.startsWith("_form:")) {
-                    try {
-                        player.formJson = t.replace("form:", "");
-                    } catch { }
-                    player.removeTag(t);
-                }
-                if (t.startsWith("run:")) {
-                    if (!player.run) player.run = [];
-                    player.run.push(t.replace("run:", "").replace(/'/g, '"'));
-                    player.removeTag(t);
-                }
-                if (t.startsWith("tell:")) {
-                    player.tell = t.replace("tell:", "").replace(/'/g, '"');
-                    player.removeTag(t);
-                }
-                if (t.startsWith("kick:")) {
-                    player.kick = t.replace("kick:", "").replace(/'/g, '"');
-                    player.removeTag(t);
-                }
-                if (t.startsWith("knockback:")) {
-                    player.knockback = t.replace("knockback:", "").replace(/'/g, '"');
-                    player.removeTag(t);
-                }
-                if (t.startsWith("kill:")) {
-                    player.kill();
-                    player.removeTag(t);
-                }
-            });
-
             // tshoot
             if (player.hasTag("Capi:system_tshoot")) {
                 player.getTags().forEach((t) => player.removeTag(t));
             }
 
-            // Rename
-            if (player.rename) {
-                player.nameTag = setVariable(player, player.rename) ?? player.rename;
-                player.rename = false;
-            }
-
-            // Reset name
-            if (player.resetName) {
-                player.nameTag = player.name;
-                player.resetName = false;
-            }
-
-            // Set slot
-            try {
-                const setSlot = getScore(player, "Capi:setSlot");
-                if (setSlot && setSlot >= 0) {
-                    player.selectedSlotIndex = setSlot;
-                    player.score.reset("Capi:setSlot");
-                }
-            } catch { }
-
-            // Set item
-            const container = player.getComponent("inventory")?.container;
-            if (player.setItemJson)
-                player.setItemJson.forEach((setItemJson: any) => {
-                    try {
-                        const Data = easySafeParse(setItemJson);
-                        if (!Data.item) return;
-                        const amount = Data.amount ? Number(Data.amount) : 1;
-                        const slot = Data.slot ? Number(Data.slot) : false;
-                        const itemName = Data.item; //.replace("minecraft:", "");
-                        const item = new Minecraft.ItemStack(itemName, amount);
-                        if (Data.name) item.nameTag = setVariable(player, Data.name);
-                        if (Data.lore) {
-                            for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
-                            item.setLore(Data.lore);
-                        }
-                        if (Data.enchants) {
-                            const enchantments = item.getComponent("enchantable");
-                            for (let i = 0; i < Data.enchants.length; i++) {
-                                if (!Data.enchants[i].name) return;
-                                let enchantsName = Data.enchants[i].name;
-                                let enchantsLevel = 1;
-                                if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
-                                enchantments?.addEnchantment({ type: enchantsName, level: enchantsLevel });
-                            }
-                        }
-                        if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
-                        if (Data.can_destroy) item.setCanDestroy(Data.can_destroy);
-                        if (Data.lock) item.lockMode = Minecraft.ItemLockMode[Data.lock as keyof typeof Minecraft.ItemLockMode];
-                        if (Data.keep_on_death) item.keepOnDeath = Data.keep_on_death === "true" ? true : false;
-                        if (typeof slot == "number") container?.setItem(slot, item);
-                        else container?.addItem(item);
-                    } catch (e) {
-                        console.error(e, (e as any).stack);
-                        player.sendMessage(`§c${e}`);
-                        for (const ply of world.getPlayers({ tags: ["Capi:hasOp"] })) ply.sendMessage(`§c${e}`);
-                    }
-                });
-            player.setItemJson = [];
-
-            // Show form
-            if (player.formJson) {
-                const Data = easySafeParse(player.formJson);
-                player.formJson = false;
-                const Form = new MinecraftUI.ActionFormData();
-                if (Data.title) Form.title(String(setVariable(player, Data.title)));
-                if (Data.body) Form.body(String(setVariable(player, Data.body)));
-
-                Data.buttons.forEach((b: any, index: number) => {
-                    if (!b.text) throw TypeError(`The button text is not passed.`);
-                    const text = setVariable(player, b.text) ?? b.text;
-                    if (b.textures) Form.button(text, String(b.textures));
-                    else Form.button(text);
-
-                    if (text && Data.buttons.length - 1 === index) {
-                        Form.show(player).then((response) => {
-                            if (Data.buttons[response.selection as any]?.tag) player.addTagWillRemove(Data.buttons[response.selection as any].tag);
-                        });
-                    }
-                });
-            }
-
-            // Run command
-            if (player.run) {
-                player.run.forEach((commands: string) => {
-                    const Data = safeParse<string[]>(commands);
-                    if (typeof Data === "object" && Data.length)
-                        Data.forEach((c) => {
-                            player.runCommandAsync(String(setVariable(player, c))).catch(() => { });
-                        });
-                });
-            }
-            player.run = [];
-
-            // tell
-            if (player.tell) {
-                const text = setVariable(player, player.tell);
-                player.sendMessage(String(text));
-            }
-            player.tell = false;
-
-            // Kick
-            if (player.kick) {
-                player
-                    .runCommandAsync(`kick "${player.name}" ${setVariable(player, player.kick)}`)
-                    .catch((e) => world.sendMessage(`[${player.name}] §c${e}`));
-                player.kick = false;
-            }
-
-            // Knockback
-            if (player.knockback) {
-                try {
-                    const Data = safeParse<
-                        | string[]
-                        | {
-                            directionX: any;
-                            directionZ: any;
-                            horizontalStrength: any;
-                            verticalStrength: any;
-                        }
-                    >(player.knockback);
-
-                    const directionX = String(setVariable(player, "directionX" in Data ? Data.directionX : Data[0] || 0));
-                    const directionZ = String(setVariable(player, "directionZ" in Data ? Data.directionX : Data[0] || 0));
-                    const horizontalStrength = String(setVariable(player, "horizontalStrength" in Data ? Data.directionX : Data[0] || 0));
-                    const verticalStrength = String(setVariable(player, "verticalStrength" in Data ? Data.directionX : Data[0] || 0));
-
-                    player.applyKnockback(
-                        Number(directionX.search(/[^0-9-.]/) >= 0 ? 0 : directionX),
-                        Number(directionZ.search(/[^0-9-.]/) >= 0 ? 0 : directionZ),
-                        Number(horizontalStrength.search(/[^0-9-.]/) >= 0 ? 0 : horizontalStrength),
-                        Number(verticalStrength.search(/[^0-9-.]/) >= 0 ? 0 : verticalStrength)
-                    );
-
-                    player.knockback = false;
-                } catch (e) {
-                    console.error(e, (e as Error).stack);
-                }
-            }
-
-            // Join
-            if (player.join) {
-                player.score.set("Capi:playerJoinX", Math.floor(player.location.x));
-                player.score.set("Capi:playerJoinY", Math.floor(player.location.y));
-                player.score.set("Capi:playerJoinZ", Math.floor(player.location.z));
-                player.score.add("Capi:joinCount", 1);
-                player.addTagWillRemove("Capi:join");
-                player.join = false;
-            }
-
             if (player.hasTag("Capi:open_config_gui")) {
-                const ui = new UI(player);
-                ui.Menu();
+                new UI(player).Menu();
             }
         }
     } catch (e) {

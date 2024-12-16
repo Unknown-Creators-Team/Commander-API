@@ -1,4 +1,4 @@
-import * as Minecraft from "@minecraft/server";
+/*import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 import { setVariable, easySafeParse, bothParse } from "./util.js";
 
@@ -314,4 +314,4 @@ namespace Form {
         type: "run_cmd";
         value: string;
     }
-}
+}*/

@@ -1,20 +1,22 @@
 import { world } from "@minecraft/server";
+import { removeTagsStartsWith } from "util.js";
 
 world.afterEvents.projectileHitEntity.subscribe(projectileHit => {
     const { projectile, source: player } = projectileHit;
-    if (!player?.isPlayer()) return;
+    
+    if (player?.isPlayer()) {
+        const { entity } = projectileHit.getEntityHit();
 
-    const hit = projectileHit.getEntityHit().entity;
+        if (entity) {
+            player.score.set("capi:hit_x", Math.floor(entity.location.x));
+            player.score.set("capi:hit_y", Math.floor(entity.location.y));
+            player.score.set("capi:hit_z", Math.floor(entity.location.z));
+        }
 
-    if (hit) {
-        player.score.set("Capi:hitX", Math.floor(hit.location.x));
-        player.score.set("Capi:hitY", Math.floor(hit.location.y));
-        player.score.set("Capi:hitZ", Math.floor(hit.location.z));
+        removeTagsStartsWith(player, "hit_with:", "hit_to:");
+
+        player.addTagWillRemove("capi:hit");
+        player.addTagWillRemove(`hit_with:${projectile.typeId}`);
+        player.addTagWillRemove(`hit_to:${entity?.typeId}`);
     }
-
-    player.removeTags(player.getTags().filter(t => t.startsWith("hitWith:") || t.startsWith("hitTo:")));
-
-    player.addTagWillRemove(`Capi:hit`);
-    player.addTagWillRemove(`hitWith:${projectile.typeId}`);
-    player.addTagWillRemove(`hitTo:${hit?.typeId}`);
 });

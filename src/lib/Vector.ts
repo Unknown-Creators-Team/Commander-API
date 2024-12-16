@@ -1,323 +1,152 @@
-// Script example for ScriptAPI
-// Author: Jayly <https://github.com/JaylyDev>
-// Project: https://github.com/JaylyDev/ScriptAPI
-
 import { Vector3 } from "@minecraft/server";
+import { FMath } from "./FastMath.js";
 
-/**
- * Contains a description of a vector.
- * @implements {Vector3}
- */
-export class Vector {
-	/**
-	 * X component of this vector.
-	 * @type {number}
-	 */
-	x: number;
-	/**
-	 * Y component of this vector.
-	 * @type {number}
-	 */
-	y: number;
-	/**
-	 * Z component of this vector.
-	 * @type {number}
-	 */
-	z: number;
-	/**
-	 * A constant vector that represents (0, 0, -1).
-	 * @readonly
-	 */
-	static back = new this(0, 0, -1);
-	/**
-	 * A constant vector that represents (0, -1, 0).
-	 * @readonly
-	 */
-	static down = new this(0, -1, 0);
-	/**
-	 * A constant vector that represents (0, 0, 1).
-	 * @readonly
-	 */
-	static forward = new this(0, 0, 1);
-	/**
-	 * A constant vector that represents (-1, 0, 0).
-	 * @readonly
-	 */
-	static left = new this(-1, 0, 0);
-	/**
-	 * A constant vector that represents (1, 1, 1).
-	 * @readonly
-	 */
-	static one = new this(1, 1, 1);
-	/**
-	 * A constant vector that represents (1, 0, 0).
-	 * @readonly
-	 */
-	static right = new this(1, 0, 0);
-	/**
-	 * A constant vector that represents (0, 1, 0).
-	 * @readonly
-	 */
-	static up = new this(0, 1, 0);
-	/**
-	 * A constant vector that represents (0, 0, 0).
-	 * @readonly
-	 */
-	static zero = new this(0, 0, 0);
-	/**
-	 * @remarks
-	 * Creates a new instance of an abstract vector.
-	 * @param {number} x
-	 * X component of the vector.
-	 * @param {number} y
-	 * Y component of the vector.
-	 * @param {number} z
-	 * Z component of the vector.
-	 */
-	constructor(x: number, y: number, z: number) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-	/**
-	 * @remarks
-	 * Compares this vector and another vector to one another.
-	 * @param {Vector} other
-	 * Other vector to compare this vector to.
-	 * @returns {boolean}
-	 * True if the two vectors are equal.
-	 */
-	equals(other: Vector): boolean {
-		if (this.x === other.x && this.y === other.y && this.z === other.z)
-			return true;
-		else return false;
-	}
-	/**
-	 * @remarks
-	 * Retur
-	 * @returns {number}ns the length of this vector.
-	 */
-	length(): number {
-		return Math.hypot(this.x, this.y, this.z);
-	}
-	/**
-	 * @remarks
-	 * Returns the
-	 * @returns {number}squared length of this vector.
-	 */
-	lengthSquared(): number {
-		return this.x ** 2 + this.y ** 2 + this.z ** 2;
-	}
-	/**
-	 * @remarks
-	 * Returns this vector as a normalized vector.
-	 * @returns {Vector}
-	 */
-	normalized(): Vector {
-		const magnitude = this.length();
-		const DirectionX = this.x / magnitude;
-		const DirectionY = this.y / magnitude;
-		const DirectionZ = this.z / magnitude;
-		return new Vector(DirectionX, DirectionY, DirectionZ);
-	}
-	toVector3(): Vector3 {
-		return { x: this.x, y: this.y, z: this.z };
-	}
-	/**
-	 * @remarks
-	 * Returns the addition of these vectors.
-	 * @param {Vector3} a
-	 * @param {Vector3} b
-	 * @returns {Vector}
-	 */
-	static add(a: Vector3, b: Vector3 | number): Vector {
-		const vector = new Vector(a.x, a.y, a.z);
-		if (typeof b === "number") {
-			vector.x += b;
-			vector.y += b;
-			vector.z += b;
-		} else {
-			vector.x += b.x;
-			vector.y += b.y;
-			vector.z += b.z;
-		}
-		return vector;
-	}
-	/**
-	 * @remarks
-	 * Returns the cross product of these two vectors.
-	 * @param {Vector3} a
-	 * @param {Vector3} b
-	 * @returns {Vector}
-	 */
-	static cross(a: Vector3, b: Vector3): Vector {
-		return new Vector(
-			a.y * b.z - a.z * b.y,
-			a.z * b.x - a.x * b.z,
-			a.x * b.y - a.y * b.x
-		);
-	}
-	/**
-	 * @remarks
-	 * Returns the distance between two vectors.
-	 * @param {Vector3} a
-	 * @param {Vector3} b
-	 * @returns {number}
-	 */
-	static distance(a: Vector3, b: Vector3): number {
-		const dx = b.x - a.x;
-		const dy = b.y - a.y;
-		const dz = b.z - a.z;
-		const distance = Math.hypot(dx, dy, dz);
 
-		return distance;
-	}
-	/**
-	 * @remarks
-	 * Returns the component-wise division of these vectors.
-	 * @param {Vector3} a
-	 * @param {Vector3 | number} b
-	 * @returns {Vector}
-	 */
-	static divide(a: Vector3, b: Vector3 | number): Vector {
-		const vector = new Vector(a.x, a.y, a.z);
+export default class Vector implements Vector3 {
+    public x: number;
+    public y: number;
+    public z: number;
 
-		if (typeof b === "number") {
-			vector.x /= b;
-			vector.y /= b;
-			vector.z /= b;
-		} else {
-			vector.x /= b.x;
-			vector.y /= b.y;
-			vector.z /= b.z;
-		}
+    constructor(x: number, y: number, z: number) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
-		return vector;
-	}
-	/**
-	 * @remarks
-	 * Returns the linear interpolation between a and b using t as
-	 * the control.
-	 * @param {Vector3} a
-	 * @param {Vector3} b
-	 * @param {number} t
-	 * @returns {Vector}
-	 */
-	static lerp(a: Vector3, b: Vector3, t: number): Vector {
-		const dest = new Vector(a.x, a.y, a.z);
-		dest.x += (b.x - a.x) * t;
-		dest.y += (b.y - a.y) * t;
-		dest.z += (b.z - a.z) * t;
-		return dest;
-	}
-	/**
-	 * @remarks
-	 * Returns a vector that is made from the largest components of
-	 * two vectors.
-	 * @param {Vector3} a
-	 * @param {Vector3} b
-	 * @returns {Vector}
-	 */
-	static max(a: Vector3, b: Vector3): Vector {
-		return new Vector(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
+    public toString(): string {
+        return `${this.x} ${this.y} ${this.z}`;
+    }
 
-	}
-	/**
-	 * @remarks
-	 * Returns a vector that is made from the smallest components
-	 * of two vectors.
-	 * @param {Vector3} a
-	 * @param {Vector3} b
-	 * @returns {Vector}
-	 */
-	static min(a: Vector3, b: Vector3): Vector {
-		return new Vector(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
-	}
-	/**
-	 * @remarks
-	 * Returns the component-wise product of these vectors.
-	 * @param {Vector3} a
-	 * @param {Vector3 | number} b
-	 * @returns {Vector}
-	 */
-	static multiply(a: Vector3, b: Vector3 | number): Vector {
-		const vector = new Vector(a.x, a.y, a.z);
+    public toArray(): number[] {
+        return [this.x, this.y, this.z];
+    }
 
-		if (typeof b === "number") {
-			vector.x *= b;
-			vector.y *= b;
-			vector.z *= b;
-		} else {
-			vector.x *= b.x;
-			vector.y *= b.y;
-			vector.z *= b.z;
-		}
+    public toObject(): Vector3 {
+        return { x: this.x, y: this.y, z: this.z };
+    }
 
-		return vector;
-	}
-	/**
-	 * @remarks
-	 * Returns the spherical linear interpolation between a and b
-	 * using s as the control.
-	 * @param {Vector3} a
-	 * @param {Vector3} b
-	 * @param {number} s
-	 * @returns {Vector}
-	 */
-	static slerp(a: Vector3, b: Vector3, s: number): Vector {
-		/**
-		 * @param {[number, number, number]} a
-		 * @param {[number, number, number]} b
-		 * @returns {number}
-		 */
-		function MathDot(a: [number, number, number], b: [number, number, number]): number {
-			return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
-		}
+    public toFixed(fractionDigits: number): Vector {
+        const fd = Math.min(Math.max(fractionDigits, 0), 100);
+        return new Vector(
+            parseFloat(this.x.toFixed(fd)),
+            parseFloat(this.y.toFixed(fd)),
+            parseFloat(this.z.toFixed(fd))
+        );
+    }
 
-		const θ = Math.acos(MathDot([a.x, a.y, a.z], [b.x, b.y, b.z]));
-		const factor1 = Math.sin(θ * (1 - s)) / Math.sin(θ);
-		const factor2 = Math.sin(θ * s) / Math.sin(θ);
+    public equals(v: Vector3): boolean {
+        return this.x === v.x && this.y === v.y && this.z === v.z;
+    }
 
-		return new Vector(
-			a.x * factor1 + b.x * factor2,
-			a.y * factor1 + b.y * factor2,
-			a.z * factor1 + b.z * factor2
-		);
-	}
-	/**
-	 * @remarks
-	 * Returns the subtraction of these vectors.
-	 */
-	static subtract(a: Vector3, b: Vector3 | number): Vector {
-		const vector = new Vector(a.x, a.y, a.z);
-		if (typeof b === "number") {
-			vector.x -= b;
-			vector.y -= b;
-			vector.z -= b;
-		} else {
-			vector.x -= b.x;
-			vector.y -= b.y;
-			vector.z -= b.z;
-		}
+    public add(v: Vector3): Vector {
+        return Vector.add(this, v);
+    }
 
-		return vector;
-	}
-	static areaBetweenFloored(a: Vector3, b: Vector3): number {
-		const vector = Vector.subtract(b, a);
-		return Math.floor(vector.x + 1) * Math.floor(vector.y + 1) * Math.floor(vector.z + 1);
-	}
-	static minVectors(vectors: Vector3[]) {
-		let min = vectors[0];
-		for (let i = 1; i < vectors.length; i++) {
-			min = Vector.min(min, vectors[i]);
-		}
-		return new Vector(min.x, min.y, min.z);
-	}
-	static maxVectors(vectors: Vector3[]) {
-		let max = vectors[0];
-		for (let i = 1; i < vectors.length; i++) {
-			max = Vector.max(max, vectors[i]);
-		}
-		return new Vector(max.x, max.y, max.z);
-	}
+    public subtract(v: Vector3): Vector {
+        return Vector.subtract(this, v);
+    }
+
+    public normalize(): Vector {
+        return Vector.normalize(this);
+    }
+
+    public multiply(v: Vector3): Vector {
+        return Vector.multiply(this, v);
+    }
+
+    public divide(v: Vector3): Vector {
+        return Vector.divide(this, v);
+    }
+
+    public distance(v: Vector3): number {
+        return Vector.distance(this, v);
+    }
+
+    public cross(v: Vector3): Vector {
+        return Vector.cross(this, v);
+    }
+
+    public floor(): Vector {
+        return Vector.floor(this);
+    }
+
+    public ceil(): Vector {
+        return Vector.ceil(this);
+    }
+
+    public round(): Vector {
+        return Vector.round(this);
+    }
+
+    public static add(v1: Vector3, v2: Vector3): Vector {
+        return new Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    }
+
+    public static subtract(v1: Vector3, v2: Vector3): Vector {
+        return new Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    }
+
+    public static normalize(v: Vector3): Vector {
+        const length = FMath.hypot(v.x, v.y, v.z);
+        return new Vector(v.x / length, v.y / length, v.z / length);
+    }
+
+    public static multiply(v1: Vector3, v2: Vector3): Vector {
+        return new Vector(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
+    }
+
+    public static divide(v1: Vector3, v2: Vector3): Vector {
+        return new Vector(v1.x / v2.x, v1.y / v2.y, v1.z / v2.z);
+    }
+
+    public static distance(v1: Vector3, v2: Vector3): number {
+        return FMath.hypot(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    }
+
+    public static cross(v1: Vector3, v2: Vector3): Vector {
+        return new Vector(
+            v1.y * v2.z - v1.z * v2.y,
+            v1.z * v2.x - v1.x * v2.z,
+            v1.x * v2.y - v1.y * v2.x
+        );
+    }
+
+    public static fromArray(arr: number[]): Vector {
+        return new Vector(arr[0], arr[1], arr[2]);
+    }
+
+    public static fromObject(obj: { x: number; y: number; z: number }): Vector {
+        return new Vector(obj.x, obj.y, obj.z);
+    }
+
+    public static floor(v: Vector3): Vector {
+        return new Vector(FMath.floor(v.x), FMath.floor(v.y), FMath.floor(v.z));
+    }
+
+    public static ceil(v: Vector3): Vector {
+        return new Vector(FMath.ceil(v.x), FMath.ceil(v.y), FMath.ceil(v.z));
+    }
+
+    public static round(v: Vector3): Vector {
+        return new Vector(FMath.round(v.x), FMath.round(v.y), FMath.round(v.z));
+    }
+
+    public static from(v: Vector3): Vector {
+        return new Vector(v.x, v.y, v.z);
+    }
+
+    public static ZERO = new Vector(0, 0, 0);
+    public static ONE = new Vector(1, 1, 1);
+    public static UP = new Vector(0, 1, 0);
+    public static DOWN = new Vector(0, -1, 0);
+    public static LEFT = new Vector(-1, 0, 0);
+    public static RIGHT = new Vector(1, 0, 0);
+    public static FORWARD = new Vector(0, 0, 1);
+    public static BACK = new Vector(0, 0, -1);
+    public static X = new Vector(1, 0, 0);
+    public static Y = new Vector(0, 1, 0);
+    public static Z = new Vector(0, 0, 1);
+    public static XY = new Vector(1, 1, 0);
+    public static XZ = new Vector(1, 0, 1);
+    public static YZ = new Vector(0, 1, 1);
 }

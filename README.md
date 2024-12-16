@@ -13,7 +13,11 @@
 このアドオンは、他のアドオンとの重複を避ける設計になっており、他のアドオンと併用することができます。また、公式のWikiが用意されており、使い方や機能についての情報を簡単に参照することができます。
 「Commander API」を使用することで、Minecraftのゲームプレイをカスタマイズすることができます。例えば、拡張されたコマンドを使用することで、より複雑なシステムを作成したり、ゲームプレイを改善したりすることができます。また、より効率的に作業することができるようになります。
 
-## Commander APIの機能
+<br><br><br><br>
+
+# 特別な理由がない限り、Stable/Beta版を使用してください。
+
+<!-- ## Commander APIの機能
 ### Methods
 * プレイヤーにformを表示する
 * プレイヤーを追放する
@@ -90,4 +94,4 @@ Wikiの内容はすべてこのドキュメントに移行予定であり、ド�
 また、移行完了次第、Wikiは削除されます。<br>
 [ドキュメントを見る](https://c-api.docs.un-known.xyz/)
 ドキュメントはまだ作成中です。ぜひご協力ください！
-[ドキュメントの作成に協力](https://github.com/Unknown-Creators-Team/Commander-API/blob/docs/index.md)
+[ドキュメントの作成に協力](https://github.com/Unknown-Creators-Team/Commander-API/blob/docs/index.md) -->

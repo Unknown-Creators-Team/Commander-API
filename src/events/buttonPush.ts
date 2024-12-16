@@ -6,8 +6,8 @@ world.afterEvents.buttonPush.subscribe(async buttonPush => {
 
     if (!player.isPlayer()) return;
 
-    player.score.set("Capi:buttonXPos", x);
-    player.score.set("Capi:buttonYPos", y);
-    player.score.set("Capi:buttonZPos", z);
-    player.addTagWillRemove(`Capi:pushed`);
+    player.score.set("capi:button_x", x);
+    player.score.set("capi:button_y", y);
+    player.score.set("capi:button_z", z);
+    player.addTagWillRemove(`capi:button_push`);
 });

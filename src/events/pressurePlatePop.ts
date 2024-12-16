@@ -1,17 +1,17 @@
-import { Vector3, world } from "@minecraft/server";
+import { world } from "@minecraft/server";
+import { setScore } from "util.js";
 
 world.afterEvents.pressurePlatePop.subscribe(pressurePlatePop => {
-    const { block, dimension } = pressurePlatePop;
-    const { x, y, z } = block;
+    const { block } = pressurePlatePop;
+    
+    const entity = block.dimension.getEntities({ location: block.location, closest: 1 })[0];
 
-    const distance = (location: Vector3) => Math.sqrt(((location.x - x) ** 2) + ((location.y - y) ** 2) + ((location.z - z) ** 2));
+    if (entity.isPlayer()) {
+        setScore(entity, "capi:plate_x", block.location.x);
+        setScore(entity, "capi:plate_y", block.location.y);
+        setScore(entity, "capi:plate_z", block.location.z);
 
-    const player = world.getPlayers().reduce((a, b) => distance(a.location) < distance(b.location) ? a : b, world.getPlayers()[0]);
+        entity.addTagWillRemove("capi:plate_pop");
+    }
 
-    if (!player.isPlayer()) return;
-
-    player.score.set("Capi:plateX", x);
-    player.score.set("Capi:plateY", y);
-    player.score.set("Capi:plateZ", z);
-    player.addTagWillRemove(`Capi:pop`);
 });

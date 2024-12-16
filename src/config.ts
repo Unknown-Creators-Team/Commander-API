@@ -12,6 +12,6 @@
  * @LINK https://github.com/191225/Commander-API
  */
 
-import { ScoreboardDatabase } from "./lib/DatabaseMC.js";
-const Config = new ScoreboardDatabase("Capi_CONFIG");
+import { WorldPropertyDatabase } from "./lib/DatabaseMC.js";
+const Config = new WorldPropertyDatabase<string, any>("Capi_CONFIG");
 export default Config;

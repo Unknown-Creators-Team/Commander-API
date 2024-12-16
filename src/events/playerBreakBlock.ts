@@ -1,13 +1,15 @@
 import { world } from "@minecraft/server";
+import { removeTagsStartsWith, setScore } from "util.js";
 
 world.afterEvents.playerBreakBlock.subscribe(async blockBreak => {
     const { player, block, brokenBlockPermutation } = blockBreak;
 
-    player.removeTags(player.getTags().filter(t => t.startsWith("blockBreak:")));
+    setScore(player, "capi:break_x", block.x);
+    setScore(player, "capi:break_y", block.y);
+    setScore(player, "capi:break_z", block.z);
 
-    player.addTagWillRemove(`Capi:blockBreak`);
-    player.addTagWillRemove(`blockBreak:${brokenBlockPermutation.type.id}`);
-    player.score.set("Capi:blockBreakX", block.x);
-    player.score.set("Capi:blockBreakY", block.y);
-    player.score.set("Capi:blockBreakZ", block.z);
+    removeTagsStartsWith(player, "break:");
+
+    player.addTagWillRemove("capi:break");
+    player.addTagWillRemove(`break:${brokenBlockPermutation.type.id}`);
 });

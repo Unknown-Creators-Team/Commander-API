@@ -1,50 +1,88 @@
-import { world } from "@minecraft/server";
+import { Block, Entity, world } from "@minecraft/server";
 import tickEvent from "../lib/TickEvent.js";
+import { removeTagsStartsWith, setScore } from "util.js";
+import { FMath } from "lib/FastMath.js";
 
 tickEvent.subscribe("scores", () => {
     for (const player of world.getAllPlayers()) {
-        // speed
-        player.score.set("Capi:speedX", Math.round(player.getVelocity().x * 10));
-        player.score.set("Capi:speedY", Math.round(player.getVelocity().y * 10));
-        player.score.set("Capi:speedZ", Math.round(player.getVelocity().z * 10));
-        player.score.set("Capi:speedXZ", Math.round(Math.sqrt(player.getVelocity().x ** 2 + player.getVelocity().z ** 2) * 10));
-        player.score.set(
-            "Capi:speedXYZ",
-            Math.round(Math.sqrt(player.getVelocity().x ** 2 + player.getVelocity().y ** 2 + player.getVelocity().z ** 2) * 10)
-        );
+        removeTagsStartsWith(player, "view:");
 
-        // vector
-        player.score.set("Capi:vectorX", Math.round(player.getViewDirection().x * 100));
-        player.score.set("Capi:vectorY", Math.round(player.getViewDirection().y * 100));
-        player.score.set("Capi:vectorZ", Math.round(player.getViewDirection().z * 100));
+        //? speed
+        const velocity = player.getVelocity();
+        setScore(player, "capi:velocity_x", FMath.floor(velocity.x * 200));
+        setScore(player, "capi:velocity_y", FMath.floor(velocity.y * 200));
+        setScore(player, "capi:velocity_z", FMath.floor(velocity.z * 200));
+        setScore(player, "capi:velocity_xz", FMath.floor(FMath.hypot(velocity.x, velocity.z) * 200));
+        setScore(player, "capi:velocity_xyz", FMath.floor(FMath.hypot(velocity.x, velocity.y, velocity.z) * 200));
 
-        // health
-        const health = Math.round(player.getComponent("health")?.currentValue ?? -1);
-        player.score.set("Capi:health", health);
+        //? vector
+        const direction = player.getViewDirection();
+        setScore(player, "capi:view_direction_x", FMath.floor(direction.x * 100));
+        setScore(player, "capi:view_direction_y", FMath.floor(direction.y * 100));
+        setScore(player, "capi:view_direction_z", FMath.floor(direction.z * 100));
 
-        // pos
-        player.score.set("Capi:x", Math.floor(player.location.x));
-        player.score.set("Capi:y", Math.floor(player.location.y));
-        player.score.set("Capi:z", Math.floor(player.location.z));
+        //? input
+        const input = player.inputInfo.getMovementVector();
+        setScore(player, "capi:input_x", FMath.floor(input.x * 100));
+        setScore(player, "capi:input_y", FMath.floor(input.y * 100));
 
-        // rotation
-        player.score.set("Capi:rx", Math.floor(player.getRotation().x));
-        player.score.set("Capi:ry", Math.floor(player.getRotation().y));
+        //? health
+        const health = player.getComponent("health")?.currentValue ?? -1;
+        setScore(player, "capi:health", FMath.floor(health));
 
-        // selected slot
-        player.score.set("Capi:slot", player.selectedSlotIndex);
+        //? location
+        const { location } = player;
+        setScore(player, "capi:location_x", FMath.floor(location.x));
+        setScore(player, "capi:location_y", FMath.floor(location.y));
+        setScore(player, "capi:location_z", FMath.floor(location.z));
 
-        // timestamp
-        player.score.set("Capi:timestamp", Math.floor(Date.now() / 1000));
+        //? rotation
+        const rotation = player.getRotation();
+        setScore(player, "capi:rotation_x", FMath.floor(rotation.x));
+        setScore(player, "capi:rotation_y", FMath.floor(rotation.y));
 
-        // dimension
-        if (player.dimension.id === "minecraft:overworld") player.score.set("Capi:dimension", 0);
-        else if (player.dimension.id === "minecraft:nether") player.score.set("Capi:dimension", -1);
-        else if (player.dimension.id === "minecraft:the_end") player.score.set("Capi:dimension", 1);
-        else player.score.set("Capi:dimension", -2);
+        //? view direction
+        let view : Entity | Block | undefined = player.getEntitiesFromViewDirection()[0]?.entity;
+        try { view ??= player.getBlockFromViewDirection()?.block } catch (e) {}
+        setScore(player, "capi:view_x", view?.location.x ?? (-2) ** 31);
+        setScore(player, "capi:view_y", view?.location.y ?? (-2) ** 31);
+        setScore(player, "capi:view_z", view?.location.z ?? (-2) ** 31);
+        if (view) try { player.addTag(`view:${view.typeId}`); } catch (e) {}
 
-        // fall distance
-        // ! Removed due to sabotage by Microsoft
-        // player.score.set("Capi:fall", Math.round(player.fallDistance));
+        //? selected slot
+        setScore(player, "capi:slot", player.selectedSlotIndex);
+
+        //? timestamp
+        setScore(player, "capi:timestamp", FMath.floor(Date.now() / 1000));
+
+        //? dimension
+        const dimensions = [
+            "minecraft:nether",
+            "minecraft:overworld",
+            "minecraft:the_end",
+        ];
+        setScore(player, "capi:dimension", dimensions.indexOf(player.dimension.id) - 1);
+
+        //? max render distance
+        const maxRenderDistance = player.clientSystemInfo.maxRenderDistance;
+        setScore(player, "capi:max_render_distance", maxRenderDistance);
+
+        //? memory tier
+        const memoryTier = player.clientSystemInfo.memoryTier;
+        setScore(player, "capi:memory_tier", memoryTier);
+
+        //? level
+        setScore(player, "capi:level", player.level);
+
+        //? total xp
+        setScore(player, "capi:total_xp", player.getTotalXp());
+
+        //? xp needed for next level
+        setScore(player, "capi:xp_needed_for_next_level", player.totalXpNeededForNextLevel);
+
+        //? xp earned at current level
+        setScore(player, "capi:xp_earned_at_current_level", player.xpEarnedAtCurrentLevel);
+        
+        
     }
 });

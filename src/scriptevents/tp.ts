@@ -1,5 +1,5 @@
 import { Block, Entity, world } from "@minecraft/server";
-import { setVariable, bothParse, parsePos } from "../util.js";
+import { format, bothParse, parsePos } from "../util.js";
 
 
 export default function main(source: Entity | Block | undefined, message: string) {
