@@ -10,7 +10,7 @@ system.afterEvents.scriptEventReceive.subscribe(
 
         const source = player ?? block;
 
-        if (!source?.isPlayer() && !block?.isBlock()) return;
+        if (!source?.isEntity() && !block?.isBlock()) return;
 
         const module = modules.scriptevents.find((module) => sanitize(module) === sanitize(id));
         if (!module) throw new Error(`Module '${id}' not found.`);
@@ -18,7 +18,11 @@ system.afterEvents.scriptEventReceive.subscribe(
         const path = `./${sanitize(id)}`;
 
         if (cache.has(path)) {
-            cache.get(path)!(source, message);
+            try {
+                cache.get(path)!(source, message);
+            } catch (e) {
+                console.error(e, (e as Error).stack);
+            }
         } else {
             import(path)
                 .then((module) => {
@@ -35,9 +39,9 @@ system.afterEvents.scriptEventReceive.subscribe(
                 });
         }
     },
-    { namespaces: ["capi"/*, "Capi", "cApi", "cAPI", "CApi", "CAPI", "C-API"*/] }
+    { namespaces: ["capi" /*, "Capi", "cApi", "cAPI", "CApi", "CAPI", "C-API"*/] }
 );
 
 function sanitize(str: string) {
-    return str.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+    return str.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase();
 }

@@ -13,10 +13,11 @@ world.afterEvents.projectileHitEntity.subscribe(projectileHit => {
             player.score.set("capi:hit_z", Math.floor(entity.location.z));
         }
 
-        removeTagsStartsWith(player, "hit_with:", "hit_to:");
+        removeTagsStartsWith(player, "hit_with:", "hit_to:", "hit_from:");
 
         player.addTagWillRemove("capi:hit");
         player.addTagWillRemove(`hit_with:${projectile.typeId}`);
         player.addTagWillRemove(`hit_to:${entity?.typeId}`);
+        projectile.addTagWillRemove(`hit_from:${player.name}`);
     }
 });

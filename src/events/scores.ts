@@ -17,9 +17,9 @@ tickEvent.subscribe("scores", () => {
 
         //? vector
         const direction = player.getViewDirection();
-        setScore(player, "capi:view_direction_x", FMath.floor(direction.x * 100));
-        setScore(player, "capi:view_direction_y", FMath.floor(direction.y * 100));
-        setScore(player, "capi:view_direction_z", FMath.floor(direction.z * 100));
+        setScore(player, "capi:direction_x", FMath.floor(direction.x * 100));
+        setScore(player, "capi:direction_y", FMath.floor(direction.y * 100));
+        setScore(player, "capi:direction_z", FMath.floor(direction.z * 100));
 
         //? input
         const input = player.inputInfo.getMovementVector();
@@ -85,4 +85,25 @@ tickEvent.subscribe("scores", () => {
         
         
     }
+
+    // const entities = [
+    //     ...world.getDimension("overworld").getEntities({ tags: ["capi:trace"] }),
+    //     ...world.getDimension("nether").getEntities({ tags: ["capi:trace"] }),
+    //     ...world.getDimension("the_end").getEntities({ tags: ["capi:trace"] })
+    // ];
+
+
+    // for (const entity of entities) {
+    //     //? velocity
+    //     const velocity = entity.getVelocity();
+    //     setScore(entity, "capi:velocity_x", FMath.floor(velocity.x * 200));
+    //     setScore(entity, "capi:velocity_y", FMath.floor(velocity.y * 200));
+    //     setScore(entity, "capi:velocity_z", FMath.floor(velocity.z * 200));
+
+    //     //? location
+    //     const { location } = entity;
+    //     setScore(entity, "capi:location_x", FMath.floor(location.x));
+    //     setScore(entity, "capi:location_y", FMath.floor(location.y));
+    //     setScore(entity, "capi:location_z", FMath.floor(location.z));
+    // }
 });

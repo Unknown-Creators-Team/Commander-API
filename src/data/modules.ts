@@ -1,16 +1,21 @@
-export default
-{
+export default {
     scriptevents: [
         "rename",
-        "resetName",
-        "setItem",
+        "reset_name",
+        "set_item",
         "form",
         "explosion",
-        "spawnentity",
-        "spawnitem",
+        "spawn_entity",
+        "spawn_item",
         "say",
         "tp",
-        "run"
+        "run",
+        "set_slot",
+        "tell",
+        "kick",
+        "kill",
+        "knockback",
+        "impulse",
     ],
     events: [
         "buttonPush",
@@ -31,8 +36,9 @@ export default
         "pressurePlatePush",
         "projectileHitBlock",
         "projectileHitEntity",
+        "projectileShoot",
         "scores",
         "tags",
-        "tripWireTrip"
-    ]
-}
+        "tripWireTrip",
+    ],
+};

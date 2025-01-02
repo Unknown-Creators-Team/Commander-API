@@ -41,6 +41,8 @@ export function format(player: Minecraft.Player | Minecraft.Entity | Minecraft.B
 
         text = text.replace(/({nl}|{nl,})/i, `\n`);
 
+        text = text.replace(/({at}|{at,})/i, `@`);
+
         // tag
         try {
             if (player?.isPlayer() || player?.isEntity()) {

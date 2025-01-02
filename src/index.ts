@@ -19,7 +19,7 @@ import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 
 import tickEvent from "./lib/TickEvent.js";
-import { UI } from "./ui.js";
+// import { UI } from "./ui.js";
 
 import "./playground";
 import "./events/index.js";
@@ -53,7 +53,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             }
 
             if (player.hasTag("Capi:open_config_gui")) {
-                new UI(player).Menu();
+                // new UI(player).Menu();
             }
         }
     } catch (e) {
