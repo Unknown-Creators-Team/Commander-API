@@ -1,6 +1,6 @@
 {
     "name": "commander-api",
-    "version": "1.14.0",
+    "version": "1.19.0",
     "description": "<div align=\"center\">",
     "main": "index.js",
     "scripts": {
@@ -17,7 +17,7 @@
     },
     "homepage": "https://github.com/Unknown-Creators-Team/Commander-API#readme",
     "devDependencies": {
-        "@minecraft/server": "1.17.0-beta.1.21.50-stable",
-        "@minecraft/server-ui": "1.4.0-beta.1.21.50-stable"
+        "@minecraft/server": "1.18.0-beta.1.21.60-stable",
+        "@minecraft/server-ui": "1.4.0-beta.1.21.60-stable"
     }
 }
