@@ -32,7 +32,8 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
         world.getPlayers().forEach((PLAYER) => {
             const player = PLAYER;
 
-            if (!player.isValid()) return;
+            //! <Player>.isValid() is not working
+            // if (!player.isValid()) return;
 
             player.getTags().forEach((t) => {
                 if (t.startsWith("rename:")) {
@@ -473,7 +474,7 @@ world.afterEvents.itemUse.subscribe((itemUse) => {
     player.addTagWillRemove(`itemUseD:${ESON.stringify(details)}`);
 });
 
-world.afterEvents.itemUseOn.subscribe(async (itemUseOn) => {
+world.afterEvents.itemStartUseOn.subscribe(async (itemUseOn) => {
     const { source: player, itemStack: item, block } = itemUseOn;
 
     if (!player.isPlayer()) return;

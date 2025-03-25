@@ -32,11 +32,15 @@ function createScoreboardManager(player) {
                 if (!objective) return undefined;
                 world.scoreboard.setScore(objective, player.scoreboardIdentity, score);
             } catch (e) {
-                player.runCommandAsync(`scoreboard players set @s "${objectName}" ${score}`);
+                Promise.resolve().then(() => {
+                    player.runCommand(`scoreboard players set @s "${objectName}" ${score}`);
+                });
             }
         },
         reset: (objectName) => {
-            player.runCommandAsync(`scoreboard players reset @s "${objectName}"`);
+            Promise.resolve().then(() => {
+                player.runCommand(`scoreboard players reset @s "${objectName}"`);
+            });
         },
         add: (objectName, score) => {
             try {
@@ -45,7 +49,9 @@ function createScoreboardManager(player) {
                 score += world.scoreboard.getScore(objective, player.scoreboardIdentity);
                 world.scoreboard.setScore(objective, player.scoreboardIdentity, score);
             } catch (e) {
-                player.runCommandAsync(`scoreboard players add @s "${objectName}" ${score}`);
+                Promise.resolve().then(() => {
+                    player.runCommand(`scoreboard players add @s "${objectName}" ${score}`);
+                });
             }
         },
         remove: (objectName, score) => {
@@ -55,7 +61,9 @@ function createScoreboardManager(player) {
                 score = world.scoreboard.getScore(objective, player.scoreboardIdentity) - score;
                 world.scoreboard.setScore(objective, player.scoreboardIdentity, score);
             } catch (e) {
-                player.runCommandAsync(`scoreboard players remove @s "${objectName}" ${score}`);
+                Promise.resolve().then(() => {
+                    player.runCommand(`scoreboard players remove @s "${objectName}" ${score}`);
+                });
             }
         },
         get: (objectName) => {
@@ -117,7 +125,8 @@ Object.assign(Minecraft.Entity.prototype, {
     removeTags(tags) { tags.forEach(tag => this.removeTag(tag)); },
     addTags(tags) { tags.forEach(tag => this.addTag(tag)); },
     isPlayer() {
-        if (!this.isValid()) return false;
+        //! <Player>.isValid() is not working
+        // if (!this.isValid()) return false;
         return this.typeId === "minecraft:player" || this instanceof Minecraft.Player;
     },
 });

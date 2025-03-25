@@ -6,7 +6,8 @@ export class FMath {
         return x | 0;
     }
     static ceil(x) {
-        return (x | 0) + 1;
+        const intPart = x | 0;
+        return x > intPart ? intPart + 1 : intPart;
     }
     static round(x) {
         return (x + 0.5) | 0;
