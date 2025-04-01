@@ -1,21 +1,30 @@
 import { world } from "@minecraft/server";
-import { removeTagsStartsWith, setScore } from "util.js";
+import config from "data/config.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { propertyArray, removeTagsStartsWith } from "util.js";
 
-world.afterEvents.projectileHitBlock.subscribe(projectileHit => {
+world.afterEvents.projectileHitBlock.subscribe((projectileHit) => {
     const { projectile, source: player } = projectileHit;
 
     if (player?.isPlayer()) {
         const { block } = projectileHit.getBlockHit();
 
-        setScore(player, "capi:hit_x", block.x);
-        setScore(player, "capi:hit_y", block.y);
-        setScore(player, "capi:hit_z", block.z);
+        const data = {
+            with: projectile.typeId,
+            to: block.typeId,
+            from: player.name,
+        };
 
-        removeTagsStartsWith(player, "hit_with:", "hit_to:", "hit_from:");
+        ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitBlock.name}_x`, block.x);
+        ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitBlock.name}_y`, block.y);
+        ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitBlock.name}_z`, block.z);
 
-        player.addTagWillRemove("capi:hit");
-        player.addTagWillRemove(`hit_with:${projectile.typeId}`);
-        player.addTagWillRemove(`hit_to:${block.typeId}`);
-        projectile.addTagWillRemove(`hit_from:${player.name}`);
+        removeTagsStartsWith(player, `${config.events.projectileHitBlock.name}.`);
+
+        player.addTagWillRemove(`capi:${config.events.projectileHitBlock.name}`);
+
+        for (const value of propertyArray(data)) {
+            player.addTagWillRemove(`${config.events.projectileHitBlock.name}.${value}`);
+        }
     }
 });

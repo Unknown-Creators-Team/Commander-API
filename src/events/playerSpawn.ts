@@ -1,21 +1,17 @@
 import { world } from "@minecraft/server";
-import Config from "../config.js";
-import { setScore } from "util.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import config from "data/config.js";
 
-world.afterEvents.playerSpawn.subscribe(async playerSpawn => {
+world.afterEvents.playerSpawn.subscribe(async (playerSpawn) => {
     const { player, initialSpawn } = playerSpawn;
 
-    setScore(player, "capi:spawn_x", player.location.x);
-    setScore(player, "capi:spawn_y", player.location.y);
-    setScore(player, "capi:spawn_z", player.location.z);
-    
-    player.addTagWillRemove("capi:spawn");
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerSpawn.name}_x`, player.location.x);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerSpawn.name}_y`, player.location.y);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerSpawn.name}_z`, player.location.z);
+
+    player.addTagWillRemove(`capi:${config.events.playerSpawn.name}`);
 
     if (initialSpawn) {
-        player.addTagWillRemove("capi:initial_spawn");
-
-        if (!Config.has("TagWillRemoveTickEnabled")) {
-            Config.set("TagWillRemoveTickEnabled", true);
-        }
+        player.addTagWillRemove(`capi:${config.events.playerSpawn.name}_initial`);
     }
 });

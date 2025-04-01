@@ -1,5 +1,5 @@
 import { Player, system } from "@minecraft/server";
-import modules from "../data/modules.js";
+import config from "../data/config.js";
 
 const cache: Map<string, CallableFunction> = new Map();
 
@@ -8,14 +8,15 @@ system.afterEvents.scriptEventReceive.subscribe(
         const { message, sourceEntity: player, sourceBlock: block } = event;
         const id = event.id.split(":").slice(1).join(":");
 
+        if (id === "config") return;
         const source = player ?? block;
 
         if (!source?.isEntity() && !block?.isBlock()) return;
 
-        const module = modules.scriptevents.find((module) => sanitize(module) === sanitize(id));
-        if (!module) throw new Error(`Module '${id}' not found.`);
+        const module = Object.entries(config.scriptevents).find(([key, value]) => sanitize(value.name) === sanitize(id));
+        if (!module) return console.warn(`Module '${id}' not found.`);
 
-        const path = `./${sanitize(id)}`;
+        const path = `./${sanitize(module[0])}`;
 
         if (cache.has(path)) {
             try {
@@ -31,7 +32,7 @@ system.afterEvents.scriptEventReceive.subscribe(
 
                         cache.set(path, module.default);
                     } else {
-                        throw new Error(`Module '${id}' is not a function.`);
+                        return console.error(`Module '${id}' is not a function.`);
                     }
                 })
                 .catch((e) => {
@@ -41,6 +42,8 @@ system.afterEvents.scriptEventReceive.subscribe(
     },
     { namespaces: ["capi" /*, "Capi", "cApi", "cAPI", "CApi", "CAPI", "C-API"*/] }
 );
+
+console.info(`Loaded script event handler`);
 
 function sanitize(str: string) {
     return str.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase();

@@ -1,43 +1,36 @@
 import { Block, Entity, ExplosionOptions, world } from "@minecraft/server";
-import { bothParse, isTrue, parsePos, format } from "../util.js";
+import { parsePos, parseFormat } from "../util.js";
+import Vector from "lib/Vector.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
-    const object: Explosion = bothParse(format(source, message) ?? "{}");
+    const object = parseFormat<Explosion>(message, source);
+    if (object === undefined) throw new Error("Invalid format");
 
-    if (object.radius === undefined) throw new Error("Radius is required.");
+    if (object.radius === undefined) throw new Error("radius is required");
 
-    const radius = Number(object.radius);
+    object.location ??= source ? (Object.values(source.location) as any) : [0, 0, 0];
 
-    const x = getCoordinate(object.x, source, "x");
-    const y = getCoordinate(object.y, source, "y");
-    const z = getCoordinate(object.z, source, "z");
-    const location = { x, y, z };
-    const dimension = object.dimension ?? source?.dimension.id ?? "overworld";
+    const radius = object.radius;
+    const location = Vector.fromArray(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
+    const dimension = world.getDimension(object.dimension ?? source?.dimension.id ?? "overworld");
     const options: ExplosionOptions = {
-        allowUnderwater: isTrue(object.options?.allow_under_water),
-        breaksBlocks: isTrue(object.options?.breaks_blocks),
-        causesFire: isTrue(object.options?.causes_fire),
-        source: source?.isEntity() ? source : undefined,
+        allowUnderwater: object.options?.allow_under_water,
+        breaksBlocks: object.options?.breaks_blocks,
+        causesFire: object.options?.causes_fire,
     };
 
-    try {
-        world.getDimension(dimension).createExplosion(location, radius, options);
-    } catch {}
+    dimension.createExplosion(location, radius, options);
 }
 
 interface Explosion {
-    radius: string | number;
-    x?: string | number;
-    y?: string | number;
-    z?: string | number;
-    dimension?: string;
-    options?: {
-        allow_under_water?: string | boolean;
-        breaks_blocks?: string | boolean;
-        causes_fire?: string | boolean;
-    };
-}
-
-function getCoordinate(value: string | number | undefined, source: Entity | Block | undefined, axis: "x" | "y" | "z") {
-    return typeof value === "string" ? parsePos(value, source, axis) : value ?? source?.location[axis] ?? 0;
+    radius: number;
+    location: [number | string , number | string, number | string] | undefined;
+    dimension: string | undefined;
+    options:
+        | {
+              allow_under_water: boolean | undefined;
+              breaks_blocks: boolean | undefined;
+              causes_fire: boolean | undefined;
+          }
+        | undefined;
 }

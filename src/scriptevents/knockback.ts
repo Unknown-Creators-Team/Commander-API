@@ -1,31 +1,26 @@
 import { Block, Entity } from "@minecraft/server";
-import { format, bothParse } from "../util.js";
+import { format, bothParse, parseFormat } from "../util.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isEntity()) throw new Error("Source must be an entity");
 
-    const data: Knockback = bothParse(message);
+    const object = parseFormat<Knockback>(message, source);
 
-    if (data.direction_x === undefined) throw new Error("direction_x is required");
-    if (data.direction_z === undefined) throw new Error("direction_z is required");
-    if (data.horizontal_strength === undefined) throw new Error("horizontal_strength is required");
-    if (data.vertical_strength === undefined) throw new Error("vertical_strength is required");
+    if (object === undefined) throw new Error("Invalid format");
+    if (object.horizontal_force === undefined) throw new Error("horizontal_strength is required");
+    if (object.horizontal_force.length !== 2) throw new Error("horizontal_strength must be an array of 2 numbers");
+    if (object.vertical_strength === undefined) throw new Error("vertical_strength is required");
 
-    const directionX = toNumber(source, data.direction_x);
-    const directionZ = toNumber(source, data.direction_z);
-    const horizontalStrength = toNumber(source, data.horizontal_strength);
-    const verticalStrength = toNumber(source, data.vertical_strength);
+    const horizontalForce = {
+        x: object.horizontal_force[0],
+        z: object.horizontal_force[1],
+    };
+    const verticalStrength = object.vertical_strength;
 
-    source.applyKnockback(directionX, directionZ, horizontalStrength, verticalStrength);
+    source.applyKnockback(horizontalForce, verticalStrength);
 }
 
 interface Knockback {
-    direction_x: string | number;
-    direction_z: string | number;
-    horizontal_strength: string | number;
-    vertical_strength: string | number;
-}
-
-function toNumber(source: Entity, value: string | number): number {
-    return typeof value === "string" ? Number(format(source, value)) : value;
+    horizontal_force: [number, number];
+    vertical_strength: number;
 }

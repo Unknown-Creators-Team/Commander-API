@@ -1,74 +1,133 @@
-import { PlatformType, world } from "@minecraft/server";
+import { GraphicsMode, PlatformType, world } from "@minecraft/server";
 import tickEvent from "../lib/TickEvent.js";
+import config from "data/config.js";
 
 tickEvent.subscribe("tags", () => {
     for (const player of world.getAllPlayers()) {
         //? is op
-        if (player.isOp()) player.addTag("capi:op");
-        else player.removeTag("capi:op");
+        if (config.events.isOp.enabled) {
+            if (player.isOp()) player.addTag(`capi:${config.events.isOp.name}`);
+            else player.removeTag(`capi:${config.events.isOp.name}`);
+        }
 
-        //? flying
-        if (player.isFlying) player.addTag("capi:fly");
-        else player.removeTag("capi:fly");
+        //? is flying
+        if (config.events.isFlying.enabled) {
+            if (player.isFlying) player.addTag(`capi:${config.events.isFlying.name}`);
+            else player.removeTag(`capi:${config.events.isFlying.name}`);
+        }
 
-        //? gliding
-        if (player.isGliding) player.addTag("capi:glide");
-        else player.removeTag("capi:glide");
+        //? is gliding
+        if (config.events.isGliding.enabled) {
+            if (player.isGliding) player.addTag(`capi:${config.events.isGliding.name}`);
+            else player.removeTag(`capi:${config.events.isGliding.name}`);
+        }
 
-        //? jumping
-        if (player.isJumping) player.addTag("capi:jump");
-        else player.removeTag("capi:jump");
+        //? is jumping
+        if (config.events.isJumping.enabled) {
+            if (player.isJumping) player.addTag(`capi:${config.events.isJumping.name}`);
+            else player.removeTag(`capi:${config.events.isJumping.name}`);
+        }
 
-        //? climbing
-        if (player.isClimbing) player.addTag("capi:climb");
-        else player.removeTag("capi:climb");
+        //? is climbing
+        if (config.events.isClimbing.enabled) {
+            if (player.isClimbing) player.addTag(`capi:${config.events.isClimbing.name}`);
+            else player.removeTag(`capi:${config.events.isClimbing.name}`);
+        }
 
-        //? falling
-        if (player.isFalling) player.addTag("capi:fall");
-        else player.removeTag("capi:fall");
+        //? is falling
+        if (config.events.isFalling.enabled) {
+            if (player.isFalling) player.addTag(`capi:${config.events.isFalling.name}`);
+            else player.removeTag(`capi:${config.events.isFalling.name}`);
+        }
 
-        //? in water
-        if (player.isInWater) player.addTag("capi:in_water");
-        else player.removeTag("capi:in_water");
+        //? is in water
+        if (config.events.isInWater.enabled) {
+            if (player.isInWater) player.addTag(`capi:${config.events.isInWater.name}`);
+            else player.removeTag(`capi:${config.events.isInWater.name}`);
+        }
 
-        //? on ground
-        if (player.isOnGround) player.addTag("capi:on_ground");
-        else player.removeTag("capi:on_ground");
+        //? is on ground
+        if (config.events.isOnGround.enabled) {
+            if (player.isOnGround) player.addTag(`capi:${config.events.isOnGround.name}`);
+            else player.removeTag(`capi:${config.events.isOnGround.name}`);
+        }
 
-        //? sneaking
-        if (player.isSneaking) player.addTag("capi:sneak");
-        else player.removeTag("capi:sneak");
+        //? is sneaking
+        if (config.events.isSneaking.enabled) {
+            if (player.isSneaking) player.addTag(`capi:${config.events.isSneaking.name}`);
+            else player.removeTag(`capi:${config.events.isSneaking.name}`);
+        }
 
-        //? sprinting
-        if (player.isSprinting) player.addTag("capi:sprint");
-        else player.removeTag("capi:sprint");
+        //? is sprinting
+        if (config.events.isSprinting.enabled) {
+            if (player.isSprinting) player.addTag(`capi:${config.events.isSprinting.name}`);
+            else player.removeTag(`capi:${config.events.isSprinting.name}`);
+        }
 
-        //? swimming
-        if (player.isSwimming) player.addTag("capi:swim");
-        else player.removeTag("capi:swim");
+        //? is swimming
+        if (config.events.isSwimming.enabled) {
+            if (player.isSwimming) player.addTag(`capi:${config.events.isSwimming.name}`);
+            else player.removeTag(`capi:${config.events.isSwimming.name}`);
+        }
 
-        //? sleeping
-        if (player.isSleeping) player.addTag("capi:sleep");
-        else player.removeTag("capi:sleep");
+        //? is sleeping
+        if (config.events.isSleeping.enabled) {
+            if (player.isSleeping) player.addTag(`capi:${config.events.isSleeping.name}`);
+            else player.removeTag(`capi:${config.events.isSleeping.name}`);
+        }
 
-        //? emoting
-        if (player.isEmoting) player.addTag("capi:emote");
-        else player.removeTag("capi:emote");
+        //? is emoting
+        if (config.events.isEmoting.enabled) {
+            if (player.isEmoting) player.addTag(`capi:${config.events.isEmoting.name}`);
+            else player.removeTag(`capi:${config.events.isEmoting.name}`);
+        }
 
-        //? riding
-        if (player.getComponent("riding")?.entityRidingOn.isEntity()) player.addTag("capi:ride");
-        else player.removeTag("capi:ride");
+        //? is riding
+        if (config.events.isRiding.enabled) {
+            if (player.isRiding) player.addTag(`capi:${config.events.isRiding.name}`);
+            else player.removeTag(`capi:${config.events.isRiding.name}`);
+        }
 
         //? is desktop
-        if (player.clientSystemInfo.platformType === PlatformType.Desktop) player.addTag("capi:desktop");
-        else player.removeTag("capi:desktop");
+        if (config.events.isDesktop.enabled) {
+            if (player.clientSystemInfo.platformType === PlatformType.Desktop) player.addTag(`capi:${config.events.isDesktop.name}`);
+            else player.removeTag(`capi:${config.events.isDesktop.name}`);
+        }
 
         //? is mobile
-        if (player.clientSystemInfo.platformType === PlatformType.Mobile) player.addTag("capi:mobile");
-        else player.removeTag("capi:mobile");
+        if (config.events.isMobile.enabled) {
+            if (player.clientSystemInfo.platformType === PlatformType.Mobile) player.addTag(`capi:${config.events.isMobile.name}`);
+            else player.removeTag(`capi:${config.events.isMobile.name}`);
+        }
 
         //? is console
-        if (player.clientSystemInfo.platformType === PlatformType.Console) player.addTag("capi:console");
-        else player.removeTag("capi:console");
+        if (config.events.isConsole.enabled) {
+            if (player.clientSystemInfo.platformType === PlatformType.Console) player.addTag(`capi:${config.events.isConsole.name}`);
+            else player.removeTag(`capi:${config.events.isConsole.name}`);
+        }
+
+        //? graphics is simple
+        if (config.events.isGraphicsSimple.enabled) {
+            if (player.graphicsMode === GraphicsMode.Simple) player.addTag(`capi:${config.events.isGraphicsSimple.name}`);
+            else player.removeTag(`capi:${config.events.isGraphicsSimple.name}`);
+        }
+
+        //? graphics is fancy
+        if (config.events.isGraphicsFancy.enabled) {
+            if (player.graphicsMode === GraphicsMode.Fancy) player.addTag(`capi:${config.events.isGraphicsFancy.name}`);
+            else player.removeTag(`capi:${config.events.isGraphicsFancy.name}`);
+        }
+
+        //? graphics is deferred
+        if (config.events.isGraphicsDeferred.enabled) {
+            if (player.graphicsMode === GraphicsMode.Deferred) player.addTag(`capi:${config.events.isGraphicsDeferred.name}`);
+            else player.removeTag(`capi:${config.events.isGraphicsDeferred.name}`);
+        }
+
+        //? graphics is ray_traced
+        if (config.events.isGraphicsRayTraced.enabled) {
+            if (player.graphicsMode === GraphicsMode.RayTraced) player.addTag(`capi:${config.events.isGraphicsRayTraced.name}`);
+            else player.removeTag(`capi:${config.events.isGraphicsRayTraced.name}`);
+        }
     }
 });

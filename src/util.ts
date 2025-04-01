@@ -16,10 +16,15 @@
 import * as Minecraft from "@minecraft/server";
 import ESON from "./lib/ESON.js";
 import { FMath } from "lib/FastMath.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { Macro } from "lib/Macro.js";
+
 
 const { world, system } = Minecraft;
 
+/** @deprecated */
 export function format(player: Minecraft.Player | Minecraft.Entity | Minecraft.Block | undefined, text: string) {
+    console.warn("format is deprecated. Use Macro.format instead.\n" + new Error().stack);
     // if (!(player instanceof Minecraft.Player)) throw Error("player needs Player Class");
     if (!text?.length) return text;
     const dataLength = text.split("").filter((t) => t === "{").length;
@@ -59,12 +64,12 @@ export function format(player: Minecraft.Player | Minecraft.Entity | Minecraft.B
             const object = easySafeParse(str);
             if (Object.values(object).length === 0 && (player?.isPlayer() || player?.isEntity())) {
                 if (score) {
-                    text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), getScore(player, score)?.toString() ?? "null");
+                    text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), ScoreboardUtils.getScore(player, score)?.toString() ?? "null");
                 }
             } else if (Object.values(object).length > 0) {
                 const playerName = object.name || player;
                 const objectName = object.object;
-                text = text.replace(new RegExp(`({score:${str}}|{score:${str},})`, "i"), getScore(playerName, objectName)?.toString() ?? "null");
+                text = text.replace(new RegExp(`({score:${str}}|{score:${str},})`, "i"), ScoreboardUtils.getScore(playerName, objectName)?.toString() ?? "null");
             }
         } catch (e) {}
 
@@ -139,6 +144,10 @@ export function bothParse(object: string): any {
     }
 }
 
+export function parseFormat<T extends any>(object: string | undefined, source: Minecraft.Entity | Minecraft.Player | Minecraft.Block | undefined): T {
+    return bothParse(Macro.format(source, object as any) ?? "{}") as T;
+}
+
 export const parsePos = (pos: string, player: Minecraft.Entity | Minecraft.Block | undefined, type: "x" | "y" | "z" | "rx" | "ry"): number => {
     let resultPos = 0;
     if (pos) {
@@ -155,7 +164,7 @@ export const parsePos = (pos: string, player: Minecraft.Entity | Minecraft.Block
     return resultPos;
 };
 
-function calculate(expression: string): number {
+export function calculate(expression: string): number {
     const operatorPrecedence: { [key: string]: number } = {
         "+": 1,
         "-": 1,
@@ -272,50 +281,50 @@ function calculate(expression: string): number {
     return calculationStack.pop()!;
 }
 
-export function getScore(target: Minecraft.Entity | string, objective: string): number | undefined {
-    // if target is a string, get the score by name
-    if (typeof target === "string") {
-        // get all scores in the objective
-        const scores = world.scoreboard.getObjective(objective)?.getScores();
-        // find the score with the matching name
-        const score = scores?.find(({ participant }) => participant.displayName === target)?.score;
-        // return the score value
-        if (typeof score === "number") return score;
-        else return undefined;
-    } else {
-        // if target is a player, get the score by player
-        try {
-            // get the score by player
-            const score = world.scoreboard.getObjective(objective)?.getScore(target);
-            // return the score value
-            if (typeof score === "number") return score;
-            else return undefined;
-        } catch (e) {
-            return undefined;
-        }
-    }
-}
+// export function getScore(target: Minecraft.Entity | string, objective: string): number | undefined {
+//     // if target is a string, get the score by name
+//     if (typeof target === "string") {
+//         // get all scores in the objective
+//         const scores = world.scoreboard.getObjective(objective)?.getScores();
+//         // find the score with the matching name
+//         const score = scores?.find(({ participant }) => participant.displayName === target)?.score;
+//         // return the score value
+//         if (typeof score === "number") return score;
+//         else return undefined;
+//     } else {
+//         // if target is a player, get the score by player
+//         try {
+//             // get the score by player
+//             const score = world.scoreboard.getObjective(objective)?.getScore(target);
+//             // return the score value
+//             if (typeof score === "number") return score;
+//             else return undefined;
+//         } catch (e) {
+//             return undefined;
+//         }
+//     }
+// }
 
-export function setScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
-    const object = world.scoreboard.getObjective(objective);
-    if (!object) {
-        world.scoreboard.addObjective(objective);
-        return setScore(target, objective, score);
-    }
+// export function setScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
+//     const object = world.scoreboard.getObjective(objective);
+//     if (!object) {
+//         world.scoreboard.addObjective(objective);
+//         return setScore(target, objective, score);
+//     }
 
-    score = FMath.max(FMath.min(score, 2 ** 31 - 1), (-2) ** 31);
-    object.setScore(target, score);
-}
+//     score = FMath.max(FMath.min(score, 2 ** 31 - 1), (-2) ** 31);
+//     object.setScore(target, score);
+// }
 
-export function addScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
-    const object = world.scoreboard.getObjective(objective);
-    if (!object) {
-        world.scoreboard.addObjective(objective);
-        return addScore(target, objective, score);
-    }
+// export function addScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
+//     const object = world.scoreboard.getObjective(objective);
+//     if (!object) {
+//         world.scoreboard.addObjective(objective);
+//         return addScore(target, objective, score);
+//     }
 
-    object.addScore(target, score);
-}
+//     object.addScore(target, score);
+// }
 
 export function isTrue(value: any): boolean {
     if (typeof value === "boolean") return value;
@@ -334,4 +343,8 @@ export function removeTagsStartsWith(player: Minecraft.Player, ...tags: string[]
             if (t.startsWith(tag)) player.removeTag(t);
         }
     }
+}
+
+export function propertyArray(object: Record<string, string | undefined>): string[] {
+    return Object.entries(object).map(([key, value]) => `${key}:${value ?? "NULL"}`);
 }

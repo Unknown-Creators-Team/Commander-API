@@ -1,8 +1,9 @@
 import { system, world } from "@minecraft/server";
-import Config from "../config.js";
-import { addScore, format, promiseDelay, setScore } from "../util.js";
+import { format, promiseDelay } from "../util.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import config from "data/config.js";
 
-world.beforeEvents.chatSend.subscribe(chat => {
+world.beforeEvents.chatSend.subscribe((chat) => {
     const { sender: player, message } = chat;
 
     for (const tag of player.getTags()) {
@@ -16,51 +17,47 @@ world.beforeEvents.chatSend.subscribe(chat => {
     }
 
     promiseDelay(() => {
-        player.addTagWillRemove(`capi:chat`);
-        player.addTagWillRemove(`chat:${message}`);
-        setScore(player, "capi:chat_length", message.length);
-        addScore(player, "capi:chat_count", 1);
+        player.addTagWillRemove(`capi:${config.events.chatSend.name}`);
+        player.addTagWillRemove(`${config.events.chatSend.name}:${message}`);
+        ScoreboardUtils.setScore(player, `capi:${config.events.chatSend.name}_len`, message.length);
+        ScoreboardUtils.addScore(player, `capi:${config.events.chatSend.name}_cnt`, 1);
     });
-
-
-
 
     return;
-    let msg = chat.message;
-    let mute: string | undefined = undefined;
-    player.getTags().forEach((t) => {
-        t = t.replace(/"/g, "");
-        if (t.startsWith("chat:")) system.run(() => player.removeTag(t));
-        if (t.startsWith("mute:")) mute = t.slice(5);
-    });
-    player.addTagWillRemove(`Capi:chat`);
-    player.addTagWillRemove(`chat:${msg.replace(/"/g, "")}`);
-    player.score.set("Capi:chatLength", msg.length);
-    player.score.add("Capi:chatCount", 1);
-    if (Config.get("CancelSendMsgEnabled")) {
-        const CancelSendMsg = Config.get("CancelSendMsg") as { start: string[], end: string[], include: string[] };
-        const start = CancelSendMsg?.start.some(v => v.length && msg.startsWith(v));
-        const end = CancelSendMsg?.end.some(v => v.length && msg.endsWith(v));
-        const include = CancelSendMsg?.include.some(v => v.length && msg.includes(v));
-        if (start || end || include) return chat.cancel = true;
-    }
-    if (mute !== undefined || player.hasTag("mute")) {
-        // player.sendMessage(mute ? mute : "§cYou have been muted.");
-        return chat.cancel = true;
-    }
-    if (player.score.get("Capi:privatechat")) {
-        const resident = world.getPlayers()
-            .filter(p => p.score.get("Capi:privatechat") === player.score.get("Capi:privatechat"));
+    // let msg = chat.message;
+    // let mute: string | undefined = undefined;
+    // player.getTags().forEach((t) => {
+    //     t = t.replace(/"/g, "");
+    //     if (t.startsWith("chat:")) system.run(() => player.removeTag(t));
+    //     if (t.startsWith("mute:")) mute = t.slice(5);
+    // });
+    // player.addTagWillRemove(`Capi:chat`);
+    // player.addTagWillRemove(`chat:${msg.replace(/"/g, "")}`);
+    // player.score.set("Capi:chatLength", msg.length);
+    // player.score.add("Capi:chatCount", 1);
+    // if (Config.get("CancelSendMsgEnabled")) {
+    //     const CancelSendMsg = Config.get("CancelSendMsg") as { start: string[]; end: string[]; include: string[] };
+    //     const start = CancelSendMsg?.start.some((v) => v.length && msg.startsWith(v));
+    //     const end = CancelSendMsg?.end.some((v) => v.length && msg.endsWith(v));
+    //     const include = CancelSendMsg?.include.some((v) => v.length && msg.includes(v));
+    //     if (start || end || include) return (chat.cancel = true);
+    // }
+    // if (mute !== undefined || player.hasTag("mute")) {
+    //     // player.sendMessage(mute ? mute : "§cYou have been muted.");
+    //     return (chat.cancel = true);
+    // }
+    // if (player.score.get("Capi:privatechat")) {
+    //     const resident = world.getPlayers().filter((p) => p.score.get("Capi:privatechat") === player.score.get("Capi:privatechat"));
 
-        resident.forEach(p => {
-            p.sendMessage(`§i【プライベート】§r §l${player.name}§r §7>>§r ${msg}`);
-        });
+    //     resident.forEach((p) => {
+    //         p.sendMessage(`§i【プライベート】§r §l${player.name}§r §7>>§r ${msg}`);
+    //     });
 
-        return chat.cancel = true;
-    }
-    if (Config.get("ChatUIEnabled")) {
-        const text = format(player, String((Config.get("ChatUI"))));
-        // text ? world.sendMessage(text.replace(/({message}|{msg})/gi, msg)) : 0;
-        return chat.cancel = true;
-    }
+    //     return (chat.cancel = true);
+    // }
+    // if (Config.get("ChatUIEnabled")) {
+    //     const text = format(player, String(Config.get("ChatUI")));
+    //     // text ? world.sendMessage(text.replace(/({message}|{msg})/gi, msg)) : 0;
+    //     return (chat.cancel = true);
+    // }
 });

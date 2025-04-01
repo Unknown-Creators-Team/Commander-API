@@ -1,16 +1,18 @@
 import { world } from "@minecraft/server";
-import { addScore, removeTagsStartsWith, setScore } from "util.js";
+import config from "data/config.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { removeTagsStartsWith } from "util.js";
 
-world.afterEvents.entityHitEntity.subscribe(entityHitEntity => {
+world.afterEvents.entityHitEntity.subscribe((entityHitEntity) => {
     const { damagingEntity: player, hitEntity: entity } = entityHitEntity;
 
     if (player.isPlayer()) {
-        addScore(player, "capi:attacks", 1);
-        setScore(player, "capi:attack_x", entity.location.x);
-        setScore(player, "capi:attack_y", entity.location.y);
-        setScore(player, "capi:attack_z", entity.location.z);
-        removeTagsStartsWith(player, "attack:");
-        player.addTagWillRemove("capi:attack");
-        player.addTagWillRemove(`attack:${entity.typeId}`);
+        ScoreboardUtils.addScore(player, `capi:${config.events.entityHitEntity.name}`, 1);
+        ScoreboardUtils.setScore(player, `capi:${config.events.entityHitEntity.name}_x`, entity.location.x);
+        ScoreboardUtils.setScore(player, `capi:${config.events.entityHitEntity.name}_y`, entity.location.y);
+        ScoreboardUtils.setScore(player, `capi:${config.events.entityHitEntity.name}_z`, entity.location.z);
+        removeTagsStartsWith(player, `${config.events.entityHitEntity.name}:`);
+        player.addTagWillRemove(`capi:${config.events.entityHitEntity.name}`);
+        player.addTagWillRemove(`${config.events.entityHitEntity.name}:${entity.typeId}`);
     }
 });

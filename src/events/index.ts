@@ -1,15 +1,17 @@
-import modules from "../data/modules.js";
+import { world } from "@minecraft/server";
+import config from "../data/config.js";
 
 const start = Date.now();
 
-for(const moduleName of (modules.events as string[])) {
+for (const [event, data] of Object.entries(config.events)) {
     const start = Date.now();
 
-    import(`./${moduleName}`).then(() => {
-        console.warn(`loaded ${moduleName} in ${Date.now() - start}ms`);
-    }).catch((e) => {
-        console.error(e + e.stack);
-    });
+    if (data.enabled && !data.inline) {
+        await import(`./${event}`).catch((e) => {
+            console.error(e + e.stack);
+        });
+        console.log(`loaded ${event} in ${Date.now() - start}ms`);
+    }
 }
 
-console.warn(`loaded all events in ${Date.now() - start}ms`);
+console.info(`loaded all events in ${Date.now() - start}ms`);

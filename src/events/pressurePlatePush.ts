@@ -1,14 +1,15 @@
 import { world } from "@minecraft/server";
-import { setScore } from "util.js";
+import config from "data/config.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 
-world.afterEvents.pressurePlatePush.subscribe(pressurePlatePush => {
+world.afterEvents.pressurePlatePush.subscribe((pressurePlatePush) => {
     const { block, source: player } = pressurePlatePush;
-    
-    if (player.isPlayer()) {
-        setScore(player, "capi:plate_x", block.location.x);
-        setScore(player, "capi:plate_y", block.location.y);
-        setScore(player, "capi:plate_z", block.location.z);
 
-        player.addTagWillRemove("capi:plate_push");
+    if (player.isPlayer()) {
+        ScoreboardUtils.setScore(player, `capi:${config.events.pressurePlatePush.name}_x`, block.location.x);
+        ScoreboardUtils.setScore(player, `capi:${config.events.pressurePlatePush.name}_y`, block.location.y);
+        ScoreboardUtils.setScore(player, `capi:${config.events.pressurePlatePush.name}_z`, block.location.z);
+
+        player.addTagWillRemove(`capi:${config.events.pressurePlatePush.name}`);
     }
 });

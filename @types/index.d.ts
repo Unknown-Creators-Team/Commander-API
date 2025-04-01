@@ -4,10 +4,6 @@ import * as Gametest from "@minecraft/gametest";
 
 declare module "@minecraft/server" {
     interface Entity {
-        isPlayer(): this is Player;
-        isEntity(): this is Entity;
-        isBlock(): this is Block;
-
         addTags(tags: string[]): void;
         removeTags(tags: string[]): void;
         addTagWillRemove(tag: string): void;
@@ -36,12 +32,6 @@ declare module "@minecraft/server" {
         pushedTime?: number;
     }
 
-    interface Block {
-        isBlock(): this is Block;
-        isPlayer(): this is Player;
-        isEntity(): this is Entity;
-    }
-
     export interface ScoreboardManager {
         set: (objectName: string, score: number) => void;
         reset: (objectName: string) => void;
@@ -51,19 +41,19 @@ declare module "@minecraft/server" {
     }
 }
 
-declare module "@minecraft/server-ui" {
-    interface ActionFormData {
-        show(player: MC.Player): Promise<MCUI.ActionFormResponse>;
-    }
+// declare module "@minecraft/server-ui" {
+//     interface ActionFormData {
+//         show(player: MC.Player): Promise<MCUI.ActionFormResponse>;
+//     }
 
-    interface ModalFormData {
-        show(player: MC.Player): Promise<MCUI.ModalFormResponse>;
-    }
+//     interface ModalFormData {
+//         show(player: MC.Player): Promise<MCUI.ModalFormResponse>;
+//     }
 
-    interface MessageFormData {
-        show(player: MC.Player): Promise<MCUI.MessageFormResponse>;
-    }
-}
+//     interface MessageFormData {
+//         show(player: MC.Player): Promise<MCUI.MessageFormResponse>;
+//     }
+// }
 
 declare module "@minecraft/gametest" {
     interface SimulatedPlayer {

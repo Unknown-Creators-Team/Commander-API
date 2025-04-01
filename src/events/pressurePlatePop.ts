@@ -1,17 +1,17 @@
 import { world } from "@minecraft/server";
-import { setScore } from "util.js";
+import config from "data/config.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 
-world.afterEvents.pressurePlatePop.subscribe(pressurePlatePop => {
+world.afterEvents.pressurePlatePop.subscribe((pressurePlatePop) => {
     const { block } = pressurePlatePop;
-    
+
     const entity = block.dimension.getEntities({ location: block.location, closest: 1 })[0];
 
     if (entity.isPlayer()) {
-        setScore(entity, "capi:plate_x", block.location.x);
-        setScore(entity, "capi:plate_y", block.location.y);
-        setScore(entity, "capi:plate_z", block.location.z);
+        ScoreboardUtils.setScore(entity, `capi:${config.events.pressurePlatePop.name}_x`, block.location.x);
+        ScoreboardUtils.setScore(entity, `capi:${config.events.pressurePlatePop.name}_y`, block.location.y);
+        ScoreboardUtils.setScore(entity, `capi:${config.events.pressurePlatePop.name}_z`, block.location.z);
 
-        entity.addTagWillRemove("capi:plate_pop");
+        entity.addTagWillRemove(`capi:${config.events.pressurePlatePop.name}`);
     }
-
 });

@@ -1,7 +1,11 @@
 import { world } from "@minecraft/server";
-import Config from "../config.js";
+import config from "data/config.js";
 
-world.afterEvents.playerLeave.subscribe(async playerLeave => {
-    const player = playerLeave.playerName;
-    if (Config.get("LeaveMsgEnabled")) world.sendMessage(String((Config.get("LeaveMsg")).replace("{name}", player)));
+world.afterEvents.playerLeave.subscribe(async (playerLeave) => {
+    const name = playerLeave.playerName;
+
+    if (config.others.leave.enabled) {
+        const msg = config.others.leave.message.replace("{name}", name);
+        world.sendMessage(msg);
+    }
 });

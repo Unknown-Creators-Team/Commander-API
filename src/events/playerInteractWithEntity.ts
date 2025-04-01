@@ -1,23 +1,18 @@
 import { world } from "@minecraft/server";
-import { removeTagsStartsWith, setScore } from "util.js";
+import config from "data/config.js";
+import { FMath } from "lib/FastMath.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { removeTagsStartsWith } from "util.js";
 
-world.afterEvents.playerInteractWithEntity.subscribe(playerInteractWithEntity => {
+world.afterEvents.playerInteractWithEntity.subscribe((playerInteractWithEntity) => {
     const { player, target: entity } = playerInteractWithEntity;
 
-    player.score.set("Capi:interactX", Math.floor(entity.location.x));
-    player.score.set("Capi:interactY", Math.floor(entity.location.y));
-    player.score.set("Capi:interactZ", Math.floor(entity.location.z));
-    player.addTagWillRemove(`Capi:interact`);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerInteractWithEntity}_x`, FMath.floor(entity.location.x));
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerInteractWithEntity}_y`, FMath.floor(entity.location.y));
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerInteractWithEntity}_z`, FMath.floor(entity.location.z));
 
-    player.removeTags(player.getTags().filter(t => t.startsWith("interact:")));
-    player.addTagWillRemove(`interact:${entity.typeId}`);
+    removeTagsStartsWith(player, `${config.events.playerInteractWithEntity}:`);
 
-    setScore(player, "capi.interact_x", Math.floor(entity.location.x));
-    setScore(player, "capi.interact_y", Math.floor(entity.location.y));
-    setScore(player, "capi.interact_z", Math.floor(entity.location.z));
-
-    removeTagsStartsWith(player, "interact:");
-
-    player.addTagWillRemove("capi:interact");
-    player.addTagWillRemove(`interact:${entity.typeId}`);
+    player.addTagWillRemove(`capi:${config.events.playerInteractWithEntity}`);
+    player.addTagWillRemove(`${config.events.playerInteractWithEntity}:${entity.typeId}`);
 });

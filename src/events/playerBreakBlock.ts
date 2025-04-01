@@ -1,15 +1,17 @@
 import { world } from "@minecraft/server";
-import { removeTagsStartsWith, setScore } from "util.js";
+import config from "data/config.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { removeTagsStartsWith } from "util.js";
 
-world.afterEvents.playerBreakBlock.subscribe(async blockBreak => {
+world.afterEvents.playerBreakBlock.subscribe(async (blockBreak) => {
     const { player, block, brokenBlockPermutation } = blockBreak;
 
-    setScore(player, "capi:break_x", block.x);
-    setScore(player, "capi:break_y", block.y);
-    setScore(player, "capi:break_z", block.z);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerBreakBlock.name}_x`, block.x);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerBreakBlock.name}_y`, block.y);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerBreakBlock.name}_z`, block.z);
 
-    removeTagsStartsWith(player, "break:");
+    removeTagsStartsWith(player, `${config.events.playerBreakBlock.name}:`);
 
-    player.addTagWillRemove("capi:break");
-    player.addTagWillRemove(`break:${brokenBlockPermutation.type.id}`);
+    player.addTagWillRemove(`capi:${config.events.playerBreakBlock.name}`);
+    player.addTagWillRemove(`${config.events.playerBreakBlock.name}:${brokenBlockPermutation.type.id}`);
 });

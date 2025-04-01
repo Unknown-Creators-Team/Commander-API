@@ -1,6 +1,7 @@
 import { Vector3 } from "@minecraft/server";
 import { FMath } from "./FastMath.js";
 
+type VectorLike = Vector3 | { x: number; y: number; z: number } | number[] | [number, number, number] | number;
 
 export default class Vector implements Vector3 {
     public x: number;
@@ -38,24 +39,76 @@ export default class Vector implements Vector3 {
         return this.x === v.x && this.y === v.y && this.z === v.z;
     }
 
-    public add(v: Vector3): Vector {
-        return Vector.add(this, v);
+    public add(v: Vector3): Vector;
+    public add(v: { x: number; y: number; z: number }): Vector;
+    public add(v: number[]): Vector;
+    public add(v: [number, number, number]): Vector;
+    public add(v: number): Vector;
+    public add(v: VectorLike): Vector {
+        if (typeof v === "number") {
+            return Vector.add(this, v);
+        } else if (Array.isArray(v)) {
+            return Vector.add(this, v);
+        } else if ("x" in v && "y" in v && "z" in v) {
+            return Vector.add(this, v);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
     }
 
-    public subtract(v: Vector3): Vector {
-        return Vector.subtract(this, v);
+    public subtract(v: Vector3): Vector;
+    public subtract(v: { x: number; y: number; z: number }): Vector;
+    public subtract(v: number[]): Vector;
+    public subtract(v: [number, number, number]): Vector;
+    public subtract(v: number): Vector;
+    public subtract(v: VectorLike): Vector {
+        if (typeof v === "number") {
+            return Vector.subtract(this, v);
+        } else if (Array.isArray(v)) {
+            return Vector.subtract(this, v);
+        } else if ("x" in v && "y" in v && "z" in v) {
+            return Vector.subtract(this, v);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
+    }
+
+    public multiply(v: Vector3): Vector;
+    public multiply(v: { x: number; y: number; z: number }): Vector;
+    public multiply(v: number[]): Vector;
+    public multiply(v: [number, number, number]): Vector;
+    public multiply(v: number): Vector;
+    public multiply(v: VectorLike): Vector {
+        if (typeof v === "number") {
+            return Vector.multiply(this, v);
+        } else if (Array.isArray(v)) {
+            return Vector.multiply(this, v);
+        } else if ("x" in v && "y" in v && "z" in v) {
+            return Vector.multiply(this, v);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
+    }
+
+    public divide(v: Vector3): Vector;
+    public divide(v: { x: number; y: number; z: number }): Vector;
+    public divide(v: number[]): Vector;
+    public divide(v: [number, number, number]): Vector;
+    public divide(v: number): Vector;
+    public divide(v: VectorLike): Vector {
+        if (typeof v === "number") {
+            return Vector.divide(this, v);
+        } else if (Array.isArray(v)) {
+            return Vector.divide(this, v);
+        } else if ("x" in v && "y" in v && "z" in v) {
+            return Vector.divide(this, v);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
     }
 
     public normalize(): Vector {
         return Vector.normalize(this);
-    }
-
-    public multiply(v: Vector3): Vector {
-        return Vector.multiply(this, v);
-    }
-
-    public divide(v: Vector3): Vector {
-        return Vector.divide(this, v);
     }
 
     public distance(v: Vector3): number {
@@ -78,25 +131,77 @@ export default class Vector implements Vector3 {
         return Vector.round(this);
     }
 
-    public static add(v1: Vector3, v2: Vector3): Vector {
-        return new Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    public static add(v1: Vector3, v2: Vector3): Vector;
+    public static add(v1: Vector3, v2: { x: number; y: number; z: number }): Vector;
+    public static add(v1: Vector3, v2: number[]): Vector;
+    public static add(v1: Vector3, v2: [number, number, number]): Vector;
+    public static add(v1: Vector3, v2: number): Vector;
+    public static add(v1: Vector3, v2: VectorLike): Vector {
+        if (typeof v2 === "number") {
+            return new Vector(v1.x + v2, v1.y + v2, v1.z + v2);
+        } else if (Array.isArray(v2)) {
+            return new Vector(v1.x + v2[0], v1.y + v2[1], v1.z + v2[2]);
+        } else if ("x" in v2 && "y" in v2 && "z" in v2) {
+            return new Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
     }
 
-    public static subtract(v1: Vector3, v2: Vector3): Vector {
-        return new Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    public static subtract(v1: Vector3, v2: Vector3): Vector;
+    public static subtract(v1: Vector3, v2: { x: number; y: number; z: number }): Vector;
+    public static subtract(v1: Vector3, v2: number[]): Vector;
+    public static subtract(v1: Vector3, v2: [number, number, number]): Vector;
+    public static subtract(v1: Vector3, v2: number): Vector;
+    public static subtract(v1: Vector3, v2: VectorLike): Vector {
+        if (typeof v2 === "number") {
+            return new Vector(v1.x - v2, v1.y - v2, v1.z - v2);
+        } else if (Array.isArray(v2)) {
+            return new Vector(v1.x - v2[0], v1.y - v2[1], v1.z - v2[2]);
+        } else if ("x" in v2 && "y" in v2 && "z" in v2) {
+            return new Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
+    }
+
+    public static multiply(v1: Vector3, v2: Vector3): Vector;
+    public static multiply(v1: Vector3, v2: { x: number; y: number; z: number }): Vector;
+    public static multiply(v1: Vector3, v2: number[]): Vector;
+    public static multiply(v1: Vector3, v2: [number, number, number]): Vector;
+    public static multiply(v1: Vector3, v2: number): Vector;
+    public static multiply(v1: Vector3, v2: VectorLike): Vector {
+        if (typeof v2 === "number") {
+            return new Vector(v1.x * v2, v1.y * v2, v1.z * v2);
+        } else if (Array.isArray(v2)) {
+            return new Vector(v1.x * v2[0], v1.y * v2[1], v1.z * v2[2]);
+        } else if ("x" in v2 && "y" in v2 && "z" in v2) {
+            return new Vector(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
+    }
+
+    public static divide(v1: Vector3, v2: Vector3): Vector;
+    public static divide(v1: Vector3, v2: { x: number; y: number; z: number }): Vector;
+    public static divide(v1: Vector3, v2: number[]): Vector;
+    public static divide(v1: Vector3, v2: [number, number, number]): Vector;
+    public static divide(v1: Vector3, v2: number): Vector;
+    public static divide(v1: Vector3, v2: VectorLike): Vector {
+        if (typeof v2 === "number") {
+            return new Vector(v1.x / v2, v1.y / v2, v1.z / v2);
+        } else if (Array.isArray(v2)) {
+            return new Vector(v1.x / v2[0], v1.y / v2[1], v1.z / v2[2]);
+        } else if ("x" in v2 && "y" in v2 && "z" in v2) {
+            return new Vector(v1.x / v2.x, v1.y / v2.y, v1.z / v2.z);
+        } else {
+            throw new Error("Invalid VectorLike");
+        }
     }
 
     public static normalize(v: Vector3): Vector {
         const length = FMath.hypot(v.x, v.y, v.z);
         return new Vector(v.x / length, v.y / length, v.z / length);
-    }
-
-    public static multiply(v1: Vector3, v2: Vector3): Vector {
-        return new Vector(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
-    }
-
-    public static divide(v1: Vector3, v2: Vector3): Vector {
-        return new Vector(v1.x / v2.x, v1.y / v2.y, v1.z / v2.z);
     }
 
     public static distance(v1: Vector3, v2: Vector3): number {

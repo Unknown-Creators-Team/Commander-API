@@ -1,16 +1,18 @@
 import { world } from "@minecraft/server";
-import { removeTagsStartsWith, setScore } from "util.js";
+import config from "data/config.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { removeTagsStartsWith } from "util.js";
 
-world.afterEvents.playerInteractWithBlock.subscribe(playerInteractWithBlock => {
+world.afterEvents.playerInteractWithBlock.subscribe((playerInteractWithBlock) => {
     const { player, block } = playerInteractWithBlock;
     const { x, y, z } = block;
 
-    setScore(player, "capi.interact_x", x);
-    setScore(player, "capi.interact_y", y);
-    setScore(player, "capi.interact_z", z);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerInteractWithBlock.name}_x`, x);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerInteractWithBlock.name}_y`, y);
+    ScoreboardUtils.setScore(player, `capi:${config.events.playerInteractWithBlock.name}_z`, z);
 
-    removeTagsStartsWith(player, "interact:");
+    removeTagsStartsWith(player, `${config.events.playerInteractWithBlock.name}:`);
 
-    player.addTagWillRemove("capi:interact");
-    player.addTagWillRemove(`interact:${block.typeId}`);
+    player.addTagWillRemove(`capi:${config.events.playerInteractWithBlock.name}`);
+    player.addTagWillRemove(`${config.events.playerInteractWithBlock.name}:${block.typeId}`);
 });

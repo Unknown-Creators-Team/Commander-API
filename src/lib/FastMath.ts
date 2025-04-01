@@ -22,7 +22,7 @@ export class FMath {
      * @returns number
      */
     static floor(x: number): number {
-        return x | 0;
+        return x < 0 && x !== (x | 0) ? (x | 0) - 1 : x | 0;
     }
 
     /**

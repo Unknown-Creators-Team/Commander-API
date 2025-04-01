@@ -1,23 +1,33 @@
 import { world } from "@minecraft/server";
-import { removeTagsStartsWith } from "util.js";
+import config from "data/config.js";
+import { FMath } from "lib/FastMath.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { propertyArray, removeTagsStartsWith } from "util.js";
 
-world.afterEvents.projectileHitEntity.subscribe(projectileHit => {
+world.afterEvents.projectileHitEntity.subscribe((projectileHit) => {
     const { projectile, source: player } = projectileHit;
-    
+
     if (player?.isPlayer()) {
         const { entity } = projectileHit.getEntityHit();
 
+        const data = {
+            with: projectile.typeId,
+            to: entity?.typeId,
+            from: player.name,
+        };
+
         if (entity) {
-            player.score.set("capi:hit_x", Math.floor(entity.location.x));
-            player.score.set("capi:hit_y", Math.floor(entity.location.y));
-            player.score.set("capi:hit_z", Math.floor(entity.location.z));
+            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_x`, FMath.floor(entity.location.x));
+            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_y`, FMath.floor(entity.location.y));
+            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_z`, FMath.floor(entity.location.z));
         }
 
-        removeTagsStartsWith(player, "hit_with:", "hit_to:", "hit_from:");
+        removeTagsStartsWith(player, `${config.events.projectileHitEntity.name}.`);
 
-        player.addTagWillRemove("capi:hit");
-        player.addTagWillRemove(`hit_with:${projectile.typeId}`);
-        player.addTagWillRemove(`hit_to:${entity?.typeId}`);
-        projectile.addTagWillRemove(`hit_from:${player.name}`);
+        player.addTagWillRemove(`capi:${config.events.projectileHitEntity.name}`);
+
+        for (const value of propertyArray(data)) {
+            player.addTagWillRemove(`${config.events.projectileHitEntity.name}.${value}`);
+        }
     }
 });

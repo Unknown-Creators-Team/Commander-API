@@ -1,15 +1,16 @@
 import { BlockVolume, Entity, Player, system, world } from "@minecraft/server";
+import config from "data/config.js";
 import { FMath } from "lib/FastMath.js";
 import Vector from "lib/Vector.js";
-import { removeTagsStartsWith } from "util.js";
+import { propertyArray, removeTagsStartsWith } from "util.js";
 
 world.afterEvents.itemStopUse.subscribe((itemStopUse) => {
     const { source: player, itemStack: item } = itemStopUse;
 
     if (item?.typeId === "minecraft:bow") {
-        const shot = getShot(player);
-        if (shot) {
-            shootEvent(player, shot);
+        const nearbyArrow = getNearbyArrow(player);
+        if (nearbyArrow) {
+            shootEvent(player, nearbyArrow);
         }
     }
 });
@@ -18,14 +19,14 @@ world.afterEvents.itemUse.subscribe((itemUse) => {
     const { source: player, itemStack: item } = itemUse;
 
     if (item.typeId === "minecraft:crossbow") {
-        const shot = getShot(player);
-        if (shot) {
-            shootEvent(player, shot);
+        const nearbyArrow = getNearbyArrow(player);
+        if (nearbyArrow) {
+            shootEvent(player, nearbyArrow);
         }
     }
 });
 
-function getShot(player: Player) {
+function getNearbyArrow(player: Player) {
     const entities = player.dimension.getEntities({ location: player.location, maxDistance: 6, minDistance: 0, type: "minecraft:arrow" });
     return entities.filter(isInAir)[0];
 }
@@ -39,9 +40,16 @@ function isInAir(entity: Entity) {
 }
 
 function shootEvent(player: Player, projectile: Entity) {
-    removeTagsStartsWith(player, "shot_with:", "shot_from:");
+    const data = {
+        with: projectile.typeId,
+        from: player.name,
+    };
 
-    player.addTagWillRemove("capi:shot");
-    player.addTagWillRemove(`shot_with:${projectile.typeId}`);
-    projectile.addTag(`shot_from:${player.name}`);
+    removeTagsStartsWith(player, `${config.events.projectileShoot.name}.`);
+
+    player.addTagWillRemove(`capi:${config.events.projectileShoot.name}`);
+
+    for (const value of propertyArray(data)) {
+        player.addTagWillRemove(`${config.events.projectileShoot.name}.${value}`);
+    }
 }

@@ -10,6 +10,9 @@ export default function main(source: Entity | Block | undefined, message: string
 
     // もしtextを含んだkickに失敗した場合、textが原因とみなしてtextを抜き、再度kickを試みる
     if (successCount <= 0) {
-        source.runCommand(`kick ${JSON.stringify(source.name)}`);
+        const { successCount } = source.runCommand(`kick ${JSON.stringify(source.name)}`);
+        if (successCount <= 0) {
+            throw new Error("Failed to kick the player");
+        }
     }
 }
