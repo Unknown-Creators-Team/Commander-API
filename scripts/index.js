@@ -198,7 +198,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                                 let enchantsName = Data.enchants[i].name;
                                 let enchantsLevel = 1;
                                 if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
-                                enchantments.addEnchantment({ type: enchantsName, level: enchantsLevel });
+                                enchantments.addEnchantment({ type: new Minecraft.EnchantmentType(enchantsName), level: enchantsLevel });
                             }
                         }
                         if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
@@ -243,7 +243,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     const Data = safeParse(commands);
                     if (typeof Data === "object" && Data.length)
                         Data.forEach((c) => {
-                            player.runCommandAsync(String(setVariable(player, c))).catch(() => {});
+                            player.runCommand(String(setVariable(player, c))).catch(() => {});
                         });
                 });
             }
@@ -259,7 +259,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             // Kick
             if (player.kick) {
                 player
-                    .runCommandAsync(`kick "${player.name}" ${setVariable(player, player.kick)}`)
+                    .runCommand(`kick "${player.name}" ${setVariable(player, player.kick)}`)
                     .catch((e) => world.sendMessage(`[${player.name}] §c${e}`));
                 player.kick = false;
             }
@@ -506,7 +506,7 @@ world.afterEvents.playerSpawn.subscribe(async (playerSpawn) => {
 
     if (initialSpawn) {
         player.join = true;
-        player.runCommandAsync("function Capi/setup");
+        player.runCommand("function Capi/setup");
         if (Config.has("TagWillRemoveTickEnabled")) Config.set("TagWillRemoveTickEnabled", true);
     }
 });

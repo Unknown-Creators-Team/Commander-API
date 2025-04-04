@@ -1,5 +1,2 @@
-node_modules/
-.vscode/
-.history/
-@types/
-package-lock.json
+node_modules
+pnpm-lock.yaml
