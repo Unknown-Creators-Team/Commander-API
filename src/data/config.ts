@@ -1,6 +1,7 @@
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 
 export const original = Object.freeze({
+    format: "1",
     basic: {
         tag: {
             enabled: true,
@@ -392,6 +393,10 @@ export const original = Object.freeze({
         actionbar: {
             enabled: true,
             name: "actionbar",
+        },
+        get_item: {
+            enabled: true,
+            name: "get_item",
         }
     },
     others: {
@@ -406,6 +411,7 @@ class Config {
     private static readonly dbName = "CAPI_CONFIG";
     private static readonly db = new ScoreboardDatabase(Config.dbName);
     private static dynamic: typeof original;
+    public readonly format: typeof original.format;
     public readonly basic: typeof original.basic;
     public readonly scriptevents: typeof original.scriptevents;
     public readonly events: typeof original.events;
@@ -418,6 +424,7 @@ class Config {
 
         Config.dynamic = Config.Encode(Object.fromEntries(Config.db.entries()) as any) as typeof original;
 
+        this.format = Config.dynamic.format;
         this.basic = Config.dynamic.basic;
         this.scriptevents = Config.dynamic.scriptevents;
         this.events = Config.dynamic.events;
@@ -437,11 +444,24 @@ class Config {
         this.updated = true;
     }
 
+    public Migrate(newConfig: typeof original) {
+        Config.Migrate(newConfig);
+        this.updated = true;
+    }
+
     private static Reset() {
         for (const keys of this.db.keys()) {
             this.db.delete(keys);
         }
         for (const [key, value] of Object.entries(this.Decode(original))) {
+            this.db.set(key, value);
+        }
+    }
+
+    private static Migrate(config: typeof original) {
+        this.Reset();
+        for (const [key, value] of Object.entries(this.Decode(config))) {
+            if (key === "format") continue;
             this.db.set(key, value);
         }
     }

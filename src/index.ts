@@ -42,7 +42,7 @@ world.afterEvents.worldLoad.subscribe(async () => {
             "§r",
             "§lCommander API をご利用いただきありがとうございます。§r",
             "§r",
-            "このアドオンは Commander API V2 の §l開発版§r です。",
+            "このアドオンは Commander API V2 の §l§c開発版§r です。",
             "予期しないエラーや予告なく仕様が変更される可能性があります。",
             "特別な事情が無い限り、本番環境での使用はお控えください。",
             "§r",

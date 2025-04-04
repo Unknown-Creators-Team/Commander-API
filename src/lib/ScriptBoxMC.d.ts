@@ -99,7 +99,7 @@ export declare class ModalFormBox {
         label: RawMessage | string,
         options: (RawMessage | string)[],
         defaultValueIndex?: number,
-        callback?: (player: Player, response: string) => void
+        callback?: (player: Player, response: number) => void
     ): ModalFormBox;
     header(headerText: RawMessage | string): ModalFormBox;
     label(labelText: RawMessage | string): ModalFormBox;

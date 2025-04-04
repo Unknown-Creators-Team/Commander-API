@@ -17,10 +17,11 @@ export default function main(source: Entity | Block | undefined, message: string
             if (object.title) form.title(object.title);
             if (object.body) form.body(object.body);
 
-            object.btns.forEach((btn) => {
+            object.btns.forEach((btn, i) => {
                 if (!btn.txt) throw TypeError("Button text is required.");
                 form.button(btn.txt, btn.img, () => {
                     if (btn.act) runAction(source, btn.act);
+                    ScoreboardUtils.setScore(source, "capi:act_form", i + 1);
                 });
             });
 
@@ -35,11 +36,13 @@ export default function main(source: Entity | Block | undefined, message: string
                 form.upperButton(object.btn1.txt, () => {
                     if (object.btn1.act) runAction(source, object.btn1.act);
                 });
+                ScoreboardUtils.setScore(source, "capi:msg_form", 1);
             }
             if (object.btn2.text) {
                 form.lowerButton(object.btn2.text, () => {
                     if (object.btn2.act) runAction(source, object.btn2.act);
                 });
+                ScoreboardUtils.setScore(source, "capi:msg_form", 2);
             }
 
             form.show(source).then((response) => {
@@ -54,49 +57,34 @@ export default function main(source: Entity | Block | undefined, message: string
             if (object.title) form.title(object.title);
             object.content.forEach((content) => {
                 if (content.type === "dropdown" || content.type === "dd") {
-                    const label = content.label;
+                    if (!content.action) throw new Error("Action is required for dropdown.");
                     const options = content.options.map((v) => v).filter(Boolean);
-                    form.dropdown(label, options, content.default, (_, res) => {
-                        console.warn("res", res);
-                        if (!content.action) return;
+                    form.dropdown(content.label, options, content.default, (_, res) => {
+                        // @ts-expect-error content.action is string
                         ScoreboardUtils.setScore(source, content.action, res);
                     });
-                } else if (content.type === "slider") {
-                    const label = content.label;
-                    form.slider(
-                        label,
-                        Number(content.min),
-                        Number(content.max),
-                        Number(content.step),
-                        content.default ? Number(content.default) : undefined
-                    );
-                } else if (content.type === "textField") {
-                    const label = content.label;
-                    form.textField(label, content.placeholder, content.default);
-                } else if (content.type === "toggle") {
-                    const label = content.label;
-                    form.toggle(label, content.default);
+                } else if (content.type === "slider" || content.type === "s") {
+                    if (!content.action) throw new Error("Action is required for slider.");
+                    form.slider(content.label, content.min, content.max, content.step, content.default, (_, res) => {
+                        // @ts-expect-error content.action is string
+                        ScoreboardUtils.setScore(source, content.action, res);
+                    });
+                } else if (content.type === "textField" || content.type === "tf") {
+                    if (!content.action) throw new Error("Action is required for textField.");
+                    form.textField(content.label, content.placeholder, content.default, (_, res) => {
+                        source.addTagWillRemove(`${content.action}:${res}`);
+                    });
+                } else if (content.type === "toggle" || content.type === "t") {
+                    if (!content.action) throw new Error("Action is required for toggle.");
+                    form.toggle(content.label, content.default, (_, res) => {
+                        // @ts-expect-error content.action is string
+                        ScoreboardUtils.setScore(source, content.action, res ? 1 : 0);
+                    });
                 }
             });
 
             form.show(source).then((response) => {
                 if (response.canceled) return;
-                response.formValues?.forEach((value, key) => {
-                    const data = object.content[key];
-                    if (data.type === "dropdown") {
-                        if (!data.action) return;
-                        world.scoreboard.getObjective(data.action)?.setScore(source, value as number);
-                    } else if (data.type === "slider") {
-                        if (!data.action) return;
-                        world.scoreboard.getObjective(data.action)?.setScore(source, value as number);
-                    } else if (data.type === "textField") {
-                        if (!data.action) return;
-                        source.addTagWillRemove(`${data.action}:${value}`);
-                    } else if (data.type === "toggle") {
-                        if (!data.action) return;
-                        world.scoreboard.getObjective(data.action)?.setScore(source, value as number);
-                    }
-                });
                 source.addTagWillRemove(`form:${object.title}`);
             });
             break;
