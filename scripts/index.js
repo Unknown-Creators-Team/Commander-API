@@ -82,12 +82,17 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             });
 
             let view = player.getEntitiesFromViewDirection()[0]?.entity;
-            try { view ??= player.getBlockFromViewDirection()?.block; } catch {}
+            try {
+                view ??= player.getBlockFromViewDirection()?.block;
+            } catch {}
             player.score.set("Capi:view", view ? Math.floor(Vector.distance(player.location, view.location)) : -1);
             player.score.set("Capi:viewX", view ? Math.floor(view.location.x) : (-2) ** 31);
             player.score.set("Capi:viewY", view ? Math.floor(view.location.y) : (-2) ** 31);
             player.score.set("Capi:viewZ", view ? Math.floor(view.location.z) : (-2) ** 31);
-            if (view) try { player.addTag(`view:${view?.typeId}`); } catch {}
+            if (view)
+                try {
+                    player.addTag(`view:${view?.typeId}`);
+                } catch {}
 
             // is op
             if (player.isOp()) player.addTag("Capi:hasOp");
@@ -98,7 +103,8 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                 player.inputInfo.getMovementVector().x ||
                 player.inputInfo.getMovementVector().y ||
                 player.inputInfo.getButtonState(Minecraft.InputButton.Jump) === Minecraft.ButtonState.Pressed
-            ) player.addTag("Capi:moving");
+            )
+                player.addTag("Capi:moving");
             else player.removeTag("Capi:moving");
 
             // flying
@@ -269,15 +275,16 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                 try {
                     const Data = safeParse(player.knockback);
 
-                    const directionX = String(setVariable(player, Data.directionX || Data[0] || 0));
-                    const directionZ = String(setVariable(player, Data.directionZ || Data[1] || 0));
-                    const horizontalStrength = String(setVariable(player, Data.horizontalStrength || Data[2] || 0));
-                    const verticalStrength = String(setVariable(player, Data.verticalStrength || Data[3] || 0));
+                    const directionX = Number(setVariable(player, Data.directionX || Data[0] || 0));
+                    const directionZ = Number(setVariable(player, Data.directionZ || Data[1] || 0));
+                    const horizontalStrength = Number(setVariable(player, Data.horizontalStrength || Data[2] || 0));
+                    const verticalStrength = Number(setVariable(player, Data.verticalStrength || Data[3] || 0));
                     player.applyKnockback(
-                        Number(directionX.search(/[^0-9-.]/) >= 0 ? 0 : directionX),
-                        Number(directionZ.search(/[^0-9-.]/) >= 0 ? 0 : directionZ),
-                        Number(horizontalStrength.search(/[^0-9-.]/) >= 0 ? 0 : horizontalStrength),
-                        Number(verticalStrength.search(/[^0-9-.]/) >= 0 ? 0 : verticalStrength)
+                        {
+                            x: directionX * horizontalStrength,
+                            z: directionZ * horizontalStrength,
+                        },
+                        verticalStrength
                     );
                     player.knockback = false;
                 } catch (e) {
