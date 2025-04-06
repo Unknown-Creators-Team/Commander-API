@@ -25,6 +25,11 @@ export default function main(source: Entity | Block | undefined, message: string
                 });
             });
 
+            form.show(source).then((response) => {
+                if (response.canceled) return;
+                source.addTagWillRemove(`form:${object.title}`);
+            });
+
             break;
         }
         case "msg":

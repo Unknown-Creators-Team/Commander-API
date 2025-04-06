@@ -19,6 +19,7 @@ import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 
 import tickEvent from "./lib/TickEvent.js";
+import { CallsUI } from "ui/calls.js";
 // import { ConfigUI } from "ui/index.js";
 // import { UI } from "./ui.js";
 
@@ -56,6 +57,9 @@ world.afterEvents.worldLoad.subscribe(async () => {
         const { id, sourceEntity } = event;
         if (id === "capi:config" && sourceEntity?.isPlayer()) {
             ConfigUI.Open(sourceEntity);
+        }
+        if (id === "capi:calls" && sourceEntity?.isPlayer()) {
+            CallsUI.Open(sourceEntity);
         }
     }, { namespaces: ["capi"] });
 });

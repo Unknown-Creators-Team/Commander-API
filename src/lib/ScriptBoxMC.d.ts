@@ -99,7 +99,7 @@ export declare class ModalFormBox {
         label: RawMessage | string,
         options: (RawMessage | string)[],
         defaultValueIndex?: number,
-        callback?: (player: Player, response: number) => void
+        callback?: (player: Player, response: number, responses: (string | number | boolean)[]) => void
     ): ModalFormBox;
     header(headerText: RawMessage | string): ModalFormBox;
     label(labelText: RawMessage | string): ModalFormBox;
@@ -110,17 +110,21 @@ export declare class ModalFormBox {
         maximumValue: number,
         valueStep: number,
         defaultValue?: number,
-        callback?: (player: Player, response: number) => void
+        callback?: (player: Player, response: number, responses: (string | number | boolean)[]) => void
     ): ModalFormBox;
     submitButton(submitButtonText: RawMessage | string): ModalFormBox;
     textField(
         label: RawMessage | string,
         placeholder?: RawMessage | string,
         defaultValue?: string,
-        callback?: (player: Player, response: string) => void
+        callback?: (player: Player, response: string, responses: (string | number | boolean)[]) => void
     ): ModalFormBox;
     title(titleText: RawMessage | string): ModalFormBox;
-    toggle(label: RawMessage | string, defaultValue?: boolean, callback?: (player: Player, response: boolean) => void): ModalFormBox;
+    toggle(
+        label: RawMessage | string,
+        defaultValue?: boolean,
+        callback?: (player: Player, response: boolean, responses: (string | number | boolean)[]) => void
+    ): ModalFormBox;
     /** @private */ private formatLabel;
 }
 

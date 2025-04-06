@@ -295,7 +295,7 @@ class ModalFormBox {
         }
         for (const i in this.callbacks)
             if (response.formValues?.length)
-                this.callbacks[i](player, response.formValues[i]);
+                this.callbacks[i](player, response.formValues[i], response.formValues);
         return response;
     }
     slider(label, minimumValue, maximumValue, valueStep, defaultValue, callback) {

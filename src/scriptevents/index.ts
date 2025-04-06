@@ -8,7 +8,7 @@ system.afterEvents.scriptEventReceive.subscribe(
         const { message, sourceEntity: player, sourceBlock: block } = event;
         const id = event.id.split(":").slice(1).join(":");
 
-        if (id === "config") return;
+        if (["config", "calls"].includes(id)) return;
         const source = player ?? block;
 
         if (!source?.isEntity() && !block?.isBlock()) return;
