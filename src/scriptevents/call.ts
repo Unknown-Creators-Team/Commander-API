@@ -19,10 +19,14 @@ export default function main(source: Entity | Block | undefined, message: string
         }
         cmd = Macro.format(source, cmd);
 
-        if (source?.isEntity()) {
-            source.runCommand(cmd);
-        } else {
-            (source?.dimension ?? world.getDimension("overworld")).runCommand(cmd);
+        try {
+            if (source?.isEntity()) {
+                source.runCommand(cmd);
+            } else {
+                (source?.dimension ?? world.getDimension("overworld")).runCommand(cmd);
+            }
+        } catch (e) {
+            throw `Failed to run command: ${cmd}\n${(e as Error).message}`;
         }
     }
 }

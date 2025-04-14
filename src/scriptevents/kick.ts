@@ -15,4 +15,5 @@ export default function main(source: Entity | Block | undefined, message: string
             throw new Error("Failed to kick the player");
         }
     }
+
 }

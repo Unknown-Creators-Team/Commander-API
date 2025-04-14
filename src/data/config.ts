@@ -401,6 +401,10 @@ export const original = Object.freeze({
         call: {
             enabled: true,
             name: "call",
+        },
+        team: {
+            enabled: true,
+            name: "team",
         }
     },
     others: {

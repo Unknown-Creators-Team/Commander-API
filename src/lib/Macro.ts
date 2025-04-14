@@ -10,9 +10,8 @@ export namespace Macro {
         const tags = value.match(/</g) || [];
         for (const _ of tags) {
             let inner = getInner(value);
-            console.log("inner:", inner, !inner.startsWith("!"));
             if (!inner) continue;
-            // inner = inner.slice(1);
+            console.log("inner:", inner);
             if (inner === "name") {
                 value = replace(value, inner, name(source, inner));
             } else if (inner === "nametag") {
