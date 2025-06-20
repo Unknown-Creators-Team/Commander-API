@@ -95,8 +95,16 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                 } catch {}
 
             // is op
-            if (player.isOp()) player.addTag("Capi:hasOp");
+            if (player.playerPermissionLevel === Minecraft.PlayerPermissionLevel.Operator) player.addTag("Capi:hasOp");
             else player.removeTag("Capi:hasOp");
+
+            // is visitor
+            if (player.playerPermissionLevel === Minecraft.PlayerPermissionLevel.Visitor) player.addTag("Capi:isVisitor");
+            else player.removeTag("Capi:isVisitor");
+
+            // is member
+            if (player.playerPermissionLevel === Minecraft.PlayerPermissionLevel.Member) player.addTag("Capi:isMember");
+            else player.removeTag("Capi:isMember");
 
             // is moving
             if (
