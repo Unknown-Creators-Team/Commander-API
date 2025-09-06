@@ -257,7 +257,11 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                     const Data = safeParse(commands);
                     if (typeof Data === "object" && Data.length)
                         Data.forEach((c) => {
-                            player.runCommand(String(setVariable(player, c)));
+                            try {
+                                player.runCommand(String(setVariable(player, c)));
+                            } catch (e) {
+                                world.sendMessage(`[${player.name}] §c${e}`);
+                            }
                         });
                 });
             }

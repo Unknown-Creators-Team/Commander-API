@@ -72,7 +72,7 @@ export class UI {
     LeaveMsgConfig() {
         const Form = new MinecraftUI.ModalFormData()
         .title("§lCommander API")
-        .textField("メッセージ", "(例) {name} がサーバーから抜けた！", Config.get("LeaveMsg") || null)
+        .textField("メッセージ", "(例) {name} がサーバーから抜けた！", { defaultValue: Config.get("LeaveMsg") || undefined })
         .show(this.player).then(response => {
             if (response.formValues && response.formValues[0]?.length) Config.set("LeaveMsg", String(response.formValues[0]));
                 else if (!response.canceled) Config.set("LeaveMsg", null);
@@ -105,7 +105,7 @@ export class UI {
     
         const Form = new MinecraftUI.ModalFormData()
         .title("§lCommander API")
-        .textField("UI", "(例) {name} >> {message}", Config.get("ChatUI") || null)
+        .textField("UI", "(例) {name} >> {message}", { defaultValue: Config.get("ChatUI") || undefined })
         .show(this.player).then(response => {
             if (response.formValues && response.formValues[0]?.length) Config.set("ChatUI", String(response.formValues[0]));
                 else if (!response.canceled) Config.set("ChatUI", null);
@@ -137,9 +137,9 @@ export class UI {
     CancelSendMsgConfig () {
         const Form = new MinecraftUI.ModalFormData()
         .title("§lCommander API")
-        .textField("で始まっているか", "(例) !, ?, #", Config.get("CancelSendMsg")?.start.join(", ") || null)
-        .textField("で終わっているか", "(例) ,, ., :)", Config.get("CancelSendMsg")?.end.join(", ") || null)
-        .textField("が含まれているか", "(例) help, !Form", Config.get("CancelSendMsg")?.include.join(", ") || null)
+        .textField("で始まっているか", "(例) !, ?, #", { defaultValue: Config.get("CancelSendMsg")?.start.join(", ") || undefined })
+        .textField("で終わっているか", "(例) ,, ., :)", { defaultValue: Config.get("CancelSendMsg")?.end.join(", ") || undefined })
+        .textField("が含まれているか", "(例) help, !Form", { defaultValue: Config.get("CancelSendMsg")?.include.join(", ") || undefined })
         .show(this.player).then(response => {
             if (response.formValues) {
                 const object = {
@@ -178,7 +178,7 @@ export class UI {
     TagWillRemoveTickConfig() {
         const Form = new MinecraftUI.ModalFormData()
         .title("§lCommander API")
-        .textField("Tick", "(例) 20", String(Config.get("TagWillRemoveTick")) || "20")
+        .textField("Tick", "(例) 20", { defaultValue: String(Config.get("TagWillRemoveTick")) || "20" })
         .show(this.player).then(response => {
             if (response.formValues && response.formValues[0].length) Config.set("TagWillRemoveTick", Number(response.formValues[0]));
                 else if (!response.canceled) Config.set("TagWillRemoveTick", null);
