@@ -28,7 +28,7 @@ export default function main(source: Entity | Block | undefined, message: string
     const location = Vector.fromArray(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
     const dimension = source?.dimension ?? world.getDimension(object.dimension ?? "overworld");
 
-    const entity = dimension.spawnEntity(object.id, location);
+    const entity = dimension.spawnEntity<string>(object.id, location);
     if (object.name) entity.nameTag = object.name;
     if (object.set_on_fire) entity.setOnFire(parseInt(object.set_on_fire.toString()));
 }

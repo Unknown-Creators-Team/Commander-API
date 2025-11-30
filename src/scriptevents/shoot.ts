@@ -20,7 +20,7 @@ export default function main(source: Entity | Block | undefined, message: string
     if (isNaN(speed)) throw new Error("speed must be a number");
     if (speed <= 0) throw new Error("speed must be greater than 0");
 
-    const entity = dimension.spawnEntity(object.id, location);
+    const entity = dimension.spawnEntity<string>(object.id, location);
     if (object.fire) entity.setOnFire(object.fire);
     if (object.nameTag) entity.nameTag = object.nameTag;
 

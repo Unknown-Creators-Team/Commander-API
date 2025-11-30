@@ -16,28 +16,58 @@ export class BasicConfigUI {
         const form = new ModalFormBox().title("§lCommander API 設定 / 基本設定").submitButton("設定を更新");
 
         form.label("タグを自動で削除")
-            .toggle("有効", config.basic.tag.enabled, (_, value) => {
-                this.config.basic.tag.enabled = value;
+            .toggle({
+                label: "有効",
+                defaultValue: config.basic.tag.enabled,
+                callback: (_, value, all) => {
+                    console.warn(JSON.stringify(all))
+                    this.config.basic.tag.enabled = value;
+                },
             })
-            .textField("ticks", "ex: 10", config.basic.tag.ticks.toString(), (_, value) => {
-                this.config.basic.tag.ticks = parseInt(value);
+            .textField({
+                label: "ticks",
+                placeholder: "ex: 10",
+                defaultValue: config.basic.tag.ticks.toString(),
+                callback: (_, value) => {
+                    this.config.basic.tag.ticks = parseInt(value);
+                },
             });
 
         form.label("デバッグ")
-            .toggle("有効", config.basic.debug.enabled, (_, value) => {
-                this.config.basic.debug.enabled = value;
+            .toggle({
+                label: "有効",
+                defaultValue: config.basic.debug.enabled,
+                callback: (_, value) => {
+                    this.config.basic.debug.enabled = value;
+                },
             })
-            .toggle("ログを表示", config.basic.debug.log, (_, value) => {
-                this.config.basic.debug.log = value;
+            .toggle({
+                label: "ログを表示",
+                defaultValue: config.basic.debug.log,
+                callback: (_, value) => {
+                    this.config.basic.debug.log = value;
+                },
             })
-            .toggle("情報を表示", config.basic.debug.info, (_, value) => {
-                this.config.basic.debug.info = value;
+            .toggle({
+                label: "情報を表示",
+                defaultValue: config.basic.debug.info,
+                callback: (_, value) => {
+                    this.config.basic.debug.info = value;
+                },
             })
-            .toggle("警告を表示", config.basic.debug.warn, (_, value) => {
-                this.config.basic.debug.warn = value;
+            .toggle({
+                label: "警告を表示",
+                defaultValue: config.basic.debug.warn,
+                callback: (_, value) => {
+                    this.config.basic.debug.warn = value;
+                },
             })
-            .toggle("エラーを表示", config.basic.debug.error, (_, value) => {
-                this.config.basic.debug.error = value;
+            .toggle({
+                label: "エラーを表示",
+                defaultValue: config.basic.debug.error,
+                callback: (_, value) => {
+                    this.config.basic.debug.error = value;
+                },
             });
 
         const res = await form.show(this.player);

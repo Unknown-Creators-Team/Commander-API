@@ -175,6 +175,14 @@ class ActionFormBox {
         this.cancelledCallback = callback;
         return this;
     }
+    label(text) {
+        this.form.label(text);
+        return this;
+    }
+    divider() {
+        this.form.divider();
+        return this;
+    }
     async show(player) {
         if (this.backCallback)
             this.form.button("Back", "textures/ui/arrowLeft.png");
@@ -270,20 +278,22 @@ class ModalFormBox {
     }
     divider() {
         this.form.divider();
+        this.callbacks.push(() => { });
         return this;
     }
-    dropdown(label, options, defaultValueIndex, callback) {
-        this.form.dropdown(this.formatLabel(label), options, defaultValueIndex);
-        if (callback)
-            this.callbacks.push(callback);
+    dropdown({ label, options, defaultValueIndex, tooltip, callback }) {
+        this.form.dropdown(this.formatLabel(label), options, { defaultValueIndex, tooltip });
+        this.callbacks.push(callback ?? (() => { }));
         return this;
     }
     header(headerText) {
         this.form.header(headerText);
+        this.callbacks.push(() => { });
         return this;
     }
     label(labelText) {
         this.form.label(labelText);
+        this.callbacks.push(() => { });
         return this;
     }
     async show(player) {
@@ -298,30 +308,27 @@ class ModalFormBox {
                 this.callbacks[i](player, response.formValues[i], response.formValues);
         return response;
     }
-    slider(label, minimumValue, maximumValue, valueStep, defaultValue, callback) {
-        this.form.slider(this.formatLabel(label), minimumValue, maximumValue, valueStep, defaultValue);
-        if (callback)
-            this.callbacks.push(callback);
+    slider({ label, minimumValue, maximumValue, valueStep, defaultValue, tooltip, callback }) {
+        this.form.slider(this.formatLabel(label), minimumValue, maximumValue, { valueStep, defaultValue, tooltip });
+        this.callbacks.push(callback ?? (() => { }));
         return this;
     }
     submitButton(submitButtonText) {
         this.form.submitButton(submitButtonText);
         return this;
     }
-    textField(label, placeholder, defaultValue, callback) {
-        this.form.textField(this.formatLabel(label), placeholder ?? "", defaultValue);
-        if (callback)
-            this.callbacks.push(callback);
+    textField({ label, placeholder, defaultValue, tooltip, callback }) {
+        this.form.textField(this.formatLabel(label), placeholder ?? "", { defaultValue, tooltip });
+        this.callbacks.push(callback ?? (() => { }));
         return this;
     }
     title(titleText) {
         this.form.title(titleText);
         return this;
     }
-    toggle(label, defaultValue, callback) {
-        this.form.toggle(this.formatLabel(label), defaultValue);
-        if (callback)
-            this.callbacks.push(callback);
+    toggle({ label, defaultValue, tooltip, callback }) {
+        this.form.toggle(this.formatLabel(label), { defaultValue, tooltip });
+        this.callbacks.push(callback ?? (() => { }));
         return this;
     }
     /** @private */ formatLabel(label) {
@@ -345,6 +352,7 @@ var ColorUtils;
 (function (ColorUtils) {
     ColorUtils.ESCAPE = "§";
     ColorUtils.MATCH_REGEXP = new RegExp(ColorUtils.ESCAPE + "[0-9a-fk-or]", "g");
+    ColorUtils.INVALID_MATCH_REGEXP = new RegExp(ColorUtils.ESCAPE + "[^0-9a-fk-or]", "g");
     function clean(text) {
         return text.replace(ColorUtils.MATCH_REGEXP, "");
     }
@@ -353,6 +361,46 @@ var ColorUtils;
         return ColorUtils.MATCH_REGEXP.test(text);
     }
     ColorUtils.includesColor = includesColor;
+    function includesInvalidColor(text) {
+        return ColorUtils.INVALID_MATCH_REGEXP.test(text);
+    }
+    ColorUtils.includesInvalidColor = includesInvalidColor;
+    (function (ColorCode) {
+        ColorCode["BLACK"] = "0";
+        ColorCode["DARK_BLUE"] = "1";
+        ColorCode["DARK_GREEN"] = "2";
+        ColorCode["DARK_AQUA"] = "3";
+        ColorCode["DARK_RED"] = "4";
+        ColorCode["DARK_PURPLE"] = "5";
+        ColorCode["GOLD"] = "6";
+        ColorCode["GRAY"] = "7";
+        ColorCode["DARK_GRAY"] = "8";
+        ColorCode["BLUE"] = "9";
+        ColorCode["GREEN"] = "a";
+        ColorCode["AQUA"] = "b";
+        ColorCode["RED"] = "c";
+        ColorCode["LIGHT_PURPLE"] = "d";
+        ColorCode["YELLOW"] = "e";
+        ColorCode["WHITE"] = "f";
+        ColorCode["MINECOIN_GOLD"] = "g";
+        ColorCode["MATERIAL_QUARTZ"] = "h";
+        ColorCode["MATERIAL_IRON"] = "i";
+        ColorCode["MATERIAL_NETHERITE"] = "j";
+        ColorCode["MATERIAL_REDSTONE"] = "m";
+        ColorCode["MATERIAL_COPPER"] = "n";
+        ColorCode["MATERIAL_GOLD"] = "p";
+        ColorCode["MATERIAL_EMERALD"] = "q";
+        ColorCode["MATERIAL_DIAMOND"] = "s";
+        ColorCode["MATERIAL_LAPIS"] = "t";
+        ColorCode["MATERIAL_AMETHYST"] = "u";
+        ColorCode["MATERIAL_RESIN"] = "v";
+        ColorCode["OBFUSCATED"] = "k";
+        ColorCode["BOLD"] = "l";
+        // STRIKETHROUGH = "m", Only supported in Java Edition
+        // UNDERLINE = "n", Only supported in Java Edition
+        ColorCode["ITALIC"] = "o";
+        ColorCode["RESET"] = "r";
+    })(ColorUtils.ColorCode || (ColorUtils.ColorCode = {}));
 })(ColorUtils || (ColorUtils = {}));
 
 var ItemStackUtils;

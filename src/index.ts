@@ -26,6 +26,7 @@ import { CallsUI } from "ui/calls.js";
 // import "./playground";
 // import "./events/index.js";
 // import "./scriptevents/index.js";
+// import("./checks/checkLoader.js");
 
 const { world, system } = Minecraft;
 
@@ -36,6 +37,8 @@ world.afterEvents.worldLoad.subscribe(async () => {
     import("./playground.js");
     import("./events/index.js");
     import("./scriptevents/index.js");
+    import("./tests/index.js");
+    // import ("checks/blockBreak.js");
     const { ConfigUI } = await import("./ui/index.js");
 
     system.run(() => {
@@ -50,16 +53,19 @@ world.afterEvents.worldLoad.subscribe(async () => {
         ].join("\n");
         world.sendMessage(msg);
     });
-    
+
     system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => (beforeWatchdogTerminate.cancel = true));
 
-    system.afterEvents.scriptEventReceive.subscribe((event) => {
-        const { id, sourceEntity } = event;
-        if (id === "capi:config" && sourceEntity?.isPlayer()) {
-            ConfigUI.Open(sourceEntity);
-        }
-        if (id === "capi:calls" && sourceEntity?.isPlayer()) {
-            CallsUI.Open(sourceEntity);
-        }
-    }, { namespaces: ["capi"] });
+    system.afterEvents.scriptEventReceive.subscribe(
+        (event) => {
+            const { id, sourceEntity } = event;
+            if (id === "capi:config" && sourceEntity?.isPlayer()) {
+                ConfigUI.Open(sourceEntity);
+            }
+            if (id === "capi:calls" && sourceEntity?.isPlayer()) {
+                CallsUI.Open(sourceEntity);
+            }
+        },
+        { namespaces: ["capi"] }
+    );
 });

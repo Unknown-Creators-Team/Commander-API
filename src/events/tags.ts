@@ -1,4 +1,4 @@
-import { GraphicsMode, PlatformType, world } from "@minecraft/server";
+import { GraphicsMode, PlatformType, PlayerPermissionLevel, world } from "@minecraft/server";
 import tickEvent from "../lib/TickEvent.js";
 import config from "data/config.js";
 
@@ -6,7 +6,7 @@ tickEvent.subscribe("tags", () => {
     for (const player of world.getAllPlayers()) {
         //? is op
         if (config.events.isOp.enabled) {
-            if (player.isOp()) player.addTag(`capi:${config.events.isOp.name}`);
+            if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) player.addTag(`capi:${config.events.isOp.name}`);
             else player.removeTag(`capi:${config.events.isOp.name}`);
         }
 

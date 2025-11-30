@@ -16,11 +16,20 @@ export class OthersConfigUI {
         const form = new ModalFormBox().title("§lCommander API 設定 / その他各種設定").submitButton("設定を更新");
 
         form.label("退出メッセージ")
-            .toggle("有効", config.others.leave.enabled, (_, value) => {
-                this.config.others.leave.enabled = value;
+            .toggle({
+                label: "有効",
+                defaultValue: config.others.leave.enabled,
+                callback: (_, value) => {
+                    this.config.others.leave.enabled = value;
+                },
             })
-            .textField("message", "ex: {name} is gone...", config.others.leave.message.toString(), (_, value) => {
-                this.config.others.leave.message = value;
+            .textField({
+                label: "message",
+                placeholder: "ex: {name} is gone...",
+                defaultValue: config.others.leave.message.toString(),
+                callback: (_, value) => {
+                    this.config.others.leave.message = value;
+                },
             });
 
         const res = await form.show(this.player);

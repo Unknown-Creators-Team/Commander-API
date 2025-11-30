@@ -18,21 +18,21 @@
             "version": [1, 0, 0]
         },
         {
-            "language": "javascript",
             "type": "script",
             "uuid": "21e93e66-928c-4f5b-a552-9b3709fd58f7",
             "version": [1, 0, 0],
+            "language": "javascript",
             "entry": "scripts/index.js"
         }
     ],
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "2.0.0-beta"
+            "version": "2.4.0-beta"
         },
         {
             "module_name": "@minecraft/server-ui",
-            "version": "2.0.0-beta"
+            "version": "2.1.0-beta"
         },
         {
             "module_name": "@minecraft/server-gametest",

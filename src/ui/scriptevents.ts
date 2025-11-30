@@ -17,11 +17,20 @@ export class ScriptEventsConfigUI {
 
         for (const [key, value] of Object.entries(config.scriptevents)) {
             form.label(key)
-                .toggle("有効化", value.enabled, (_, enabled) => {
-                    this.config.scriptevents[key as keyof typeof config.scriptevents].enabled = enabled;
+                .toggle({
+                    label: "有効化",
+                    defaultValue: value.enabled,
+                    callback: (_, enabled) => {
+                        this.config.scriptevents[key as keyof typeof config.scriptevents].enabled = enabled;
+                    },
                 })
-                .textField("イベント名", "ex: itemUse", value.name, (_, name) => {
-                    this.config.scriptevents[key as keyof typeof config.scriptevents].name = name;
+                .textField({
+                    label: "イベント名",
+                    placeholder: "ex: itemUse",
+                    defaultValue: value.name,
+                    callback: (_, name) => {
+                        this.config.scriptevents[key as keyof typeof config.scriptevents].name = name;
+                    },
                 });
         }
 

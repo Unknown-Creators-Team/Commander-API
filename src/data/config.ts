@@ -1,7 +1,7 @@
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 
 export const original = Object.freeze({
-    format: 2,
+    format: 3,
     basic: {
         tag: {
             enabled: true,
@@ -14,6 +14,11 @@ export const original = Object.freeze({
             warn: false,
             error: false,
         },
+        tests: {
+            enabled: true,
+            events: true,
+            scriptevents: true
+        }
     },
     events: {
         buttonPush: {
@@ -405,6 +410,10 @@ export const original = Object.freeze({
         team: {
             enabled: true,
             name: "team",
+        },
+        test: {
+            enabled: true,
+            name: "test",
         }
     },
     others: {
@@ -447,7 +456,7 @@ class Config {
     public Update(newConfig: typeof original) {
         Config.Reset();
         for (const [key, value] of Object.entries(Config.Decode(newConfig))) {
-            Config.db.set(key, value);
+            if (value !== undefined) Config.db.set(key, value);
         }
         this.updated = true;
     }

@@ -38,27 +38,41 @@ export class CallsUI {
         const form = new ModalFormBox().title("§lCommander API / コールを追加").submitButton("§l追加");
         if (err) form.label(err);
 
-        form.textField("コール名", "ex: my_call", this.call.name, (_, value) => {
-            this.call.name = value;
+        form.textField({
+            label: "コール名",
+            placeholder: "ex: my_call",
+            defaultValue: this.call.name,
+            callback: (_, value) => {
+                this.call.name = value;
+            },
         });
 
         for (let i in this.call.commands) {
-            form.textField(`コマンド (${Number(i) + 1})`, "ex: say hello", this.call.commands[i], (_, value) => {
-                this.call.commands[i] = value;
+            form.textField({
+                label: `コマンド (${Number(i) + 1})`,
+                placeholder: "ex: say hello",
+                defaultValue: this.call.commands[i],
+                callback: (_, value) => {
+                    this.call.commands[i] = value;
+                },
             });
         }
 
-        form.toggle("コマンドを追加", false, (_, value) => {
-            if (value) {
-                this.call.commands.push("");
-                this.AddCall();
-            } else {
-                let err = this.checkCall();
-                if (err) return this.AddCall(err);
+        form.toggle({
+            label: "コマンドを追加",
+            defaultValue: false,
+            callback: (_, value) => {
+                if (value) {
+                    this.call.commands.push("");
+                    this.AddCall();
+                } else {
+                    let err = this.checkCall();
+                    if (err) return this.AddCall(err);
 
-                this.calls.set(this.call.name, this.call.commands);
-                CallsUI.Open(this.player);
-            }
+                    this.calls.set(this.call.name, this.call.commands);
+                    CallsUI.Open(this.player);
+                }
+            },
         });
 
         form.cancel((player) => CallsUI.Open(player));
@@ -69,39 +83,57 @@ export class CallsUI {
         const form = new ModalFormBox().title("§lCommander API / コールを編集").submitButton("§l更新");
         if (err) form.label(err);
 
-        form.textField("コール名", "ex: my_call", this.call.name, (_, value) => {
-            this.call.name = value;
+        form.textField({
+            label: "コール名",
+            placeholder: "ex: my_call",
+            defaultValue: this.call.name,
+            callback: (_, value) => {
+                this.call.name = value;
+            },
         });
 
         for (let i in this.call.commands) {
-            form.textField(`コマンド (${Number(i) + 1})`, "ex: say hello", this.call.commands[i], (_, value) => {
-                this.call.commands[i] = value;
+            form.textField({
+                label: `コマンド (${Number(i) + 1})`,
+                placeholder: "ex: say hello",
+                defaultValue: this.call.commands[i],
+                callback: (_, value) => {
+                    this.call.commands[i] = value;
+                },
             });
         }
 
-        form.toggle("コマンドを追加", false, (_, value, values) => {
-            console.log(values[values.length - 1]);
-            if (values[values.length - 1] === true) return;
+        form.toggle({
+            label: "コマンドを追加",
+            defaultValue: false,
+            callback: (_, value, values) => {
+                console.log(values[values.length - 1]);
+                if (values[values.length - 1] === true) return;
 
-            if (value) {
-                this.call.commands.push("");
-                this.EditCall(oldName);
-            } else {
-                let err = this.checkCall(false);
-                if (err) return this.EditCall(oldName, err);
+                if (value) {
+                    this.call.commands.push("");
+                    this.EditCall(oldName);
+                } else {
+                    let err = this.checkCall(false);
+                    if (err) return this.EditCall(oldName, err);
 
-                this.calls.delete(oldName);
-                this.calls.set(this.call.name, this.call.commands);
-                CallsUI.Open(this.player);
-            }
+                    this.calls.delete(oldName);
+                    this.calls.set(this.call.name, this.call.commands);
+                    CallsUI.Open(this.player);
+                }
+            },
         });
 
-        form.toggle("コールを削除", false, (_, value) => {
-            if (value) {
-                this.calls.delete(this.call.name);
-                uiManager.closeAllForms(this.player);
-                CallsUI.Open(this.player);
-            }
+        form.toggle({
+            label: "コールを削除",
+            defaultValue: false,
+            callback: (_, value) => {
+                if (value) {
+                    this.calls.delete(this.call.name);
+                    uiManager.closeAllForms(this.player);
+                    CallsUI.Open(this.player);
+                }
+            },
         });
 
         form.cancel((player) => CallsUI.Open(player));

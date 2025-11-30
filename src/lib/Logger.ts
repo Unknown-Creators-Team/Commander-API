@@ -1,10 +1,10 @@
-import { world } from "@minecraft/server";
+import { PlayerPermissionLevel, world } from "@minecraft/server";
 import config from "data/config.js";
 
 export function log(...messages: unknown[]) {
     if (!config.basic.debug.log) return;
     for (const player of world.getAllPlayers()) {
-        if (player.isOp()) {
+        if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
             player.sendMessage(`[Scripting][log]-${messages.join(" ")}`);
         }
     }
@@ -13,7 +13,7 @@ export function log(...messages: unknown[]) {
 export function info(...messages: unknown[]) {
     if (!config.basic.debug.info) return;
     for (const player of world.getAllPlayers()) {
-        if (player.isOp()) {
+        if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
             player.sendMessage(`§b[Scripting][info]-${messages.join(" ")}`);
         }
     }
@@ -22,7 +22,7 @@ export function info(...messages: unknown[]) {
 export function warn(...messages: unknown[]) {
     if (!config.basic.debug.warn) return;
     for (const player of world.getAllPlayers()) {
-        if (player.isOp()) {
+        if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
             player.sendMessage(`§e[Scripting][warning]-${messages.join(" ")}`);
         }
     }
@@ -31,12 +31,11 @@ export function warn(...messages: unknown[]) {
 export function error(...messages: unknown[]) {
     if (!config.basic.debug.error) return;
     for (const player of world.getAllPlayers()) {
-        if (player.isOp()) {
+        if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
             player.sendMessage(`§c[Scripting][error]-${messages.join(" ")}`);
         }
     }
 }
-
 
 console.log = log;
 console.info = info;

@@ -1,3 +1,4 @@
+// File: /@types/base.d.ts
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
 
@@ -52,6 +53,7 @@ declare module "@minecraft/server" {
     }
 }
 
+// File: /scripts/form/action.d.ts
 import { Player, RawMessage } from "@minecraft/server";
 import { ActionFormResponse, FormCancelationReason } from "@minecraft/server-ui";
 export declare class ActionFormBox {
@@ -65,9 +67,13 @@ export declare class ActionFormBox {
     button(text: RawMessage | string, iconPath?: string, callback?: () => void): ActionFormBox;
     back(callback: (player: Player) => void): ActionFormBox;
     cancel(callback: (cancelationReason?: FormCancelationReason) => void): ActionFormBox;
+    label(text: RawMessage | string): ActionFormBox;
+    divider(): ActionFormBox;
     show(player: Player): Promise<ActionFormResponse>;
 }
 
+
+// File: /scripts/form/message.d.ts
 import { Player, RawMessage } from "@minecraft/server";
 import { FormCancelationReason, MessageFormResponse } from "@minecraft/server-ui";
 export declare class MessageFormBox {
@@ -84,8 +90,40 @@ export declare class MessageFormBox {
     show(player: Player): Promise<MessageFormResponse>;
 }
 
+
+// File: /scripts/form/modal.d.ts
 import { Player, RawMessage } from "@minecraft/server";
 import { FormCancelationReason, ModalFormResponse } from "@minecraft/server-ui";
+interface DropdownOptions {
+    label: RawMessage | string;
+    options: (RawMessage | string)[];
+    defaultValueIndex?: number;
+    tooltip?: RawMessage | string;
+    callback?: ModalElementCallback;
+}
+interface SliderOptions {
+    label: RawMessage | string;
+    minimumValue: number;
+    maximumValue: number;
+    valueStep: number;
+    defaultValue?: number;
+    tooltip?: RawMessage | string;
+    callback?: ModalElementCallback;
+}
+interface TextFieldOptions {
+    label: RawMessage | string;
+    placeholder?: RawMessage | string;
+    defaultValue?: string;
+    tooltip?: RawMessage | string;
+    callback?: ModalElementCallback;
+}
+interface ToggleOptions {
+    label: RawMessage | string;
+    defaultValue?: boolean;
+    tooltip?: RawMessage | string;
+    callback?: ModalElementCallback;
+}
+type ModalElementCallback = (player: Player, response: any, responses: (string | number | boolean | undefined)[]) => void;
 export declare class ModalFormBox {
     /** @private */ private form;
     /** @private */ private bodyText;
@@ -95,49 +133,67 @@ export declare class ModalFormBox {
     body(bodyText: string): ModalFormBox;
     cancel(callback: (player: Player, reason?: FormCancelationReason) => void): ModalFormBox;
     divider(): ModalFormBox;
-    dropdown(
-        label: RawMessage | string,
-        options: (RawMessage | string)[],
-        defaultValueIndex?: number,
-        callback?: (player: Player, response: number, responses: (string | number | boolean)[]) => void
-    ): ModalFormBox;
+    dropdown({ label, options, defaultValueIndex, tooltip, callback }: DropdownOptions): ModalFormBox;
     header(headerText: RawMessage | string): ModalFormBox;
     label(labelText: RawMessage | string): ModalFormBox;
     show(player: Player): Promise<ModalFormResponse>;
-    slider(
-        label: RawMessage | string,
-        minimumValue: number,
-        maximumValue: number,
-        valueStep: number,
-        defaultValue?: number,
-        callback?: (player: Player, response: number, responses: (string | number | boolean)[]) => void
-    ): ModalFormBox;
+    slider({ label, minimumValue, maximumValue, valueStep, defaultValue, tooltip, callback }: SliderOptions): ModalFormBox;
     submitButton(submitButtonText: RawMessage | string): ModalFormBox;
-    textField(
-        label: RawMessage | string,
-        placeholder?: RawMessage | string,
-        defaultValue?: string,
-        callback?: (player: Player, response: string, responses: (string | number | boolean)[]) => void
-    ): ModalFormBox;
+    textField({ label, placeholder, defaultValue, tooltip, callback }: TextFieldOptions): ModalFormBox;
     title(titleText: RawMessage | string): ModalFormBox;
-    toggle(
-        label: RawMessage | string,
-        defaultValue?: boolean,
-        callback?: (player: Player, response: boolean, responses: (string | number | boolean)[]) => void
-    ): ModalFormBox;
+    toggle({ label, defaultValue, tooltip, callback }: ToggleOptions): ModalFormBox;
     /** @private */ private formatLabel;
 }
+export {};
 
-/** @type {ColorUtils} */
+
+// File: /scripts/utils/color.d.ts
 export declare namespace ColorUtils {
     const ESCAPE = "\u00A7";
     const MATCH_REGEXP: RegExp;
+    const INVALID_MATCH_REGEXP: RegExp;
     function clean(text: string): string;
     function includesColor(text: string): boolean;
+    function includesInvalidColor(text: string): boolean;
+    enum ColorCode {
+        BLACK = "0",
+        DARK_BLUE = "1",
+        DARK_GREEN = "2",
+        DARK_AQUA = "3",
+        DARK_RED = "4",
+        DARK_PURPLE = "5",
+        GOLD = "6",
+        GRAY = "7",
+        DARK_GRAY = "8",
+        BLUE = "9",
+        GREEN = "a",
+        AQUA = "b",
+        RED = "c",
+        LIGHT_PURPLE = "d",
+        YELLOW = "e",
+        WHITE = "f",
+        MINECOIN_GOLD = "g",
+        MATERIAL_QUARTZ = "h",
+        MATERIAL_IRON = "i",
+        MATERIAL_NETHERITE = "j",
+        MATERIAL_REDSTONE = "m",
+        MATERIAL_COPPER = "n",
+        MATERIAL_GOLD = "p",
+        MATERIAL_EMERALD = "q",
+        MATERIAL_DIAMOND = "s",
+        MATERIAL_LAPIS = "t",
+        MATERIAL_AMETHYST = "u",
+        MATERIAL_RESIN = "v",
+        OBFUSCATED = "k",
+        BOLD = "l",
+        ITALIC = "o",
+        RESET = "r"
+    }
 }
 
+
+// File: /scripts/utils/item.d.ts
 import { ItemLockMode, ItemStack, RGB, Vector3 } from "@minecraft/server";
-/** @type {ItemStackUtils} */
 export declare namespace ItemStackUtils {
     export function toJSON(item: ItemStack): ItemStackJSON;
     export function fromJSON(json: ItemStackJSON): ItemStack;
@@ -170,8 +226,9 @@ export declare namespace ItemStackUtils {
     export {};
 }
 
+
+// File: /scripts/utils/scoreboard.d.ts
 import { Entity, ScoreboardIdentity, ScoreboardObjective } from "@minecraft/server";
-/** @type {ScoreboardUtils} */
 export declare namespace ScoreboardUtils {
     function addObjective(id: string, display?: string): ScoreboardObjective;
     function getObjective(id: string): ScoreboardObjective;
@@ -181,3 +238,5 @@ export declare namespace ScoreboardUtils {
     function setScore(target: ScoreboardIdentity | Entity | string, objective: string, value: number): void;
     function resetScore(target: ScoreboardIdentity | Entity | string, objective: string): boolean;
 }
+
+

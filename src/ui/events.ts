@@ -16,13 +16,21 @@ export class EventsConfigUI {
         const form = new ModalFormBox().title("§lCommander API 設定 / イベント設定");
 
         for (const [key, value] of Object.entries(config.events)) {
-            form.label(`${key}${value.inline ? " (インライン)" : ""}`)
-                .toggle("有効化", value.enabled, (_, enabled) => {
+            form.label(`${key}${value.inline ? " (インライン)" : ""}`).toggle({
+                label: "有効化",
+                defaultValue: value.enabled,
+                callback: (_, enabled) => {
                     this.config.events[key as keyof typeof config.events].enabled = enabled;
-                })
+                },
+            });
             if ("name" in value) {
-                form.textField("イベント名", "ex: itemUse", value.name, (_, name) => {
-                    (this.config.events[key as keyof typeof config.events] as any).name = name;
+                form.textField({
+                    label: "イベント名",
+                    placeholder: "ex: itemUse",
+                    defaultValue: value.name,
+                    callback: (_, name) => {
+                        (this.config.events[key as keyof typeof config.events] as any).name = name;
+                    },
                 });
             }
         }

@@ -64,26 +64,48 @@ export default function main(source: Entity | Block | undefined, message: string
                 if (content.type === "dropdown" || content.type === "dd") {
                     if (!content.action) throw new Error("Action is required for dropdown.");
                     const options = content.options.map((v) => v).filter(Boolean);
-                    form.dropdown(content.label, options, content.default, (_, res) => {
-                        // @ts-expect-error content.action is string
-                        ScoreboardUtils.setScore(source, content.action, res);
+                    form.dropdown({
+                        label: content.label,
+                        options: options,
+                        defaultValueIndex: content.default,
+                        callback: (_, res) => {
+                            if (content.action === undefined) throw new Error("Action is required for dropdown.");
+                            ScoreboardUtils.setScore(source, content.action, res);
+                        },
                     });
                 } else if (content.type === "slider" || content.type === "s") {
                     if (!content.action) throw new Error("Action is required for slider.");
-                    form.slider(content.label, content.min, content.max, content.step, content.default, (_, res) => {
-                        // @ts-expect-error content.action is string
-                        ScoreboardUtils.setScore(source, content.action, res);
+                    form.slider({
+                        label: content.label,
+                        minimumValue: content.min,
+                        maximumValue: content.max,
+                        valueStep: content.step,
+                        defaultValue: content.default,
+                        callback: (_, res) => {
+                            if (content.action === undefined) throw new Error("Action is required for slider.");
+                            ScoreboardUtils.setScore(source, content.action, res);
+                        },
                     });
                 } else if (content.type === "textField" || content.type === "tf") {
                     if (!content.action) throw new Error("Action is required for textField.");
-                    form.textField(content.label, content.placeholder, content.default, (_, res) => {
-                        source.addTagWillRemove(`${content.action}:${res}`);
+                    form.textField({
+                        label: content.label,
+                        placeholder: content.placeholder,
+                        defaultValue: content.default,
+                        callback: (_, res) => {
+                            if (content.action === undefined) throw new Error("Action is required for textField.");
+                            source.addTagWillRemove(`${content.action}:${res}`);
+                        },
                     });
                 } else if (content.type === "toggle" || content.type === "t") {
                     if (!content.action) throw new Error("Action is required for toggle.");
-                    form.toggle(content.label, content.default, (_, res) => {
-                        // @ts-expect-error content.action is string
-                        ScoreboardUtils.setScore(source, content.action, res ? 1 : 0);
+                    form.toggle({
+                        label: content.label,
+                        defaultValue: content.default,
+                        callback: (_, res) => {
+                            if (content.action === undefined) throw new Error("Action is required for toggle.");
+                            ScoreboardUtils.setScore(source, content.action, res ? 1 : 0);
+                        },
                     });
                 }
             });
@@ -178,7 +200,7 @@ namespace Form {
 
     export type contents = dropdown | slider | textField | toggle;
 
-    type dropdown = {
+    interface dropdown {
         type: "dd" | "dropdown";
         label: string;
         options: string[];
@@ -186,7 +208,7 @@ namespace Form {
         action: string | undefined;
     };
 
-    type slider = {
+    interface slider {
         type: "s" | "slider";
         label: string;
         min: number;
@@ -196,7 +218,7 @@ namespace Form {
         action: string | undefined;
     };
 
-    type textField = {
+    interface textField {
         type: "tf" | "textField";
         label: string;
         placeholder: string;
@@ -204,7 +226,7 @@ namespace Form {
         action: string | undefined;
     };
 
-    type toggle = {
+    interface toggle {
         type: "t" | "toggle";
         label: string;
         default: boolean | undefined;
@@ -213,17 +235,17 @@ namespace Form {
 
     export type actions = addTag | removeTag | setScore | addScore | runCmd;
 
-    type addTag = {
+    interface addTag {
         type: "at" | "add_t" | "add_tag";
         value: string;
     };
 
-    type removeTag = {
+    interface removeTag {
         type: "rt" | "rem_t" | "remove_tag";
         value: string;
     };
 
-    type setScore = {
+    interface setScore {
         type: "ss" | "set_s" | "set_score";
         value: {
             target: string | undefined;
@@ -232,7 +254,7 @@ namespace Form {
         };
     };
 
-    type addScore = {
+    interface addScore {
         type: "as" | "add_s" | "add_score";
         value: {
             target: string | undefined;
@@ -241,7 +263,7 @@ namespace Form {
         };
     };
 
-    type runCmd = {
+    interface runCmd {
         type: "r" | "run" | "run_cmd" | "run_command";
         value: string;
     };
