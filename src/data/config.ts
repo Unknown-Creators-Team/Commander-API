@@ -1,7 +1,7 @@
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 
 export const original = Object.freeze({
-    format: 3,
+    format: 4,
     basic: {
         tag: {
             enabled: true,
@@ -15,9 +15,9 @@ export const original = Object.freeze({
             error: false,
         },
         tests: {
-            enabled: true,
-            events: true,
-            scriptevents: true
+            enabled: false,
+            events: false,
+            scriptevents: false
         }
     },
     events: {

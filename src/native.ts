@@ -25,7 +25,7 @@ Object.assign(Minecraft.Entity.prototype, {
         promiseDelay(() => {
             this.addTag(tag);
             if (!config.basic.tag.enabled) return;
-            system.runTimeout(() => this.removeTag(tag), config.basic.tag.ticks ?? 10);
+            system.runTimeout(() => this.isValid && this.removeTag(tag), config.basic.tag.ticks ?? 10);
         });
     },
     removeTags(tags: string[]) { tags.forEach(tag => this.removeTag(tag)); },

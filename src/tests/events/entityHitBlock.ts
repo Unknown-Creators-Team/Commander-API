@@ -3,23 +3,25 @@ import Test from "lib/Test.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import config from "data/config.js";
 
-new Test("entity_hit_block", "empty")
+new Test("entity_hit_block", "break_block")
     .initialize((player) => {
-        player.container?.setItem(player.selectedSlotIndex, new ItemStack("minecraft:diamond_sword"));
+        // player.container?.setItem(player.selectedSlotIndex, new ItemStack("minecraft:diamond_sword"));
+        // const dimension = player.dimension;
+        // const targetLocation = {
+        //     x: player.location.x,
+        //     y: player.location.y,
+        //     z: player.location.z + 1,
+        // };
+
+        // dimension.setBlockType(targetLocation, "minecraft:stone");
     })
     .run(async (player) => {
-        const dimension = player.dimension;
-        const targetLocation = {
-            x: player.location.x,
-            y: player.location.y,
-            z: player.location.z + 2,
-        };
-
-        dimension.setBlockType(targetLocation, "minecraft:stone");
+        
 
         let timeout: number;
         await new Promise((resolve, reject) => {
             async function event({ damagingEntity, hitBlock }: EntityHitBlockAfterEvent) {
+                world.sendMessage("attacked");
                 if (!damagingEntity?.isPlayer() || damagingEntity !== player) return;
                 await system.waitTicks(1);
 
@@ -45,7 +47,7 @@ new Test("entity_hit_block", "empty")
                 reject(new Error("Timeout waiting for entityHitBlock event"));
             }, 200);
 
-            player.attack();
+            player.breakBlock({ x: 2, y: 4, z: 4 });
         });
     })
     .register();

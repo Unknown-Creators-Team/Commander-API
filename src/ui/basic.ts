@@ -69,6 +69,30 @@ export class BasicConfigUI {
                     this.config.basic.debug.error = value;
                 },
             });
+        
+        form.label("テスト")
+            .toggle({
+                label: "有効",
+                defaultValue: config.basic.tests.enabled,
+                tooltip: "テストはデバッグやトラブルシューティングに使用します。必ずドキュメントに従って使用してください。",
+                callback: (_, value) => {
+                    this.config.basic.tests.enabled = value;
+                },
+            })
+            .toggle({
+                label: "events",
+                defaultValue: config.basic.tests.events,
+                callback: (_, value) => {
+                    this.config.basic.tests.events = value;
+                },
+            })
+            .toggle({
+                label: "scriptevents",
+                defaultValue: config.basic.tests.scriptevents,
+                callback: (_, value) => {
+                    this.config.basic.tests.scriptevents = value;
+                },
+            });
 
         const res = await form.show(this.player);
         if (JSON.stringify(config) === JSON.stringify(this.config)) {

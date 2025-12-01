@@ -1,27 +1,23 @@
-import { system } from "@minecraft/server";
+import { ItemStack, system } from "@minecraft/server";
 import Test from "lib/Test.js";
 import config from "data/config.js";
 
 new Test("scriptevent_get_item", "empty")
-    .initialize((player) => {})
+    .initialize((player) => {
+        const item = new ItemStack("minecraft:diamond", 1);
+        player.container?.setItem(player.selectedSlotIndex, item);
+    })
     .run(async (player) => {
         const container = player.container;
         if (!container) throw new Error("Player container not found");
 
-        // Clear slot
-        container.setItem(5, undefined);
+        player.runCommand(`scriptevent capi:${config.scriptevents.get_item.name}`);
+        await system.waitTicks(1);
 
-        const itemData = {
-            id: "minecraft:diamond",
-            slot: 5,
-        };
+        const hasItemTag = player.hasTag(`capi:${config.scriptevents.get_item.name}`);
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.get_item.name} ${JSON.stringify(itemData)}`);
-        await system.waitTicks(5);
-
-        const item = container.getItem(itemData.slot);
-        if (!item || item.typeId !== itemData.id) {
-            throw new Error(`Test Failed: Expected item "${itemData.id}", got "${item?.typeId}"`);
+        if (!hasItemTag) {
+            throw new Error(`Test Failed: Player does not have the expected tag for get_item scriptevent`);
         }
     })
     .register();

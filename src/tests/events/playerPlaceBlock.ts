@@ -45,7 +45,7 @@ new Test("player_place_block", "empty")
 
             const item = player.container?.getItem(player.selectedSlotIndex);
             if (item) {
-                player.useItemOnBlock(item, targetLocation);
+                player.useItemOnBlock(item, { x: 2, y: 2, z: 3 });
             }
         });
     })

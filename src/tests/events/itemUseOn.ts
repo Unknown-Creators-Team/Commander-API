@@ -3,22 +3,27 @@ import Test from "lib/Test.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import config from "data/config.js";
 
+const item = new ItemStack("minecraft:diamond_pickaxe", 1);
 new Test("item_use_on", "empty")
     .initialize((player) => {
-        const item = new ItemStack("minecraft:diamond_pickaxe", 1);
         player.container?.setItem(player.selectedSlotIndex, item);
+        const dimension = player.dimension;
+        const targetLocation = {
+            x: player.location.x,
+            y: player.location.y,
+            z: player.location.z + 1,
+        };
+        dimension.setBlockType(targetLocation, "minecraft:chest");
     })
     .run(async (player) => {
         const item = player.container?.getItem(player.selectedSlotIndex);
         if (!item) throw new Error("Item not found in player inventory");
 
-        const dimension = player.dimension;
         const targetLocation = {
             x: player.location.x,
-            y: player.location.y - 1,
+            y: player.location.y,
             z: player.location.z + 1,
         };
-        dimension.setBlockType(targetLocation, "minecraft:stone");
 
         const itemTypeId = item.typeId;
 
@@ -50,7 +55,8 @@ new Test("item_use_on", "empty")
                 reject(new Error("Timeout waiting for itemUseOn event"));
             }, 200);
 
-            player.interactWithBlock(targetLocation);
+            // player.interactWithBlock(targetLocation);
+            player.useItemOnBlock(item, targetLocation);
         });
     })
     .register();

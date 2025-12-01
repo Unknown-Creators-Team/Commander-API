@@ -40,7 +40,7 @@ export default class Test {
 
             
             if (this.initializeCallback) {
-                await system.waitTicks(20);
+                await system.waitTicks(2);
                 console.log(`Initializing test "${this.name}"...`);
                 try {
                     this.initializeCallback(player, test);
@@ -63,6 +63,13 @@ export default class Test {
                 return;
             }
             // await waitOp(player, test);
+            
+            // await system.waitTicks(20);
+
+            // player.disconnect();
+
+            // await system.waitTicks(20);
+
             test.succeed();
         })
             .structureName("capi:" + this.structure)
@@ -90,7 +97,7 @@ export default class Test {
             const y = Math.floor(i / xMax);
             system.runTimeout(() => {
                 this.runTest(this.tests[i], location.add([x * distance, 0, y * distance]));
-            }, i * 20);
+            }, i * 2);
         }
     }
 

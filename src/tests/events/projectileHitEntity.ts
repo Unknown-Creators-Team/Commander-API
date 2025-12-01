@@ -12,8 +12,8 @@ new Test("projectile_hit_entity", "empty")
         const dimension = player.dimension;
         const spawnLocation = {
             x: player.location.x,
-            y: player.location.y,
-            z: player.location.z + 3,
+            y: player.location.y + 1,
+            z: player.location.z + 1,
         };
 
         const entity = dimension.spawnEntity("minecraft:cow", spawnLocation);

@@ -7,13 +7,15 @@ new Test("scriptevent_impulse", "empty")
     .run(async (player) => {
         const originalLocation = { ...player.location };
         const impulseData = {
-            force: [0, 2, 0],
+            vector: [0, 2, 0],
         };
+        
+        const entity = player.dimension.spawnEntity("minecraft:cow", originalLocation);
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.impulse.name} ${JSON.stringify(impulseData)}`);
+        entity.runCommand(`scriptevent capi:${config.scriptevents.impulse.name} ${JSON.stringify(impulseData)}`);
         await system.waitTicks(10);
 
-        const newLocation = player.location;
+        const newLocation = entity.location;
         const moved = Math.abs(newLocation.y - originalLocation.y) > 0.5;
 
         if (!moved) {

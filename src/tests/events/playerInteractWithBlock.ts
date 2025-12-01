@@ -3,26 +3,28 @@ import Test from "lib/Test.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import config from "data/config.js";
 
-new Test("player_interact_with_block", "empty")
+new Test("player_interact_with_block", "button_push")
     .initialize((player) => {
-        const dimension = player.dimension;
-        const targetLocation = {
-            x: player.location.x,
-            y: player.location.y,
-            z: player.location.z + 1,
-        };
-        dimension.setBlockType(targetLocation, "minecraft:crafting_table");
+        // const dimension = player.dimension;
+        // const targetLocation = {
+        //     x: player.location.x,
+        //     y: player.location.y + 1,
+        //     z: player.location.z + 1,
+        // };
+        // dimension.setBlockType(targetLocation, "minecraft:crafting_table");
     })
     .run(async (player) => {
-        const targetLocation = {
-            x: player.location.x,
-            y: player.location.y,
-            z: player.location.z + 1,
-        };
+        // const targetLocation = {
+        //     x: player.location.x,
+        //     y: player.location.y,
+        //     z: player.location.z + 1,
+        // };
 
         let timeout: number;
-        await new Promise((resolve, reject) => {
+        await new Promise(async (resolve, reject) => {
             async function event({ player: evPlayer, block }: PlayerInteractWithBlockAfterEvent) {
+
+                console.warn("Hi");
                 if (evPlayer !== player) return;
                 await system.waitTicks(1);
 
@@ -48,7 +50,10 @@ new Test("player_interact_with_block", "empty")
                 reject(new Error("Timeout waiting for playerInteractWithBlock event"));
             }, 200);
 
-            player.interactWithBlock(targetLocation);
+            await system.waitTicks(1);
+
+            // console.warn(player.interactWithBlock({x: 2, y: 3, z: 3}));
+            player.interact();
         });
     })
     .register();
