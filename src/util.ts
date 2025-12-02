@@ -19,7 +19,6 @@ import { FMath } from "lib/FastMath.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import { Macro } from "lib/Macro.js";
 
-
 const { world, system } = Minecraft;
 
 /** @deprecated */
@@ -64,12 +63,18 @@ export function format(player: Minecraft.Player | Minecraft.Entity | Minecraft.B
             const object = easySafeParse(str);
             if (Object.values(object).length === 0 && (player?.isPlayer() || player?.isEntity())) {
                 if (score) {
-                    text = text.replace(new RegExp(`({score:${score}}|{score:${score},})`, "i"), ScoreboardUtils.getScore(player, score)?.toString() ?? "null");
+                    text = text.replace(
+                        new RegExp(`({score:${score}}|{score:${score},})`, "i"),
+                        ScoreboardUtils.getScore(player, score)?.toString() ?? "null"
+                    );
                 }
             } else if (Object.values(object).length > 0) {
                 const playerName = object.name || player;
                 const objectName = object.object;
-                text = text.replace(new RegExp(`({score:${str}}|{score:${str},})`, "i"), ScoreboardUtils.getScore(playerName, objectName)?.toString() ?? "null");
+                text = text.replace(
+                    new RegExp(`({score:${str}}|{score:${str},})`, "i"),
+                    ScoreboardUtils.getScore(playerName, objectName)?.toString() ?? "null"
+                );
             }
         } catch (e) {}
 
@@ -187,6 +192,7 @@ export function calculate(expression: string): number {
         ceil: 4,
         log10: 4,
         log2: 4,
+        rand: 4,
     };
 
     const operators: { [key: string]: (a: number, b?: number) => number } = {
@@ -211,10 +217,11 @@ export function calculate(expression: string): number {
         ceil: (a) => Math.ceil(a),
         log10: (a) => Math.log10(a),
         log2: (a) => Math.log2(a),
+        rand: () => Math.random(),
     };
 
     expression = expression.replace(/^-\d+|\(-\d+/g, (match) => "0" + match);
-    const tokens = expression.match(/\/\/|sqrt|abs|asin|acos|atan|sin|cos|tan|round|floor|ceil|log10|log2|\*\*|\^|\d*\.?\d+|\S/g);
+    const tokens = expression.match(/\/\/|sqrt|abs|asin|acos|atan|sin|cos|tan|round|floor|ceil|log10|log2|rand|\*\*|\^|\d*\.?\d+|\S/g);
     if (!tokens) {
         throw new Error("Invalid expression");
     }
@@ -256,20 +263,25 @@ export function calculate(expression: string): number {
     outputQueue.forEach((token) => {
         if (typeof token === "number") {
             calculationStack.push(token);
-        } else if (["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token)) {
-            const a = calculationStack.pop();
-            if (a === undefined) {
-                throw new Error("Invalid operation");
+        } else if (["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2", "rand"].includes(token)) {
+            if (token === "rand") {
+                const result = Math.random();
+                calculationStack.push(result);
+            } else {
+                const a = calculationStack.pop();
+                if (a === undefined) {
+                    throw new Error("Invalid operation");
+                }
+                const result = operators[token](a);
+                calculationStack.push(result);
             }
-            const result = operators[token](a);
-            calculationStack.push(result);
         } else {
             const b = calculationStack.pop();
             const a = calculationStack.pop();
             if (
                 b === undefined ||
                 (a === undefined &&
-                    !["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2"].includes(token))
+                    !["sqrt", "abs", "asin", "acos", "atan", "sin", "cos", "tan", "round", "floor", "ceil", "log10", "log2", "rand"].includes(token))
             ) {
                 throw new Error("Invalid operation");
             }
