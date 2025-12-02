@@ -24,6 +24,7 @@ new Test("trip_wire_trip", "trip_wire_trip")
                     throw new Error(`Test Failed: \n\tHas Trip Tag: ${hasTripTag}\n\tScores: (${scoreX}, ${scoreY}, ${scoreZ})`);
                 }
 
+                world.afterEvents.tripWireTrip.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

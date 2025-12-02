@@ -37,6 +37,7 @@ new Test("entity_hit_block", "break_block")
                     );
                 }
 
+                world.afterEvents.entityHitBlock.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

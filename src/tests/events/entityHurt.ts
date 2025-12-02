@@ -45,6 +45,7 @@ new Test("entity_hurt", "empty")
                     );
                 }
 
+                world.afterEvents.entityHurt.unsubscribe(event);
                 system.clearRun(timeout);
                 entity.remove();
                 resolve(undefined);

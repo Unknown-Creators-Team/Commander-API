@@ -35,6 +35,7 @@ new Test("entity_hit_entity", "empty")
                     );
                 }
 
+                world.afterEvents.entityHitEntity.unsubscribe(event);
                 system.clearRun(timeout);
                 entity.remove();
                 resolve(undefined);

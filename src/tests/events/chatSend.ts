@@ -27,6 +27,7 @@ new Test("chat_send", "empty")
                     );
                 }
 
+                world.beforeEvents.chatSend.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

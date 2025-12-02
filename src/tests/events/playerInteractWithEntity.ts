@@ -33,6 +33,7 @@ new Test("player_interact_with_entity", "empty")
                     );
                 }
 
+                world.afterEvents.playerInteractWithEntity.unsubscribe(event);
                 system.clearRun(timeout);
                 entity.remove();
                 resolve(undefined);

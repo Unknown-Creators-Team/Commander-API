@@ -29,6 +29,7 @@ new Test("pressure_plate_push", "empty")
                     throw new Error(`Test Failed: \n\tHas Plate Tag: ${hasPlateTag}\n\tScores: (${scoreX}, ${scoreY}, ${scoreZ})`);
                 }
 
+                world.afterEvents.pressurePlatePush.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

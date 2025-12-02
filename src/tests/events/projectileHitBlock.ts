@@ -39,6 +39,7 @@ new Test("projectile_hit_block", "empty")
                     );
                 }
 
+                world.afterEvents.projectileHitBlock.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

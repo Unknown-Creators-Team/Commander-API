@@ -32,6 +32,7 @@ new Test("break_block", "break_block")
                     throw new Error(`Test Failed: \n\tHas Break Tag: ${hasBreakTag}\n\tHas Block ID: ${hasBlockId}\n\tScore X: ${isScoreEqualX}\n\tScore Y: ${isScoreEqualY}\n\tScore Z: ${isScoreEqualZ}`);
                 }
     
+                world.afterEvents.playerBreakBlock.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

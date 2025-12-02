@@ -40,6 +40,7 @@ new Test("player_interact_with_block", "button_push")
                     );
                 }
 
+                world.afterEvents.playerInteractWithBlock.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

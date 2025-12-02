@@ -38,6 +38,7 @@ new Test("entity_die", "empty")
                     );
                 }
 
+                world.afterEvents.entityDie.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }
