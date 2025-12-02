@@ -32,3 +32,12 @@ jobs:
                   asset_path: ./${{ env.FILE_NAME }}
                   asset_name: ${{ env.FILE_NAME }}
                   asset_content_type: application/octet-stream
+                  
+            - name: Notify to Discord
+              run: |
+                  curl -H "Content-Type: application/json" \
+                  -X POST \
+                  -d '{
+                      "content": "unko"
+                  }' \
+                  ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
