@@ -75,11 +75,7 @@ export default class Test {
             .structureName("capi:" + this.structure)
             .maxTicks(20 * 30);
 
-        console.warn("registered");
-
         Test.tests.push(this.name);
-        // Gametest.register
-        console.warn("tests.length: " + Test.tests.length);
     }
 
     public static runTest(name: string, location: Vector): void {
