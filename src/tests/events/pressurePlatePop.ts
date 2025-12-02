@@ -17,7 +17,6 @@ new Test("pressure_plate_pop", "empty")
         let timeout: number;
         await new Promise((resolve, reject) => {
             async function event({ block }: PressurePlatePopAfterEvent) {
-                world.sendMessage("pop");
                 await system.waitTicks(1);
 
                 const entities = block.dimension.getEntities({ location: block.location, maxDistance: 1.5 });
