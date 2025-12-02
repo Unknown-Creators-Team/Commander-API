@@ -48,7 +48,7 @@ new Test("entity_die", "empty")
                 reject(new Error("Timeout waiting for entityDie event. Please kill the spawned zombie."));
             }, 200);
 
-            while (entity.isValid) {
+            while (entity.isValid && player.isValid) {
                 player.attackEntity(entity);
                 await system.waitTicks(10);
             }
