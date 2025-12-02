@@ -1,23 +1,60 @@
-name: Notify to Dicsord
+name: Upload Release Asset and Notify Webhook
 
 on:
-    push:
-      branches:
-        - stable
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for testing'
+        required: true
+      release_name:
+        description: 'Release name'
+        required: true
+      release_body:
+        description: 'Release body'
+        required: true
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  release:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Notify to Discord
-              run: |
-                  curl -H "Content-Type: application/json" \
-                  -X POST \
-                  -d '{
-                      "content": "test"
-                  }' \
-                  ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+      - name: Zip the code
+        run: |
+          zip -r source_code.zip . -x *.git* *.github* *.vscode* "*@types*" *node_modules* .gitignore .mcattributes CNAME package-lock.json
+
+      - name: Rename the file
+        run: |
+          REPO_NAME=$(echo ${{ github.repository }} | awk -F / '{print $2}')
+          TAG_NAME=${{ github.event.release.tag_name }}
+          FILE_NAME=$REPO_NAME-$TAG_NAME.mcpack
+          mv source_code.zip $FILE_NAME
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./${{ env.FILE_NAME }}
+          asset_name: ${{ env.FILE_NAME }}
+          asset_content_type: application/octet-stream
+
+      - name: Send Release Webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          RELEASE_NAME=${{ github.event.release.name }}
+          RELEASE_TAG=${{ github.event.release.tag_name }}
+          RELEASE_BODY=${{ github.event.release.body }}
+          RELEASE_URL=${{ github.event.release.html_url }}
+          
+          # Webhook用のJSON作成
+          JSON_PAYLOAD=$(jq -n \
+            --arg content "<@&1090816431937040437>\n\n**${RELEASE_NAME}** update\n\n\`\`\`\n${RELEASE_BODY}\n\`\`\`\n[Release](${RELEASE_URL}) - [Other releases](https://github.com/${{ github.repository }}/releases)" \
+            '{content: $content}')
+          
+          curl -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" $WEBHOOK_URL
