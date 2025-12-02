@@ -41,18 +41,18 @@ world.afterEvents.worldLoad.subscribe(async () => {
     // import ("checks/blockBreak.js");
     const { ConfigUI } = await import("./ui/index.js");
 
-    system.run(() => {
-        const msg = [
-            "§r",
-            "§lCommander API をご利用いただきありがとうございます。§r",
-            "§r",
-            "このアドオンは Commander API V2 の §l§c開発版§r です。",
-            "予期しないエラーや予告なく仕様が変更される可能性があります。",
-            "特別な事情が無い限り、本番環境での使用はお控えください。",
-            "§r",
-        ].join("\n");
-        world.sendMessage(msg);
-    });
+    // system.run(() => {
+    //     const msg = [
+    //         "§r",
+    //         "§lCommander API をご利用いただきありがとうございます。§r",
+    //         "§r",
+    //         "このアドオンは Commander API V2 の §l§c開発版§r です。",
+    //         "予期しないエラーや予告なく仕様が変更される可能性があります。",
+    //         "特別な事情が無い限り、本番環境での使用はお控えください。",
+    //         "§r",
+    //     ].join("\n");
+    //     world.sendMessage(msg);
+    // });
 
     system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => (beforeWatchdogTerminate.cancel = true));
 

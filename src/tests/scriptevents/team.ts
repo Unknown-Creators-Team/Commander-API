@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import teamEvent from "../../scriptevents/team.js";
 
 new Test("scriptevent_team", "empty")
     .initialize((player) => {})
@@ -10,7 +10,7 @@ new Test("scriptevent_team", "empty")
             team: "test_team",
         };
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.team.name} ${JSON.stringify(teamData)}`);
+        teamEvent(player, JSON.stringify(teamData));
         await system.waitTicks(5);
 
         // Team機能の検証は複雑なため、エラーが発生しなければ成功とする

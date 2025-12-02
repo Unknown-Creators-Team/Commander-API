@@ -1,14 +1,13 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import rename from "../../scriptevents/rename.js";
 
 new Test("scriptevent_rename", "empty")
     .initialize((player) => {})
     .run(async (player) => {
-        const originalName = player.name;
         const newName = "TestPlayer_" + Math.random().toString(36).substring(2, 7);
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.rename.name} ${newName}`);
+        rename(player, newName);
         await system.waitTicks(5);
 
         if (player.nameTag !== newName) {

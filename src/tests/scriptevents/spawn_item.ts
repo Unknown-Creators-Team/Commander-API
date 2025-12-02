@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import spawnItemEvent from "../../scriptevents/spawn_item.js";
 import Vector from "lib/Vector.js";
 
 new Test("scriptevent_spawn_item", "empty")
@@ -22,7 +22,7 @@ new Test("scriptevent_spawn_item", "empty")
 
         const beforeCount = dimension.getEntities({ type: "minecraft:item", location: spawnLocation, maxDistance: 3 }).length;
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.spawn_item.name} ${JSON.stringify(itemData)}`);
+        spawnItemEvent(player, JSON.stringify(itemData));
         await system.waitTicks(5);
 
         const afterCount = dimension.getEntities({ type: "minecraft:item", location: spawnLocation, maxDistance: 3 }).length;

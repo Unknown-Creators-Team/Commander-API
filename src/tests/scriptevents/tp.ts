@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import tpEvent from "../../scriptevents/tp.js";
 
 new Test("scriptevent_tp", "empty")
     .initialize((player) => {})
@@ -10,7 +10,7 @@ new Test("scriptevent_tp", "empty")
             location: [targetLocation.x, targetLocation.y, targetLocation.z],
         });
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.tp.name} ${message}`);
+        tpEvent(player, message);
         await system.waitTicks(5);
 
         const currentLocation = player.location;

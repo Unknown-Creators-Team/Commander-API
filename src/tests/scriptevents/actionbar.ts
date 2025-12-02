@@ -1,16 +1,12 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import actionbar from "../../scriptevents/actionbar.js";
 
 new Test("scriptevent_actionbar", "empty")
     .initialize((player) => {})
     .run(async (player) => {
-        const testMessage = "Actionbar test message";
+        actionbar(player, "Actionbar test message");
 
-        // actionbar コマンドは実行できることを確認するだけ
-        player.runCommand(`scriptevent capi:${config.scriptevents.actionbar.name} ${testMessage}`);
-        await system.waitTicks(5);
-
-        // エラーが発生しなければ成功
+        await system.waitTicks(3);
     })
     .register();

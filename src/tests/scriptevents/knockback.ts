@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import knockback from "../../scriptevents/knockback.js";
 
 new Test("scriptevent_knockback", "empty")
     .initialize((player) => {})
@@ -11,7 +11,7 @@ new Test("scriptevent_knockback", "empty")
             vertical_strength: 1,
         };
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.knockback.name} ${JSON.stringify(knockbackData)}`);
+        knockback(player, JSON.stringify(knockbackData));
         await system.waitTicks(10);
 
         const newLocation = player.location;
