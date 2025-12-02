@@ -18,6 +18,6 @@ jobs:
                   curl -H "Content-Type: application/json" \
                   -X POST \
                   -d '{
-                      "content": "unko"
+                      "content": "test"
                   }' \
                   ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
