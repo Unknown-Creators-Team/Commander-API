@@ -9,17 +9,11 @@ new Test("pressure_plate_push", "empty")
         const plateLocation = {
             x: Math.floor(player.location.x),
             y: Math.floor(player.location.y),
-            z: Math.floor(player.location.z) + 2,
+            z: Math.floor(player.location.z) + 1,
         };
         dimension.setBlockType(plateLocation, "minecraft:stone_pressure_plate");
     })
     .run(async (player) => {
-        const plateLocation = {
-            x: Math.floor(player.location.x),
-            y: Math.floor(player.location.y),
-            z: Math.floor(player.location.z) + 2,
-        };
-
         let timeout: number;
         await new Promise((resolve, reject) => {
             async function event({ source: evPlayer, block }: PressurePlatePushAfterEvent) {
@@ -45,7 +39,7 @@ new Test("pressure_plate_push", "empty")
                 reject(new Error("Timeout waiting for pressurePlatePush event"));
             }, 200);
 
-            player.moveToBlock(plateLocation);
+            player.move(0, 1);
         });
     })
     .register();
