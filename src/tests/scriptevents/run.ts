@@ -1,4 +1,4 @@
-import { system, world } from "@minecraft/server";
+import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
 import runEvent from "../../scriptevents/run.js";
 

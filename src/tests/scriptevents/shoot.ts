@@ -1,8 +1,7 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
-import shootEvent from "../../scriptevents/shoot.js";
 import Vector from "lib/Vector.js";
+import shootEvent from "../../scriptevents/shoot.js";
 
 new Test("scriptevent_shoot", "empty")
     .initialize((player) => {})
