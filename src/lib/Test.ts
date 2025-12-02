@@ -1,8 +1,8 @@
-import { Block, Entity, GameMode, Player, PlayerPermissionLevel, system, world } from "@minecraft/server";
+import { GameMode, system, world } from "@minecraft/server";
 import * as Gametest from "@minecraft/server-gametest";
 import Vector from "./Vector.js";
 
-type StructureTypes = "empty" | "button_push" | "break_block";
+type StructureTypes = "empty" | "button_push" | "break_block" | "trip_wire_trip";
 
 type initializeCallback = (entity: Gametest.SimulatedPlayer, test: Gametest.Test) => void;
 type RunCallback = (entity: Gametest.SimulatedPlayer, test: Gametest.Test) => Promise<void>;
