@@ -1,5 +1,7 @@
 import { Block, Entity, ItemStack, ItemLockMode, EnchantmentType } from "@minecraft/server";
+import * as v from "lib/valibot.js";
 import { bothParse, format, parseFormat } from "../util.js";
+import { SetItemSchema, type SetItem } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot set item to a non-player entity.");
@@ -7,9 +9,8 @@ export default function main(source: Entity | Block | undefined, message: string
     const { container } = source;
     if (!container) throw new Error("Player does not have an inventory container.");
 
-    const object = parseFormat<ItemObject>(message, source);
-    if (object === undefined) throw new Error("Invalid format");
-    if (object.id === undefined) throw new Error("id is required");
+    const parsed = parseFormat(message, source);
+    const object = v.parse(SetItemSchema, parsed);
 
     const amount = object.amount ?? 1;
     const item = new ItemStack(object.id, amount);
@@ -30,17 +31,4 @@ export default function main(source: Entity | Block | undefined, message: string
     if (object.keep_on_death) item.keepOnDeath = true;
     if (slot >= 0) container.setItem(slot, item);
     else container.addItem(item);
-}
-
-interface ItemObject {
-    id: string;
-    name: string | undefined;
-    amount: number | undefined;
-    slot: number | undefined;
-    lore: string[] | undefined;
-    enchants: { name: string; level: number | undefined }[] | undefined;
-    can_place_on: string[] | undefined;
-    can_destroy: string[] | undefined;
-    lock: ItemLockMode | undefined;
-    keep_on_death: boolean | undefined;
 }

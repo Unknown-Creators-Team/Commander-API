@@ -1,7 +1,8 @@
 import { Block, Entity, ItemStack, ItemLockMode, EnchantmentType, world } from "@minecraft/server";
+import * as v from "lib/valibot.js";
 import { bothParse, parsePos, format, parseFormat } from "../util.js";
 import Vector from "lib/Vector.js";
-
+import { SpawnItemSchema, type SpawnItem } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     // const object: ItemObject = bothParse(message);
@@ -22,7 +23,7 @@ export default function main(source: Entity | Block | undefined, message: string
     // if (object.can_destroy) item.setCanDestroy(object.can_destroy);
     // if (object.lock) item.lockMode = ItemLockMode[object.lock as keyof typeof ItemLockMode];
     // if (object.keep_on_death) item.keepOnDeath = object.keep_on_death == true ? true : false;
-    
+
     // const x = typeof object.x === "string" ? parsePos(object.x, source, "x") : object.x ?? source?.location.x ?? 0;
     // const y = typeof object.y === "string" ? parsePos(object.y, source, "y") : object.y ?? source?.location.y ?? 0;
     // const z = typeof object.z === "string" ? parsePos(object.z, source, "z") : object.z ?? source?.location.z ?? 0;
@@ -31,10 +32,8 @@ export default function main(source: Entity | Block | undefined, message: string
 
     // world.getDimension(dimension).spawnItem(item, location);
 
-    const object = parseFormat<SpawnItem>(message, source);
-    if (object === undefined) throw new Error("Invalid format");
-
-    if (object.item === undefined) throw new Error("item is required");
+    const parsed = parseFormat(message, source);
+    const object = v.parse(SpawnItemSchema, parsed);
 
     const location = Vector.fromArray(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
     const dimension = source?.dimension ?? world.getDimension(object.dimension ?? "overworld");
@@ -56,19 +55,4 @@ export default function main(source: Entity | Block | undefined, message: string
 
     const entity = dimension.spawnItem(item, location);
     if (object.clear_velocity) entity.clearVelocity();
-}
-
-interface SpawnItem {
-    item: string;
-    name: string | undefined;
-    amount: number | undefined;
-    lore: string[] | undefined;
-    enchants: { name: string, level: number | undefined }[] | undefined;
-    can_place_on: string[] | undefined;
-    can_destroy: string[] | undefined;
-    lock: ItemLockMode | undefined;
-    keep_on_death: boolean | undefined;
-    location: [number | string, number | string, number | string] | undefined;
-    dimension: string | undefined;
-    clear_velocity: boolean | undefined;
 }

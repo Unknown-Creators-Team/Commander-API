@@ -1,6 +1,8 @@
 import { Block, Entity, world } from "@minecraft/server";
+import * as v from "lib/valibot.js";
 import { bothParse, format, parseFormat, parsePos } from "../util.js";
 import Vector from "lib/Vector.js";
+import { SpawnEntitySchema, type SpawnEntity } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     // const object: SpawnEntity = bothParse(message);
@@ -20,10 +22,8 @@ export default function main(source: Entity | Block | undefined, message: string
     // if (name) entity.nameTag = name;
     // if (fire) entity.setOnFire(fire);
 
-    const object = parseFormat<SpawnEntity>(message, source);
-    if (object === undefined) throw new Error("Invalid format");
-
-    if (object.id === undefined) throw new Error("id is required");
+    const parsed = parseFormat(message, source);
+    const object = v.parse(SpawnEntitySchema, parsed);
 
     const location = Vector.fromArray(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
     const dimension = source?.dimension ?? world.getDimension(object.dimension ?? "overworld");
@@ -31,12 +31,4 @@ export default function main(source: Entity | Block | undefined, message: string
     const entity = dimension.spawnEntity<string>(object.id, location);
     if (object.name) entity.nameTag = object.name;
     if (object.set_on_fire) entity.setOnFire(parseInt(object.set_on_fire.toString()));
-}
-
-interface SpawnEntity {
-    id: string;
-    name: string | undefined;
-    location: [number | string , number | string, number | string] | undefined;
-    dimension: string | undefined;
-    set_on_fire: number | undefined;
 }

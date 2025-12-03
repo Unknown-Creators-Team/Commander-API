@@ -1,23 +1,85 @@
 import { Block, Entity, Player, world } from "@minecraft/server";
 import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
+import * as v from "lib/valibot.js";
 import { parseFormat } from "../util.js";
 import { ActionFormBox } from "lib/ScriptBoxMC.js";
 import { MessageFormBox } from "lib/ScriptBoxMC.js";
 import { ModalFormBox } from "lib/ScriptBoxMC.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { FormSchema, FormActionsSchema, type Form, type FormActions } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot use this script event in non-player entity.");
-    const object = parseFormat<Form.Form>(message, source);
-    object.type ??= "action";
-    switch (object.type) {
+    const parsed = parseFormat(message, source);
+
+    // Validate with valibot and provide better error messages
+    let object: Form;
+    try {
+        object = v.parse(FormSchema, parsed);
+    } catch (error) {
+        if (v.isValiError(error)) {
+            // Build detailed error message
+            const errorMessages: string[] = [];
+
+            // Check what type of data we received
+            if (!parsed || typeof parsed !== "object") {
+                throw new Error("Form validation failed: Invalid input - expected an object");
+            }
+
+            // Check for type field to determine intended form type
+            const typ = (parsed as any).typ;
+            const formType = typ || "action";
+
+            // Provide specific guidance based on form type
+            if (formType === "act" || formType === "action") {
+                const missing: string[] = [];
+                if (!(parsed as any).ttl) missing.push("ttl (title)");
+                if (!(parsed as any).bdy) missing.push("bdy (body)");
+                if (!(parsed as any).btn) missing.push("btn (buttons array)");
+
+                if (missing.length > 0) {
+                    throw new Error(`Action Form validation failed: Missing required fields: ${missing.join(", ")}`);
+                }
+            } else if (formType === "msg" || formType === "message") {
+                const missing: string[] = [];
+                if (!(parsed as any).ttl) missing.push("ttl (title)");
+                if (!(parsed as any).bdy) missing.push("bdy (body)");
+                if (!(parsed as any).bt1) missing.push("bt1 (button1 object)");
+                if (!(parsed as any).bt2) missing.push("bt2 (button2 object)");
+
+                if (missing.length > 0) {
+                    throw new Error(`Message Form validation failed: Missing required fields: ${missing.join(", ")}`);
+                }
+            } else if (formType === "mdl" || formType === "modal") {
+                const missing: string[] = [];
+                if (!(parsed as any).ttl) missing.push("ttl (title)");
+                if (!(parsed as any).cnt) missing.push("cnt (content array)");
+
+                if (missing.length > 0) {
+                    throw new Error(`Modal Form validation failed: Missing required fields: ${missing.join(", ")}`);
+                }
+            }
+
+            // Collect all validation errors for detailed output
+            for (const issue of error.issues) {
+                const path = issue.path?.map((p) => p.key).join(".") || "root";
+                errorMessages.push(`${path}: ${issue.message}`);
+            }
+
+            throw new Error(`Form validation failed:\n${errorMessages.slice(0, 5).join("\n")}`);
+        }
+        throw error;
+    }
+
+    object.typ ??= "action";
+    switch (object.typ) {
         case "act":
         case "action": {
             const form = new ActionFormBox();
-            if (object.title) form.title(object.title);
-            if (object.body) form.body(object.body);
+            if (object.ttl) form.title(object.ttl);
+            if (object.bdy) form.body(object.bdy);
 
-            object.btns.forEach((btn, i) => {
+            object.btn.forEach((btn: any, i: number) => {
                 if (!btn.txt) throw TypeError("Button text is required.");
                 form.button(btn.txt, btn.img, () => {
                     if (btn.act) runAction(source, btn.act);
@@ -27,7 +89,7 @@ export default function main(source: Entity | Block | undefined, message: string
 
             form.show(source).then((response) => {
                 if (response.canceled) return;
-                source.addTagWillRemove(`form:${object.title}`);
+                source.addTagWillRemove(`form:${object.ttl}`);
             });
 
             break;
@@ -35,76 +97,76 @@ export default function main(source: Entity | Block | undefined, message: string
         case "msg":
         case "message": {
             const form = new MessageFormBox();
-            if (object.title) form.title(object.title);
-            if (object.body) form.body(object.body);
-            if (object.btn1.txt) {
-                form.upperButton(object.btn1.txt, () => {
-                    if (object.btn1.act) runAction(source, object.btn1.act);
+            if (object.ttl) form.title(object.ttl);
+            if (object.bdy) form.body(object.bdy);
+            if (object.bt1.txt) {
+                form.upperButton(object.bt1.txt, () => {
+                    if (object.bt1.act) runAction(source, object.bt1.act);
                 });
                 ScoreboardUtils.setScore(source, "capi:msg_form", 1);
             }
-            if (object.btn2.txt) {
-                form.lowerButton(object.btn2.txt, () => {
-                    if (object.btn2.act) runAction(source, object.btn2.act);
+            if (object.bt2.txt) {
+                form.lowerButton(object.bt2.txt, () => {
+                    if (object.bt2.act) runAction(source, object.bt2.act);
                 });
                 ScoreboardUtils.setScore(source, "capi:msg_form", 2);
             }
 
             form.show(source).then((response) => {
                 if (response.canceled) return;
-                source.addTagWillRemove(`form:${object.title}`);
+                source.addTagWillRemove(`form:${object.ttl}`);
             });
             break;
         }
         case "mdl":
         case "modal": {
             const form = new ModalFormBox();
-            if (object.title) form.title(object.title);
-            object.content.forEach((content) => {
-                if (content.type === "dropdown" || content.type === "dd") {
-                    if (!content.action) throw new Error("Action is required for dropdown.");
-                    const options = content.options.map((v) => v).filter(Boolean);
+            if (object.ttl) form.title(object.ttl);
+            object.cnt.forEach((content) => {
+                if (content.typ === "dropdown" || content.typ === "dd") {
+                    if (!content.act) throw new Error("Action is required for dropdown.");
+                    const options = content.opt.filter(Boolean);
                     form.dropdown({
-                        label: content.label,
+                        label: content.lbl,
                         options: options,
-                        defaultValueIndex: content.default,
+                        defaultValueIndex: content.def,
                         callback: (_, res) => {
-                            if (content.action === undefined) throw new Error("Action is required for dropdown.");
-                            ScoreboardUtils.setScore(source, content.action, res);
+                            if (content.act === undefined) throw new Error("Action is required for dropdown.");
+                            ScoreboardUtils.setScore(source, content.act, res);
                         },
                     });
-                } else if (content.type === "slider" || content.type === "s") {
-                    if (!content.action) throw new Error("Action is required for slider.");
+                } else if (content.typ === "slider" || content.typ === "s") {
+                    if (!content.act) throw new Error("Action is required for slider.");
                     form.slider({
-                        label: content.label,
+                        label: content.lbl,
                         minimumValue: content.min,
                         maximumValue: content.max,
-                        valueStep: content.step,
-                        defaultValue: content.default,
+                        valueStep: content.stp,
+                        defaultValue: content.def,
                         callback: (_, res) => {
-                            if (content.action === undefined) throw new Error("Action is required for slider.");
-                            ScoreboardUtils.setScore(source, content.action, res);
+                            if (content.act === undefined) throw new Error("Action is required for slider.");
+                            ScoreboardUtils.setScore(source, content.act, res);
                         },
                     });
-                } else if (content.type === "textField" || content.type === "tf") {
-                    if (!content.action) throw new Error("Action is required for textField.");
+                } else if (content.typ === "textField" || content.typ === "tf") {
+                    if (!content.act) throw new Error("Action is required for textField.");
                     form.textField({
-                        label: content.label,
-                        placeholder: content.placeholder,
-                        defaultValue: content.default,
+                        label: content.lbl,
+                        placeholder: content.plh,
+                        defaultValue: content.def,
                         callback: (_, res) => {
-                            if (content.action === undefined) throw new Error("Action is required for textField.");
-                            source.addTagWillRemove(`${content.action}:${res}`);
+                            if (content.act === undefined) throw new Error("Action is required for textField.");
+                            source.addTagWillRemove(`${content.act}:${res}`);
                         },
                     });
-                } else if (content.type === "toggle" || content.type === "t") {
-                    if (!content.action) throw new Error("Action is required for toggle.");
+                } else if (content.typ === "toggle" || content.typ === "t") {
+                    if (!content.act) throw new Error("Action is required for toggle.");
                     form.toggle({
-                        label: content.label,
-                        defaultValue: content.default,
+                        label: content.lbl,
+                        defaultValue: content.def,
                         callback: (_, res) => {
-                            if (content.action === undefined) throw new Error("Action is required for toggle.");
-                            ScoreboardUtils.setScore(source, content.action, res ? 1 : 0);
+                            if (content.act === undefined) throw new Error("Action is required for toggle.");
+                            ScoreboardUtils.setScore(source, content.act, res ? 1 : 0);
                         },
                     });
                 }
@@ -112,44 +174,44 @@ export default function main(source: Entity | Block | undefined, message: string
 
             form.show(source).then((response) => {
                 if (response.canceled) return;
-                source.addTagWillRemove(`form:${object.title}`);
+                source.addTagWillRemove(`form:${object.ttl}`);
             });
             break;
         }
     }
 }
 
-function runAction(source: Player, action: Form.actions) {
-    switch (action.type) {
+function runAction(source: Player, action: FormActions) {
+    switch (action.typ) {
         case "at":
         case "add_t":
         case "add_tag": {
-            source.addTag(action.value);
+            source.addTag(action.val);
             break;
         }
         case "rt":
         case "rem_t":
         case "remove_tag": {
-            source.removeTag(action.value);
+            source.removeTag(action.val);
             break;
         }
         case "ss":
         case "set_s":
         case "set_score": {
-            const data = action.value;
-            const object = data.object;
-            const target = data.target ? data.target : source;
-            const value = data.value;
+            const data = action.val;
+            const object = data.obj;
+            const target = data.tgt ? data.tgt : source;
+            const value = data.val;
             world.scoreboard.getObjective(object)?.setScore(target, value);
             break;
         }
         case "as":
         case "add_s":
         case "add_score": {
-            const data = action.value;
-            const object = data.object;
-            const target = data.target ? data.target : source;
-            const value = data.value;
+            const data = action.val;
+            const object = data.obj;
+            const target = data.tgt ? data.tgt : source;
+            const value = data.val;
             world.scoreboard.getObjective(object)?.addScore(target, value);
             break;
         }
@@ -157,114 +219,9 @@ function runAction(source: Player, action: Form.actions) {
         case "run":
         case "run_cmd":
         case "run_command": {
-            const cmd = action.value;
+            const cmd = action.val;
             source.runCommand(cmd);
             break;
         }
     }
-}
-
-namespace Form {
-    export type Form = Action | Message | Modal;
-
-    export interface Action {
-        type: "act" | "action";
-        title: string;
-        body: string;
-        btns: {
-            txt: string;
-            img: string | undefined;
-            act: actions | undefined;
-        }[];
-    }
-
-    export interface Message {
-        type: "msg" | "message";
-        title: string;
-        body: string;
-        btn1: {
-            txt: string;
-            act: actions | undefined;
-        };
-        btn2: {
-            txt: string;
-            act: actions | undefined;
-        };
-    }
-
-    export interface Modal {
-        type: "mdl" | "modal";
-        title: string;
-        content: contents[];
-    }
-
-    export type contents = dropdown | slider | textField | toggle;
-
-    interface dropdown {
-        type: "dd" | "dropdown";
-        label: string;
-        options: string[];
-        default: number | undefined;
-        action: string | undefined;
-    };
-
-    interface slider {
-        type: "s" | "slider";
-        label: string;
-        min: number;
-        max: number;
-        step: number;
-        default: number | undefined;
-        action: string | undefined;
-    };
-
-    interface textField {
-        type: "tf" | "textField";
-        label: string;
-        placeholder: string;
-        default: string | undefined;
-        action: string | undefined;
-    };
-
-    interface toggle {
-        type: "t" | "toggle";
-        label: string;
-        default: boolean | undefined;
-        action: string | undefined;
-    };
-
-    export type actions = addTag | removeTag | setScore | addScore | runCmd;
-
-    interface addTag {
-        type: "at" | "add_t" | "add_tag";
-        value: string;
-    };
-
-    interface removeTag {
-        type: "rt" | "rem_t" | "remove_tag";
-        value: string;
-    };
-
-    interface setScore {
-        type: "ss" | "set_s" | "set_score";
-        value: {
-            target: string | undefined;
-            object: string;
-            value: number;
-        };
-    };
-
-    interface addScore {
-        type: "as" | "add_s" | "add_score";
-        value: {
-            target: string | undefined;
-            object: string;
-            value: number;
-        };
-    };
-
-    interface runCmd {
-        type: "r" | "run" | "run_cmd" | "run_command";
-        value: string;
-    };
 }

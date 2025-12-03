@@ -1,12 +1,12 @@
 import { Block, Entity, ExplosionOptions, world } from "@minecraft/server";
+import * as v from "lib/valibot.js";
 import { parsePos, parseFormat } from "../util.js";
 import Vector from "lib/Vector.js";
+import { ExplosionSchema, type Explosion } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
-    const object = parseFormat<Explosion>(message, source);
-    if (object === undefined) throw new Error("Invalid format");
-
-    if (object.radius === undefined) throw new Error("radius is required");
+    const parsed = parseFormat(message, source);
+    const object = v.parse(ExplosionSchema, parsed);
 
     object.location ??= source ? (Object.values(source.location) as any) : [0, 0, 0];
 
@@ -20,17 +20,4 @@ export default function main(source: Entity | Block | undefined, message: string
     };
 
     dimension.createExplosion(location, radius, options);
-}
-
-interface Explosion {
-    radius: number;
-    location: [number | string , number | string, number | string] | undefined;
-    dimension: string | undefined;
-    options:
-        | {
-              allow_under_water: boolean | undefined;
-              breaks_blocks: boolean | undefined;
-              causes_fire: boolean | undefined;
-          }
-        | undefined;
 }

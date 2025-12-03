@@ -1,14 +1,13 @@
 import { Block, Entity, world } from "@minecraft/server";
+import * as v from "lib/valibot.js";
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 import { Macro } from "lib/Macro.js";
 import { parseFormat } from "util.js";
+import { CallSchema, type Call } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
-    
-    const object = parseFormat<Call>(message, source);
-    if (object === undefined) throw new Error("Invalid format.");
-
-    if (object.name === undefined) throw new Error("name is required.");
+    const parsed = parseFormat(message, source);
+    const object = v.parse(CallSchema, parsed);
 
     const call = new ScoreboardDatabase<string, string[]>(`CAPI_CALLS`).get(object.name);
     if (!call) throw new Error(`Call '${object.name}' not found.`);
@@ -29,9 +28,4 @@ export default function main(source: Entity | Block | undefined, message: string
             throw `Failed to run command: ${cmd}\n${(e as Error).message}`;
         }
     }
-}
-
-interface Call {
-    name: string;
-    args: Record<string, any> | undefined;
 }

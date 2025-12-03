@@ -1,14 +1,16 @@
 import { Block, Entity } from "@minecraft/server";
+import * as v from "lib/valibot.js";
 import config from "data/config.js";
 import { Macro } from "lib/Macro.js";
 import { ItemStackUtils } from "lib/ScriptBoxMC.js";
 import { parseFormat, removeTagsStartsWith } from "util.js";
+import { GetItemSchema, type GetItem } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot run command as a non-player entity.");
 
-    const object = parseFormat<GetItem>(message, source);
-    if (object === undefined) throw new Error("Invalid object format.");
+    const parsed = parseFormat(message, source);
+    const object = v.parse(GetItemSchema, parsed);
     object.slot ??= source.selectedSlotIndex;
     object.minimize ??= true;
 
@@ -40,9 +42,4 @@ function decode<T extends string | number | boolean | symbol | undefined>(obj: a
         }
         return { ...acc, [path]: value };
     }, {});
-}
-
-interface GetItem {
-    slot: number | undefined;
-    minimize: boolean | undefined;
 }

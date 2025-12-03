@@ -1,7 +1,8 @@
 import { Block, Entity, ExplosionOptions, Player } from "@minecraft/server";
+import * as v from "lib/valibot.js";
 import { format } from "util.js";
 
-export default function main(source: Entity | Block | undefined, message: string) {    
+export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Source must be a player");
 
     const slot = parseInt(format(source, message) ?? message);
