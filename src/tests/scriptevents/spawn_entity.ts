@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import spawnEntityEvent from "../../scriptevents/spawn_entity.js";
 
 new Test("scriptevent_spawn_entity", "empty")
     .initialize((player) => {})
@@ -19,7 +19,7 @@ new Test("scriptevent_spawn_entity", "empty")
 
         const beforeCount = player.dimension.getEntities({ type: "minecraft:pig", location: spawnLocation, maxDistance: 5 }).length;
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.spawn_entity.name} ${JSON.stringify(spawnData)}`);
+        spawnEntityEvent(player, JSON.stringify(spawnData));
         await system.waitTicks(5);
 
         const afterCount = player.dimension.getEntities({ type: "minecraft:pig", location: spawnLocation, maxDistance: 5 }).length;

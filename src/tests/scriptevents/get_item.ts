@@ -1,6 +1,7 @@
 import { ItemStack, system } from "@minecraft/server";
 import Test from "lib/Test.js";
 import config from "data/config.js";
+import getItem from "../../scriptevents/get_item.js";
 
 new Test("scriptevent_get_item", "empty")
     .initialize((player) => {
@@ -11,7 +12,7 @@ new Test("scriptevent_get_item", "empty")
         const container = player.container;
         if (!container) throw new Error("Player container not found");
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.get_item.name}`);
+        getItem(player, "");
         await system.waitTicks(1);
 
         const hasItemTag = player.hasTag(`capi:${config.scriptevents.get_item.name}`);

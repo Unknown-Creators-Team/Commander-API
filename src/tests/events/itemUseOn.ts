@@ -45,6 +45,7 @@ new Test("item_use_on", "empty")
                     );
                 }
 
+                world.afterEvents.itemStartUseOn.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import resetName from "../../scriptevents/reset_name.js";
 
 new Test("scriptevent_reset_name", "empty")
     .initialize((player) => {})
@@ -11,8 +11,8 @@ new Test("scriptevent_reset_name", "empty")
         player.nameTag = "TempName";
         await system.waitTicks(2);
 
-        // Reset name
-        player.runCommand(`scriptevent capi:${config.scriptevents.reset_name.name}`);
+        // Reset name (call original scriptevent function)
+        resetName(player, "");
         await system.waitTicks(5);
 
         if (player.nameTag !== originalName) {

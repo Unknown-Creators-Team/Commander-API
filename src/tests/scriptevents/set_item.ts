@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import setItemEvent from "../../scriptevents/set_item.js";
 
 new Test("scriptevent_set_item", "empty")
     .initialize((player) => {})
@@ -12,7 +12,7 @@ new Test("scriptevent_set_item", "empty")
             slot: 0,
         };
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.set_item.name} ${JSON.stringify(itemData)}`);
+        setItemEvent(player, JSON.stringify(itemData));
         await system.waitTicks(5);
 
         const container = player.container;

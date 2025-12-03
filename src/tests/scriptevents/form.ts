@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import form from "../../scriptevents/form.js";
 
 new Test("scriptevent_form", "empty")
     .initialize((player) => {})
@@ -9,12 +9,15 @@ new Test("scriptevent_form", "empty")
             type: "message",
             title: "Test Form",
             body: "This is a test form",
+            btn1: {
+                txt: "Upper"
+            },
+            btn2: {
+                txt: "Lower"
+            }
         };
 
-        // Note: SimulatedPlayer cannot interact with forms, so we just verify the command runs
-        player.runCommand(`scriptevent capi:${config.scriptevents.form.name} ${JSON.stringify(formData)}`);
+        form(player, JSON.stringify(formData));
         await system.waitTicks(5);
-
-        // If no error is thrown, the test passes
     })
     .register();

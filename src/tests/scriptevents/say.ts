@@ -1,6 +1,6 @@
-import { system, world } from "@minecraft/server";
+import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import sayEvent from "../../scriptevents/say.js";
 
 new Test("scriptevent_say", "empty")
     .initialize((player) => {})
@@ -14,7 +14,7 @@ new Test("scriptevent_say", "empty")
             }
         });
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.say.name} ${testMessage}`);
+        sayEvent(player, testMessage);
         await system.waitTicks(5);
 
         system.afterEvents.scriptEventReceive.unsubscribe(unsubscribe);

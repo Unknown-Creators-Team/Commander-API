@@ -1,7 +1,7 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
 import Vector from "lib/Vector.js";
+import shootEvent from "../../scriptevents/shoot.js";
 
 new Test("scriptevent_shoot", "empty")
     .initialize((player) => {})
@@ -16,7 +16,7 @@ new Test("scriptevent_shoot", "empty")
 
         const beforeCount = player.dimension.getEntities({ type: "minecraft:arrow", location: originalLocation, maxDistance: 10 }).length;
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.shoot.name} ${JSON.stringify(shootData)}`);
+        shootEvent(player, JSON.stringify(shootData));
         await system.waitTicks(20);
 
         const afterCount = player.dimension.getEntities({ type: "minecraft:arrow", location: originalLocation, maxDistance: 10 }).length;

@@ -26,6 +26,7 @@ new Test("item_use", "empty")
                     throw new Error(`Test Failed: \n\tHas Item Use Tag: ${hasItemUseTag}\n\tHas Item ID Tag: ${hasItemIdTag}`);
                 }
 
+                world.afterEvents.itemUse.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

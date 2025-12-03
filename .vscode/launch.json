@@ -12,9 +12,10 @@
             "host": "localhost",
             "port": 19144,
 
-            "localRoot": "${workspaceFolder}/src",
-            "generatedSourceRoot": "${workspaceFolder}/scripts",
-            "sourceMapRoot": "${workspaceFolder}/scripts"
+            "localRoot": "${workspaceFolder}/scripts/",
+            "generatedSourceRoot": "${workspaceFolder}/scripts/",
+            "sourceMapRoot": "${workspaceFolder}/scripts/",
+            "targetModuleUuid": "21e93e66-928c-4f5b-a552-9b3709fd58f7"
         }
     ]
 }

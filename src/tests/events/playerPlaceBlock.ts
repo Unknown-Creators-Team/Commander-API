@@ -33,6 +33,7 @@ new Test("player_place_block", "empty")
                     );
                 }
 
+                world.afterEvents.playerPlaceBlock.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

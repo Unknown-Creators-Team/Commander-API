@@ -1,6 +1,7 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
 import config from "data/config.js";
+import impluse from "../../scriptevents/impulse.js";
 
 new Test("scriptevent_impulse", "empty")
     .initialize((player) => {})
@@ -12,7 +13,7 @@ new Test("scriptevent_impulse", "empty")
         
         const entity = player.dimension.spawnEntity("minecraft:cow", originalLocation);
 
-        entity.runCommand(`scriptevent capi:${config.scriptevents.impulse.name} ${JSON.stringify(impulseData)}`);
+        impluse(entity, JSON.stringify(impulseData));
         await system.waitTicks(10);
 
         const newLocation = entity.location;

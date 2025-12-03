@@ -1,4 +1,4 @@
-import { PressurePlatePopAfterEvent, system, world } from "@minecraft/server";
+import { PressurePlatePopAfterEvent, PressurePlatePushAfterEvent, system, world, WorldAfterEvents } from "@minecraft/server";
 import Test from "lib/Test.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import config from "data/config.js";
@@ -9,34 +9,17 @@ new Test("pressure_plate_pop", "empty")
         const plateLocation = {
             x: Math.floor(player.location.x),
             y: Math.floor(player.location.y),
-            z: Math.floor(player.location.z) + 2,
+            z: Math.floor(player.location.z) + 1,
         };
         dimension.setBlockType(plateLocation, "minecraft:stone_pressure_plate");
     })
     .run(async (player) => {
-        const plateLocation = {
-            x: Math.floor(player.location.x),
-            y: Math.floor(player.location.y),
-            z: Math.floor(player.location.z) + 2,
-        };
-
-        // まずプレートに乗る
-        player.moveToBlock(plateLocation);
-        await system.waitTicks(10);
-
-        // プレートから離れる
-        const awayLocation = {
-            x: Math.floor(player.location.x),
-            y: Math.floor(player.location.y),
-            z: Math.floor(player.location.z) - 2,
-        };
-
         let timeout: number;
         await new Promise((resolve, reject) => {
             async function event({ block }: PressurePlatePopAfterEvent) {
                 await system.waitTicks(1);
 
-                const entities = block.dimension.getEntities({ location: block.location, maxDistance: 1 });
+                const entities = block.dimension.getEntities({ location: block.location, maxDistance: 1.5 });
                 const nearbyPlayer = entities.find((e) => e.isPlayer() && e.id === player.id);
 
                 if (!nearbyPlayer) return;
@@ -54,13 +37,24 @@ new Test("pressure_plate_pop", "empty")
                 resolve(undefined);
             }
 
+            // 踏んだあとに戻るため
+            async function pushEvent({ source: evPlayer }: PressurePlatePushAfterEvent) {
+                if (evPlayer.id === player.id) {
+                    player.move(0, -1);
+                    await system.waitTicks(3);
+                    player.stopMoving();
+                }
+            }
+
             world.afterEvents.pressurePlatePop.subscribe(event);
+            world.afterEvents.pressurePlatePush.subscribe(pushEvent);
             timeout = system.runTimeout(() => {
                 world.afterEvents.pressurePlatePop.unsubscribe(event);
+                world.afterEvents.pressurePlatePush.unsubscribe(pushEvent);
                 reject(new Error("Timeout waiting for pressurePlatePop event"));
             }, 300);
 
-            player.moveToBlock(awayLocation);
+            player.move(0, 1);
         });
     })
     .register();

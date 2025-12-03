@@ -1,6 +1,6 @@
 import { system, world } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import kill from "../../scriptevents/kill.js";
 
 new Test("scriptevent_kill", "empty")
     .initialize((player) => {})
@@ -13,7 +13,7 @@ new Test("scriptevent_kill", "empty")
             }
         });
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.kill.name}`);
+        kill(player, "");
         await system.waitTicks(10);
 
         world.afterEvents.entityDie.unsubscribe(unsubscribe);

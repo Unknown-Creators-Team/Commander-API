@@ -1,7 +1,7 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
 import Vector from "lib/Vector.js";
+import explosion from "../../scriptevents/explosion.js";
 
 new Test("scriptevent_explosion", "empty")
     .initialize((player) => {})
@@ -17,7 +17,8 @@ new Test("scriptevent_explosion", "empty")
             radius: 2,
         };
 
-        player.runCommand(`scriptevent capi:${config.scriptevents.explosion.name} ${JSON.stringify(explosionData)}`);
+        explosion(player, JSON.stringify(explosionData));
+
         await system.waitTicks(20);
 
         const isBlockBroke = player.dimension.getBlock(explosionLocation.subtract([0, 2, 0]))?.typeId === "minecraft:air";

@@ -42,6 +42,7 @@ new Test("projectile_hit_entity", "empty")
                     );
                 }
 
+                world.afterEvents.projectileHitEntity.unsubscribe(event);
                 system.clearRun(timeout);
                 entity.remove();
                 resolve(undefined);

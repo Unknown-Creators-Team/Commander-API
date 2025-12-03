@@ -30,6 +30,7 @@ new Test("button_push", "button_push")
                     );
                 }
 
+                world.afterEvents.buttonPush.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

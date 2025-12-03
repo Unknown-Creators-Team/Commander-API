@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import config from "data/config.js";
+import screenEvent from "../../scriptevents/screen.js";
 
 new Test("scriptevent_screen", "empty")
     .initialize((player) => {})
@@ -11,7 +11,7 @@ new Test("scriptevent_screen", "empty")
         };
 
         // screen コマンドは実行できることを確認するだけ
-        player.runCommand(`scriptevent capi:${config.scriptevents.screen.name} ${JSON.stringify(screenData)}`);
+        screenEvent(player, JSON.stringify(screenData));
         await system.waitTicks(5);
 
         // エラーが発生しなければ成功
