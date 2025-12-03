@@ -43,8 +43,8 @@ export default function main(source: Entity | Block | undefined, message: string
                 });
                 ScoreboardUtils.setScore(source, "capi:msg_form", 1);
             }
-            if (object.btn2.text) {
-                form.lowerButton(object.btn2.text, () => {
+            if (object.btn2.txt) {
+                form.lowerButton(object.btn2.txt, () => {
                     if (object.btn2.act) runAction(source, object.btn2.act);
                 });
                 ScoreboardUtils.setScore(source, "capi:msg_form", 2);
@@ -187,7 +187,7 @@ namespace Form {
             act: actions | undefined;
         };
         btn2: {
-            text: string;
+            txt: string;
             act: actions | undefined;
         };
     }
