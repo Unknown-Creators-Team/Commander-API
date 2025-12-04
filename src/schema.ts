@@ -1,5 +1,4 @@
 import * as v from "lib/valibot.js";
-import { ItemLockMode } from "@minecraft/server";
 
 // ========================================
 // Form Schemas
@@ -152,7 +151,7 @@ export const TeleportSchema = v.object({
 export const SpawnEntitySchema = v.object({
     id: v.string(),
     name: v.optional(v.string()),
-    location: v.optional(v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])])),
+    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
     dimension: v.optional(v.string()),
     set_on_fire: v.optional(v.number()),
 });
