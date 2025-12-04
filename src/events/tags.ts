@@ -10,6 +10,18 @@ tickEvent.subscribe("tags", () => {
             else player.removeTag(`capi:${config.events.isOp.name}`);
         }
 
+        //? is member
+        if (config.events.isMember.enabled) {
+            if (player.playerPermissionLevel === PlayerPermissionLevel.Member) player.addTag(`capi:${config.events.isMember.name}`);
+            else player.removeTag(`capi:${config.events.isMember.name}`);
+        }
+
+        //? is visitor
+        if (config.events.isVisitor.enabled) {
+            if (player.playerPermissionLevel === PlayerPermissionLevel.Visitor) player.addTag(`capi:${config.events.isVisitor.name}`);
+            else player.removeTag(`capi:${config.events.isVisitor.name}`);
+        }
+
         //? is flying
         if (config.events.isFlying.enabled) {
             if (player.isFlying) player.addTag(`capi:${config.events.isFlying.name}`);
