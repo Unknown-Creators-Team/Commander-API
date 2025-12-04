@@ -1,4 +1,4 @@
-import { Player, system } from "@minecraft/server";
+import { system } from "@minecraft/server";
 import config from "../data/config.js";
 
 const cache: Map<string, CallableFunction> = new Map();

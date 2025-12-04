@@ -1,10 +1,9 @@
 import { Block, Entity } from "@minecraft/server";
-import * as v from "lib/valibot.js";
 import config from "data/config.js";
-import { Macro } from "lib/Macro.js";
 import { ItemStackUtils } from "lib/ScriptBoxMC.js";
+import * as v from "lib/valibot.js";
 import { parseFormat, removeTagsStartsWith } from "util.js";
-import { GetItemSchema, type GetItem } from "../schema.js";
+import { GetItemSchema } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot run command as a non-player entity.");

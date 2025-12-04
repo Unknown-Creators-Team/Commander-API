@@ -1,6 +1,5 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
-import ESON from "lib/ESON.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import { propertyArray, removeTagsStartsWith } from "util.js";
 

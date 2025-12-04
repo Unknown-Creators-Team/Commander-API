@@ -1,8 +1,8 @@
 import { Block, Entity, world } from "@minecraft/server";
 import * as v from "lib/valibot.js";
-import { format, bothParse, parsePos, parseFormat } from "../util.js";
 import Vector from "lib/Vector.js";
-import { TeleportSchema, type Teleport } from "../schema.js";
+import { TeleportSchema } from "../schema.js";
+import { parseFormat, parsePos } from "../util.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isEntity()) throw new Error("Cannot teleport a non-entity.");

@@ -1,7 +1,6 @@
 import { world } from "@minecraft/server";
-import ESON from "../lib/ESON.js";
-import { propertyArray, removeTagsStartsWith } from "util.js";
 import config from "data/config.js";
+import { propertyArray, removeTagsStartsWith } from "util.js";
 
 world.afterEvents.itemUse.subscribe((itemUse) => {
     const { source: player, itemStack: item } = itemUse;

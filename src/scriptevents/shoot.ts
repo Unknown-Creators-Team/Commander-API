@@ -1,8 +1,8 @@
-import { Block, Entity, Vector3, world } from "@minecraft/server";
+import { Block, Entity, world } from "@minecraft/server";
 import * as v from "lib/valibot.js";
-import { format, bothParse, parsePos, parseFormat } from "../util.js";
 import Vector from "lib/Vector.js";
-import { ShootSchema, type Shoot } from "../schema.js";
+import { ShootSchema } from "../schema.js";
+import { parseFormat, parsePos } from "../util.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     const parsed = parseFormat(message, source);

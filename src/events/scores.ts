@@ -1,10 +1,10 @@
-import { Block, Entity, world } from "@minecraft/server";
-import tickEvent from "../lib/TickEvent.js";
-import { removeTagsStartsWith } from "util.js";
+import { world } from "@minecraft/server";
+import config from "data/config.js";
 import { FMath } from "lib/FastMath.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import config from "data/config.js";
 import Vector from "lib/Vector.js";
+import { removeTagsStartsWith } from "util.js";
+import tickEvent from "../lib/TickEvent.js";
 
 tickEvent.subscribe("scores", () => {
     for (const player of world.getAllPlayers()) {
