@@ -171,7 +171,7 @@ export const SpawnItemSchema = v.object({
     can_destroy: v.optional(v.array(v.string())),
     lock: v.optional(v.string()),
     keep_on_death: v.optional(v.boolean()),
-    location: v.optional(v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])])),
+    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
     dimension: v.optional(v.string()),
     clear_velocity: v.optional(v.boolean()),
 });
