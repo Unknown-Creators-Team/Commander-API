@@ -56,7 +56,7 @@ const ActionFormSchema = v.object({
 });
 
 // Form Message
-const MessageFormSchema = v.object({
+export const MessageFormSchema = v.object({
     typ: v.union([v.literal("msg"), v.literal("message")]),
     ttl: v.string(),
     bdy: v.string(),
