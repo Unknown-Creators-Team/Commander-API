@@ -248,3 +248,16 @@ export function removeTagsStartsWith(player: Minecraft.Player, ...tags: string[]
 export function propertyArray(object: Record<string, string | undefined>): string[] {
     return Object.entries(object).map(([key, value]) => `${key}:${value ?? "NULL"}`);
 }
+
+
+export function flattenObject<T extends string | number | boolean | symbol | undefined>(obj: any, parent = ""): Record<string, T> {
+    return Object.keys(obj).reduce((acc, key) => {
+        const sneaky = key.replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`);
+        const value = obj[key];
+        const path = parent ? `${parent}.${sneaky}` : sneaky;
+        if (typeof value === "object") {
+            return { ...acc, ...flattenObject(value, path) };
+        }
+        return { ...acc, [path]: value };
+    }, {});
+}

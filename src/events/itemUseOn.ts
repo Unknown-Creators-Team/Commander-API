@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { propertyArray, removeTagsStartsWith } from "util.js";
+import { flattenObject, removeTagsStartsWith } from "util.js";
 
 world.afterEvents.itemStartUseOn.subscribe(async (itemUseOn) => {
     const { source: player, itemStack: item, block } = itemUseOn;
@@ -23,7 +23,9 @@ world.afterEvents.itemStartUseOn.subscribe(async (itemUseOn) => {
 
     player.addTagWillRemove(`capi:${config.events.itemUseOn.name}`);
 
-    for (const value of propertyArray(data)) {
-        player.addTagWillRemove(`${config.events.itemUseOn.name}.${value}`);
+    for (const [key, value] of Object.entries(flattenObject(data))) {
+        if(value === undefined || value === null) continue;
+
+        player.addTagWillRemove(`${config.events.itemUseOn.name}.${key}:${value?.toString()}`);
     }
 });
