@@ -222,6 +222,11 @@ export const CallSchema = v.object({
     args: v.optional(v.record(v.string(), v.any())),
 });
 
+export const DelaySchema = v.object({
+    command: v.string(),
+    ticks: v.number(),
+});
+
 // ========================================
 // Type Exports
 // ========================================
@@ -239,3 +244,4 @@ export type Screen = v.InferOutput<typeof ScreenSchema>;
 export type SetItem = v.InferOutput<typeof SetItemSchema>;
 export type GetItem = v.InferOutput<typeof GetItemSchema>;
 export type Call = v.InferOutput<typeof CallSchema>;
+export type Delay = v.InferOutput<typeof DelaySchema>;
