@@ -20,5 +20,5 @@ export default function main(source: Entity | Block | undefined, message: string
     if (object.fire) entity.setOnFire(object.fire);
     if (object.nameTag) entity.nameTag = object.nameTag;
 
-    entity.applyImpulse(Vector.multiply(vector, speed));
+    entity.applyImpulse(Vector.multiply(vector.normalize(), speed));
 }

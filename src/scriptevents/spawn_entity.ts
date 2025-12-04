@@ -30,5 +30,5 @@ export default function main(source: Entity | Block | undefined, message: string
 
     const entity = dimension.spawnEntity<string>(object.id, location);
     if (object.name) entity.nameTag = object.name;
-    if (object.set_on_fire) entity.setOnFire(parseInt(object.set_on_fire.toString()));
+    if (object.fire) entity.setOnFire(object.fire);
 }

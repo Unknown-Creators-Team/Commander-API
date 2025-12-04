@@ -1,5 +1,4 @@
 import * as v from "lib/valibot.js";
-import { ItemLockMode } from "@minecraft/server";
 
 // ========================================
 // Form Schemas
@@ -57,7 +56,7 @@ const ActionFormSchema = v.object({
 });
 
 // Form Message
-const MessageFormSchema = v.object({
+export const MessageFormSchema = v.object({
     typ: v.union([v.literal("msg"), v.literal("message")]),
     ttl: v.string(),
     bdy: v.string(),
@@ -152,9 +151,9 @@ export const TeleportSchema = v.object({
 export const SpawnEntitySchema = v.object({
     id: v.string(),
     name: v.optional(v.string()),
-    location: v.optional(v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])])),
+    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
     dimension: v.optional(v.string()),
-    set_on_fire: v.optional(v.number()),
+    fire: v.optional(v.number()),
 });
 
 const EnchantmentSchema = v.object({
@@ -172,7 +171,7 @@ export const SpawnItemSchema = v.object({
     can_destroy: v.optional(v.array(v.string())),
     lock: v.optional(v.string()),
     keep_on_death: v.optional(v.boolean()),
-    location: v.optional(v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])])),
+    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
     dimension: v.optional(v.string()),
     clear_velocity: v.optional(v.boolean()),
 });
