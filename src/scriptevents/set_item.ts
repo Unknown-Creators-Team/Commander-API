@@ -1,7 +1,7 @@
-import { Block, Entity, ItemStack, ItemLockMode, EnchantmentType } from "@minecraft/server";
+import { Block, Entity, ItemLockMode, ItemStack } from "@minecraft/server";
 import * as v from "lib/valibot.js";
-import { bothParse, format, parseFormat } from "../util.js";
-import { SetItemSchema, type SetItem } from "../schema.js";
+import { SetItemSchema } from "../schema.js";
+import { parseFormat } from "../util.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot set item to a non-player entity.");

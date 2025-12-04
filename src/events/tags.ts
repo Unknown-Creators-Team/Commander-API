@@ -1,6 +1,6 @@
 import { GraphicsMode, PlatformType, PlayerPermissionLevel, world } from "@minecraft/server";
-import tickEvent from "../lib/TickEvent.js";
 import config from "data/config.js";
+import tickEvent from "../lib/TickEvent.js";
 
 tickEvent.subscribe("tags", () => {
     for (const player of world.getAllPlayers()) {

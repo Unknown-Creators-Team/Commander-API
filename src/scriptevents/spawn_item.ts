@@ -1,8 +1,8 @@
-import { Block, Entity, ItemStack, ItemLockMode, EnchantmentType, world } from "@minecraft/server";
+import { Block, Entity, ItemLockMode, ItemStack, world } from "@minecraft/server";
 import * as v from "lib/valibot.js";
-import { bothParse, parsePos, format, parseFormat } from "../util.js";
 import Vector from "lib/Vector.js";
-import { SpawnItemSchema, type SpawnItem } from "../schema.js";
+import { SpawnItemSchema } from "../schema.js";
+import { parseFormat, parsePos } from "../util.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     // const object: ItemObject = bothParse(message);

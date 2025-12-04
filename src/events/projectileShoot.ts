@@ -1,6 +1,5 @@
-import { BlockVolume, Entity, Player, system, world } from "@minecraft/server";
+import { BlockVolume, Entity, Player, world } from "@minecraft/server";
 import config from "data/config.js";
-import { FMath } from "lib/FastMath.js";
 import Vector from "lib/Vector.js";
 import { propertyArray, removeTagsStartsWith } from "util.js";
 

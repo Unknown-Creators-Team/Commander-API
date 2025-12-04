@@ -1,8 +1,8 @@
 import { Block, Entity } from "@minecraft/server";
 import * as v from "lib/valibot.js";
-import { isTrue, parseFormat } from "../util.js";
 import Vector from "lib/Vector.js";
-import { ImpulseSchema, type Impulse } from "../schema.js";
+import { ImpulseSchema } from "../schema.js";
+import { parseFormat } from "../util.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isEntity()) throw new Error("Cannot apply impulse to a non-entity.");

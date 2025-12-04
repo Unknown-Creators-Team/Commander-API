@@ -1,5 +1,4 @@
 import { Block, Entity } from "@minecraft/server";
-import { format } from "../util.js";
 import { Macro } from "lib/Macro.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {

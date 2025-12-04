@@ -1,12 +1,8 @@
 import { Block, Entity, Player, world } from "@minecraft/server";
-import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
+import { ActionFormBox, MessageFormBox, ModalFormBox, ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import * as v from "lib/valibot.js";
+import { FormSchema, type Form, type FormActions } from "../schema.js";
 import { parseFormat } from "../util.js";
-import { ActionFormBox } from "lib/ScriptBoxMC.js";
-import { MessageFormBox } from "lib/ScriptBoxMC.js";
-import { ModalFormBox } from "lib/ScriptBoxMC.js";
-import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { FormSchema, FormActionsSchema, type Form, type FormActions } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot use this script event in non-player entity.");

@@ -1,4 +1,4 @@
-import { Block, Entity, ExplosionOptions, Player } from "@minecraft/server";
+import { Block, Entity } from "@minecraft/server";
 import Test from "lib/Test.js";
 import Vector from "lib/Vector.js";
 

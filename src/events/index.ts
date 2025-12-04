@@ -1,4 +1,3 @@
-import { world } from "@minecraft/server";
 import config from "../data/config.js";
 
 const start = Date.now();

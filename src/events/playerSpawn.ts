@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
-import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import config from "data/config.js";
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 
 world.afterEvents.playerSpawn.subscribe(async (playerSpawn) => {
     const { player, initialSpawn } = playerSpawn;

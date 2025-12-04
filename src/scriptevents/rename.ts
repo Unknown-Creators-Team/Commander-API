@@ -1,8 +1,8 @@
 import { Block, Entity } from "@minecraft/server";
-import { format } from "../util.js";
+import { Macro } from "lib/Macro.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot rename a non-player entity.");
 
-    source.nameTag = format(source, message) ?? message;
+    source.nameTag = Macro.format(source, message) ?? message;
 }

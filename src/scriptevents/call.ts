@@ -1,9 +1,9 @@
 import { Block, Entity, world } from "@minecraft/server";
-import * as v from "lib/valibot.js";
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 import { Macro } from "lib/Macro.js";
+import * as v from "lib/valibot.js";
 import { parseFormat } from "util.js";
-import { CallSchema, type Call } from "../schema.js";
+import { CallSchema } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     const parsed = parseFormat(message, source);
