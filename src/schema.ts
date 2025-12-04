@@ -153,7 +153,7 @@ export const SpawnEntitySchema = v.object({
     name: v.optional(v.string()),
     location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
     dimension: v.optional(v.string()),
-    set_on_fire: v.optional(v.number()),
+    fire: v.optional(v.number()),
 });
 
 const EnchantmentSchema = v.object({
