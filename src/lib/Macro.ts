@@ -141,13 +141,13 @@ export namespace Macro {
                 z: selector.dz ?? 1,
             };
         }
-        if (selector.tag) (selector.tags ??= []).push(selector.tag);
+        if (selector.tag) (options.tags ??= []).push(selector.tag);
         if (selector.tags) {
             for (const tag of selector.tags) {
                 if (tag.startsWith("!")) {
-                    options.excludeTags = [tag.slice(1)];
+                    (options.excludeTags ??= []).push(tag.slice(1));
                 } else {
-                    options.tags = [tag];
+                    (options.tags ??= []).push(tag);
                 }
             }
         }

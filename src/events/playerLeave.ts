@@ -8,4 +8,6 @@ world.afterEvents.playerLeave.subscribe(async (playerLeave) => {
         const msg = config.others.leave.message.replace("{name}", name);
         world.sendMessage(msg);
     }
+
+    console.log(`Player ${name} left the game`);
 });

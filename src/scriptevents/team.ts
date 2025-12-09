@@ -6,5 +6,11 @@ export default function main(source: Entity | Block | undefined, message: string
 
     const team = Macro.format(source, message);
 
-    source.setProperty("capi:team", parseInt(team));
+    console.warn(`Team set to: ${team}`);
+
+    if (team) {
+        source.setProperty("capi:team", parseInt(team));
+    } else {
+        source.resetProperty("capi:team");
+    }
 }

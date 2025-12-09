@@ -14,4 +14,8 @@ world.afterEvents.playerSpawn.subscribe(async (playerSpawn) => {
     if (initialSpawn) {
         player.addTagWillRemove(`capi:${config.events.playerSpawn.name}_initial`);
     }
+
+    console.log(
+        `Player ${player.name} spawned at (${player.location.x}, ${player.location.y}, ${player.location.z})${initialSpawn ? " (initial)" : ""}`
+    );
 });

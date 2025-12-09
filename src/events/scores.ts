@@ -1,4 +1,4 @@
-import { world } from "@minecraft/server";
+import { Difficulty, system, world } from "@minecraft/server";
 import config from "data/config.js";
 import { FMath } from "lib/FastMath.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
@@ -142,6 +142,55 @@ tickEvent.subscribe("scores", () => {
         }
     }
 
+    //? time of day
+    if (config.events.timeOfDay.enabled) {
+        ScoreboardUtils.setScore(config.events.timeOfDay.name, "capi:world", world.getTimeOfDay());
+    }
+
+    //? day
+    if (config.events.day.enabled) {
+        ScoreboardUtils.setScore(config.events.day.name, "capi:world", world.getDay());
+    }
+
+    //? absolute time
+    if (config.events.absoluteTime.enabled) {
+        ScoreboardUtils.setScore(config.events.absoluteTime.name, "capi:world", world.getAbsoluteTime());
+    }
+
+    //? default spawn location
+    if (config.events.defaultSpawnLocation.enabled) {
+        const defaultSpawnLocation = world.getDefaultSpawnLocation();
+        ScoreboardUtils.setScore(`${config.events.defaultSpawnLocation.name}_x`, "capi:world", defaultSpawnLocation.x);
+        ScoreboardUtils.setScore(`${config.events.defaultSpawnLocation.name}_y`, "capi:world", defaultSpawnLocation.y);
+        ScoreboardUtils.setScore(`${config.events.defaultSpawnLocation.name}_z`, "capi:world", defaultSpawnLocation.z);
+    }
+
+    //? difficulty
+    if (config.events.difficulty.enabled) {
+        const difficulties = [Difficulty.Peaceful, Difficulty.Easy, Difficulty.Normal, Difficulty.Hard];
+        ScoreboardUtils.setScore(config.events.difficulty.name, "capi:world", difficulties.indexOf(world.getDifficulty()));
+    }
+
+    //? is hardcore
+    if (config.events.isHardcore.enabled) {
+        ScoreboardUtils.setScore(config.events.isHardcore.name, "capi:world", world.isHardcore ? 1 : 0);
+    }
+
+    //? current tick
+    if (config.events.currentTick.enabled) {
+        ScoreboardUtils.setScore(config.events.currentTick.name, "capi:world", system.currentTick);
+    }
+
+    //? is editor world
+    if (config.events.isEditorWorld.enabled) {
+        ScoreboardUtils.setScore(config.events.isEditorWorld.name, "capi:world", system.isEditorWorld ? 1 : 0);
+    }
+
+    //? system memory tier
+    if (config.events.systemMemoryTier.enabled) {
+        ScoreboardUtils.setScore(config.events.systemMemoryTier.name, "capi:world", system.serverSystemInfo.memoryTier);
+    }
+
     // const entities = [
     //     ...world.getDimension("overworld").getEntities({ tags: ["capi:trace"] }),
     //     ...world.getDimension("nether").getEntities({ tags: ["capi:trace"] }),
@@ -162,3 +211,4 @@ tickEvent.subscribe("scores", () => {
     //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_z`, FMath.floor(location.z));
     // }
 });
+

@@ -22,12 +22,11 @@ new Test("chat_send", "empty")
                 const chatCount = ScoreboardUtils.getScore(player, `capi:${config.events.chatSend.name}_cnt`);
 
                 if (!hasChatTag || !hasMessageTag || messageLength !== testMessage.length || chatCount === undefined) {
-                    throw new Error(
+                    return reject(new Error(
                         `Test Failed: \n\tHas Chat Tag: ${hasChatTag}\n\tHas Message Tag: ${hasMessageTag}\n\tMessage Length: ${messageLength} (expected ${testMessage.length})\n\tChat Count: ${chatCount}`
-                    );
+                    ));
                 }
 
-                world.beforeEvents.chatSend.unsubscribe(event);
                 system.clearRun(timeout);
                 resolve(undefined);
             }

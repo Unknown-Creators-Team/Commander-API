@@ -17,20 +17,12 @@ import * as Minecraft from "@minecraft/server";
 import { Macro } from "lib/Macro.js";
 import ESON from "./lib/ESON.js";
 
-export const safeParse = <T extends Object>(object: string): T => {
-    return JSON.parse(object);
-};
-
-export const easySafeParse = (object: string): any => {
-    return ESON.parse(object);
-};
-
 export function bothParse(object: string): any {
     try {
-        return safeParse(object);
+        return JSON.parse(object);
     } catch {
         try {
-            return easySafeParse(object);
+            return ESON.parse(object);
         } catch {
             throw new Error("Failed to parse object");
         }
@@ -179,58 +171,6 @@ export function calculate(expression: string): number {
     });
 
     return calculationStack.pop()!;
-}
-
-// export function getScore(target: Minecraft.Entity | string, objective: string): number | undefined {
-//     // if target is a string, get the score by name
-//     if (typeof target === "string") {
-//         // get all scores in the objective
-//         const scores = world.scoreboard.getObjective(objective)?.getScores();
-//         // find the score with the matching name
-//         const score = scores?.find(({ participant }) => participant.displayName === target)?.score;
-//         // return the score value
-//         if (typeof score === "number") return score;
-//         else return undefined;
-//     } else {
-//         // if target is a player, get the score by player
-//         try {
-//             // get the score by player
-//             const score = world.scoreboard.getObjective(objective)?.getScore(target);
-//             // return the score value
-//             if (typeof score === "number") return score;
-//             else return undefined;
-//         } catch (e) {
-//             return undefined;
-//         }
-//     }
-// }
-
-// export function setScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
-//     const object = world.scoreboard.getObjective(objective);
-//     if (!object) {
-//         world.scoreboard.addObjective(objective);
-//         return setScore(target, objective, score);
-//     }
-
-//     score = FMath.max(FMath.min(score, 2 ** 31 - 1), (-2) ** 31);
-//     object.setScore(target, score);
-// }
-
-// export function addScore(target: Minecraft.Entity | Minecraft.ScoreboardIdentity | string, objective: string, score: number): void {
-//     const object = world.scoreboard.getObjective(objective);
-//     if (!object) {
-//         world.scoreboard.addObjective(objective);
-//         return addScore(target, objective, score);
-//     }
-
-//     object.addScore(target, score);
-// }
-
-export function isTrue(value: any): boolean {
-    if (typeof value === "boolean") return value;
-    if (typeof value === "string") return value.toLowerCase() === "true";
-    if (typeof value === "number") return value === 1;
-    return false;
 }
 
 export function promiseDelay(callback: (...value: any[]) => any, ...value: any[]): void {

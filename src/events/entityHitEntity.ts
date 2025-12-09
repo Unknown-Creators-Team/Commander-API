@@ -14,5 +14,6 @@ world.afterEvents.entityHitEntity.subscribe((entityHitEntity) => {
         removeTagsStartsWith(player, `${config.events.entityHitEntity.name}:`);
         player.addTagWillRemove(`capi:${config.events.entityHitEntity.name}`);
         player.addTagWillRemove(`${config.events.entityHitEntity.name}:${entity.typeId}`);
+        console.log(`Player ${player.name} hit entity ${entity.typeId} at (${entity.location.x}, ${entity.location.y}, ${entity.location.z})`);
     }
 });

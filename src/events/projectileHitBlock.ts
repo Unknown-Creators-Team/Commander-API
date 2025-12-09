@@ -26,5 +26,7 @@ world.afterEvents.projectileHitBlock.subscribe((projectileHit) => {
         for (const value of propertyArray(data)) {
             player.addTagWillRemove(`${config.events.projectileHitBlock.name}.${value}`);
         }
+
+        console.log(`Player ${player.name}'s projectile ${projectile.typeId} hit block ${block.typeId} at (${block.x}, ${block.y}, ${block.z})`);
     }
 });

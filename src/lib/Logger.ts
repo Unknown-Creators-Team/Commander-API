@@ -5,7 +5,7 @@ export function log(...messages: unknown[]) {
     if (!config.basic.debug.log) return;
     for (const player of world.getAllPlayers()) {
         if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
-            player.sendMessage(`[Scripting][log]-${messages.join(" ")}`);
+            player.sendMessage(`[CAPI][log]-${messages.join(" ")}`);
         }
     }
 }
@@ -14,7 +14,7 @@ export function info(...messages: unknown[]) {
     if (!config.basic.debug.info) return;
     for (const player of world.getAllPlayers()) {
         if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
-            player.sendMessage(`§b[Scripting][info]-${messages.join(" ")}`);
+            player.sendMessage(`§b[CAPI][info]-${messages.join(" ")}`);
         }
     }
 }
@@ -23,7 +23,7 @@ export function warn(...messages: unknown[]) {
     if (!config.basic.debug.warn) return;
     for (const player of world.getAllPlayers()) {
         if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
-            player.sendMessage(`§e[Scripting][warning]-${messages.join(" ")}`);
+            player.sendMessage(`§e[CAPI][warning]-${messages.join(" ")}`);
         }
     }
 }
@@ -32,7 +32,7 @@ export function error(...messages: unknown[]) {
     if (!config.basic.debug.error) return;
     for (const player of world.getAllPlayers()) {
         if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
-            player.sendMessage(`§c[Scripting][error]-${messages.join(" ")}`);
+            player.sendMessage(`§c[CAPI][error]-${messages.join(" ")}`);
         }
     }
 }

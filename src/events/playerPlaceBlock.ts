@@ -14,4 +14,6 @@ world.afterEvents.playerPlaceBlock.subscribe((blockPlace) => {
 
     player.addTagWillRemove(`capi:${config.events.playerPlaceBlock.name}`);
     player.addTagWillRemove(`${config.events.playerPlaceBlock.name}:${block.typeId}`);
+
+    console.log(`Player ${player.name} placed block ${block.typeId} at (${block.location.x}, ${block.location.y}, ${block.location.z})`);
 });

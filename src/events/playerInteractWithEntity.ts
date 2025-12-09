@@ -15,4 +15,6 @@ world.afterEvents.playerInteractWithEntity.subscribe((playerInteractWithEntity) 
 
     player.addTagWillRemove(`capi:${config.events.playerInteractWithEntity}`);
     player.addTagWillRemove(`${config.events.playerInteractWithEntity}:${entity.typeId}`);
+
+    console.log(`Player ${player.name} interacted with entity ${entity.typeId}`);
 });

@@ -13,5 +13,7 @@ world.afterEvents.pressurePlatePop.subscribe((pressurePlatePop) => {
         ScoreboardUtils.setScore(entity, `capi:${config.events.pressurePlatePop.name}_z`, block.location.z);
 
         entity.addTagWillRemove(`capi:${config.events.pressurePlatePop.name}`);
+
+        console.log(`Player ${entity.name} released pressure plate at (${block.location.x}, ${block.location.y}, ${block.location.z})`);
     }
 });

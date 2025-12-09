@@ -15,4 +15,6 @@ world.afterEvents.playerInteractWithBlock.subscribe((playerInteractWithBlock) =>
 
     player.addTagWillRemove(`capi:${config.events.playerInteractWithBlock.name}`);
     player.addTagWillRemove(`${config.events.playerInteractWithBlock.name}:${block.typeId}`);
+
+    console.log(`Player ${player.name} interacted with block ${block.typeId} at (${x}, ${y}, ${z})`);
 });

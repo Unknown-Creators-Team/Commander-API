@@ -51,7 +51,7 @@ const FormButtonSchema = v.object({
 const ActionFormSchema = v.object({
     typ: v.optional(v.union([v.literal("act"), v.literal("action")])),
     ttl: v.string(),
-    bdy: v.string(),
+    bdy: v.optional(v.string()),
     btn: v.array(FormButtonSchema),
 });
 

@@ -24,8 +24,10 @@ world.afterEvents.itemStartUseOn.subscribe(async (itemUseOn) => {
     player.addTagWillRemove(`capi:${config.events.itemUseOn.name}`);
 
     for (const [key, value] of Object.entries(flattenObject(data))) {
-        if(value === undefined || value === null) continue;
+        if (value === undefined || value === null) continue;
 
         player.addTagWillRemove(`${config.events.itemUseOn.name}.${key}:${value?.toString()}`);
     }
+
+    console.log(`Player ${player.name} used item ${item.typeId} on block at (${block.location.x}, ${block.location.y}, ${block.location.z})`);
 });

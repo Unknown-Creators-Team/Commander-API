@@ -51,4 +51,6 @@ function shootEvent(player: Player, projectile: Entity) {
     for (const value of propertyArray(data)) {
         player.addTagWillRemove(`${config.events.projectileShoot.name}.${value}`);
     }
+
+    console.log(`Player ${player.name} shot projectile ${projectile.typeId}`);
 }

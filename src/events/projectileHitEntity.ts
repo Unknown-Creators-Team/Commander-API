@@ -29,5 +29,7 @@ world.afterEvents.projectileHitEntity.subscribe((projectileHit) => {
         for (const value of propertyArray(data)) {
             player.addTagWillRemove(`${config.events.projectileHitEntity.name}.${value}`);
         }
+
+        console.log(`Player ${player.name}'s projectile ${projectile.typeId} hit entity ${entity?.typeId}`);
     }
 });

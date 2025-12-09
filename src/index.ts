@@ -12,22 +12,9 @@
  * @LINK https://github.com/191225/Commander-API
  */
 
-// import "./NativeCode.js";
-// import "./lib/Logger.js";
-
 import * as Minecraft from "@minecraft/server";
-import * as MinecraftUI from "@minecraft/server-ui";
-
-import tickEvent from "./lib/TickEvent.js";
 import { CallsUI } from "ui/calls.js";
-// import { ConfigUI } from "ui/index.js";
-// import { UI } from "./ui.js";
-
-// import "./playground";
-// import "./events/index.js";
-// import "./scriptevents/index.js";
-// import("./checks/checkLoader.js");
-
+import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 const { world, system } = Minecraft;
 
 world.afterEvents.worldLoad.subscribe(async () => {
@@ -38,21 +25,7 @@ world.afterEvents.worldLoad.subscribe(async () => {
     import("./events/index.js");
     import("./scriptevents/index.js");
     import("./tests/index.js");
-    // import ("checks/blockBreak.js");
     const { ConfigUI } = await import("./ui/index.js");
-
-    // system.run(() => {
-    //     const msg = [
-    //         "§r",
-    //         "§lCommander API をご利用いただきありがとうございます。§r",
-    //         "§r",
-    //         "このアドオンは Commander API V2 の §l§c開発版§r です。",
-    //         "予期しないエラーや予告なく仕様が変更される可能性があります。",
-    //         "特別な事情が無い限り、本番環境での使用はお控えください。",
-    //         "§r",
-    //     ].join("\n");
-    //     world.sendMessage(msg);
-    // });
 
     system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => (beforeWatchdogTerminate.cancel = true));
 
@@ -68,4 +41,9 @@ world.afterEvents.worldLoad.subscribe(async () => {
         },
         { namespaces: ["capi"] }
     );
+
+    ScoreboardUtils.setScore("watchdog", "capi:world", 0);
+    system.runInterval(() => {
+        ScoreboardUtils.setScore("watchdog", "capi:world", 0);
+    }, 20);
 });

@@ -14,5 +14,6 @@ world.afterEvents.entityHitBlock.subscribe((entityHitBlock) => {
         removeTagsStartsWith(player, `${config.events.entityHitBlock.name}:`);
         player.addTagWillRemove(`capi:${config.events.entityHitBlock.name}`);
         player.addTagWillRemove(`${config.events.entityHitBlock.name}:${block.typeId}`);
+        console.log(`Player ${player.name} hit block ${block.typeId} at (${block.x}, ${block.y}, ${block.z})`);
     }
 });
