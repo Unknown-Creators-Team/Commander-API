@@ -12,6 +12,8 @@ world.afterEvents.tripWireTrip.subscribe((tripWireTrip) => {
             ScoreboardUtils.setScore(player, `capi:${config.events.tripWireTrip.name}_y`, block.y);
             ScoreboardUtils.setScore(player, `capi:${config.events.tripWireTrip.name}_z`, block.z);
             player.addTagWillRemove(`capi:${config.events.tripWireTrip.name}`);
+
+            console.log(`Player ${player.name} tripped trip wire at (${block.x}, ${block.y}, ${block.z})`);
         }
     });
 });

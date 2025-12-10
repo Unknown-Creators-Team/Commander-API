@@ -24,5 +24,6 @@ world.afterEvents.entityHurt.subscribe((entityHurt) => {
         removeTagsStartsWith(entity, "hurt_cause:");
         entity.addTagWillRemove("capi:hurt");
         entity.addTagWillRemove(`hurt_cause:${cause.toString()}`);
+        console.log(`Entity ${entity.typeId} hurt with ${damage} damage, cause: ${cause.toString()}`);
     }
 });

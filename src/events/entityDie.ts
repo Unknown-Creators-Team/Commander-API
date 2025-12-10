@@ -28,5 +28,6 @@ world.afterEvents.entityDie.subscribe((entityDie) => {
         ScoreboardUtils.setScore(entity, "capi:death_z", entity.location.z);
         entity.addTagWillRemove("capi:death");
         entity.addTagWillRemove(`die_cause:${cause}`);
+        console.log(`Entity died: ${entity.typeId} at (${entity.location.x}, ${entity.location.y}, ${entity.location.z}), cause: ${cause}`);
     }
 });

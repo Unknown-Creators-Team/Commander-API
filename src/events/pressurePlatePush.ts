@@ -11,5 +11,7 @@ world.afterEvents.pressurePlatePush.subscribe((pressurePlatePush) => {
         ScoreboardUtils.setScore(player, `capi:${config.events.pressurePlatePush.name}_z`, block.location.z);
 
         player.addTagWillRemove(`capi:${config.events.pressurePlatePush.name}`);
+
+        console.log(`Player ${player.name} pushed pressure plate at (${block.location.x}, ${block.location.y}, ${block.location.z})`);
     }
 });

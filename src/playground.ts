@@ -1,4 +1,5 @@
 import * as Minecraft from "@minecraft/server";
+import Vector from "lib/Vector.js";
 
 const { world, system } = Minecraft;
 
@@ -17,22 +18,3 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
     entity.applyImpulse(vector);
     // entity.applyKnockback()
 }, { namespaces: ["cpg"] });
-
-class Vector {
-    static add(v1: Minecraft.Vector3, v2: Minecraft.Vector3): Minecraft.Vector3 {
-        return { x: v1.x + v2.x, y: v1.y + v2.y, z: v1.z + v2.z };
-    }
-
-    static subtract(v1: Minecraft.Vector3, v2: Minecraft.Vector3): Minecraft.Vector3 {
-        return { x: v1.x - v2.x, y: v1.y - v2.y, z: v1.z - v2.z };
-    }
-
-    static multiply(v: Minecraft.Vector3, scalar: number): Minecraft.Vector3 {
-        return { x: v.x * scalar, y: v.y * scalar, z: v.z * scalar };
-    }
-
-    static normalize(v: Minecraft.Vector3): Minecraft.Vector3 {
-        const length = Math.hypot(v.x, v.y, v.z);
-        return { x: v.x / length, y: v.y / length, z: v.z / length };
-    }
-}

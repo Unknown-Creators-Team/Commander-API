@@ -9,7 +9,7 @@ world.afterEvents.itemUse.subscribe((itemUse) => {
         id: item.typeId,
         name: item.nameTag,
         amount: item.amount.toString(),
-        lore: item.getLore()
+        lore: item.getLore(),
     };
 
     removeTagsStartsWith(player, `${config.events.itemUse.name}.`);
@@ -17,8 +17,10 @@ world.afterEvents.itemUse.subscribe((itemUse) => {
     player.addTagWillRemove(`capi:${config.events.itemUse.name}`);
 
     for (const [key, value] of Object.entries(flattenObject(data))) {
-        if(value === undefined || value === null) continue;
+        if (value === undefined || value === null) continue;
 
         player.addTagWillRemove(`${config.events.itemUse.name}.${key}:${value?.toString()}`);
     }
+
+    console.log(`Player ${player.name} used item ${item.typeId}`);
 });

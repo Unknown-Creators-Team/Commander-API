@@ -14,4 +14,6 @@ world.afterEvents.playerBreakBlock.subscribe(async (blockBreak) => {
 
     player.addTagWillRemove(`capi:${config.events.playerBreakBlock.name}`);
     player.addTagWillRemove(`${config.events.playerBreakBlock.name}:${brokenBlockPermutation.type.id}`);
+
+    console.log(`Player ${player.name} broke block ${brokenBlockPermutation.type.id} at (${block.x}, ${block.y}, ${block.z})`);
 });

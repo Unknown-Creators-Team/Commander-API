@@ -20,7 +20,6 @@ export class BasicConfigUI {
                 label: "有効",
                 defaultValue: config.basic.tag.enabled,
                 callback: (_, value, all) => {
-                    console.warn(JSON.stringify(all))
                     this.config.basic.tag.enabled = value;
                 },
             })

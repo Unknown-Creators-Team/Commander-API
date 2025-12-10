@@ -1,7 +1,7 @@
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 
 export const original = Object.freeze({
-    format: 5,
+    format: 9,
     basic: {
         tag: {
             enabled: true,
@@ -206,6 +206,51 @@ export const original = Object.freeze({
             inline: true,
             name: "xp_earned_at_current_level",
         },
+        timeOfDay: {
+            enabled: true,
+            inline: true,
+            name: "time",
+        },
+        day: {
+            enabled: true,
+            inline: true,
+            name: "day",
+        },
+        absoluteTime: {
+            enabled: true,
+            inline: true,
+            name: "absolute_time",
+        },
+        defaultSpawnLocation: {
+            enabled: true,
+            inline: true,
+            name: "default_spawn_location",
+        },
+        difficulty: {
+            enabled: true,
+            inline: true,
+            name: "difficulty",
+        },
+        isHardcore: {
+            enabled: true,
+            inline: true,
+            name: "hardcore",
+        },
+        currentTick: {
+            enabled: true,
+            inline: true,
+            name: "current_tick",
+        },
+        isEditorWorld: {
+            enabled: true,
+            inline: true,
+            name: "editor_world",
+        },
+        systemMemoryTier: {
+            enabled: true,
+            inline: true,
+            name: "memory_tier",
+        },
         tags: {
             enabled: true,
             inline: false,
@@ -215,6 +260,16 @@ export const original = Object.freeze({
             enabled: true,
             inline: true,
             name: "op",
+        },
+        isMember: {
+            enabled: true,
+            inline: true,
+            name: "member",
+        },
+        isVisitor: {
+            enabled: true,
+            inline: true,
+            name: "visitor",
         },
         isFlying: {
             enabled: true,

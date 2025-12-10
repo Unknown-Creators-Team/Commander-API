@@ -69,6 +69,7 @@ export class CallsUI {
                     let err = this.checkCall();
                     if (err) return this.AddCall(err);
 
+                    this.call.commands = this.call.commands.map((v) => ((v = v.trim()), v.startsWith("/") ? v.slice(1) : v)).filter(Boolean);
                     this.calls.set(this.call.name, this.call.commands);
                     CallsUI.Open(this.player);
                 }

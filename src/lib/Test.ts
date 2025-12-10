@@ -81,7 +81,7 @@ export default class Test {
     public static runTest(name: string, location: Vector): void {
         if (!this.tests.includes(name)) throw new Error(`Test "${name}" is not registered.`);
         // /execute positioned 0 0 0 run gametest run testName
-        world.getDimension("overworld").runCommand(`execute @p ${location.add([0, 0, 1]).floor().toString()} gametest run capi:${name}`);
+        world.getDimension("overworld").runCommand(`execute positioned ${location.add([0, 0, 1]).floor().toString()} run gametest run capi:${name}`);
     }
 
     public static runAll(location: Vector): void {

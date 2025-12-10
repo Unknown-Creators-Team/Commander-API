@@ -29,8 +29,7 @@ export default function main(source: Entity | Block | undefined, message: string
             // Provide specific guidance based on form type
             if (formType === "act" || formType === "action") {
                 const missing: string[] = [];
-                if (!(parsed as any).ttl) missing.push("ttl (title)");
-                if (!(parsed as any).bdy) missing.push("bdy (body)");
+                if (!(parsed as any).ttl) missing.push("ttl (title)")
                 if (!(parsed as any).btn) missing.push("btn (buttons array)");
 
                 if (missing.length > 0) {

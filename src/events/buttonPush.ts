@@ -12,4 +12,6 @@ world.afterEvents.buttonPush.subscribe(async (buttonPush) => {
     ScoreboardUtils.setScore(player, `capi:${config.events.buttonPush.name}_y`, y);
     ScoreboardUtils.setScore(player, `capi:${config.events.buttonPush.name}_z`, z);
     player.addTagWillRemove(`capi:${config.events.buttonPush.name}`);
+
+    console.log(`Player ${player.name} pushed a button at (${x}, ${y}, ${z})`);
 });

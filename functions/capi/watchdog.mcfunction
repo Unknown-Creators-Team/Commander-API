@@ -1,0 +1,5 @@
+scoreboard objectives add capi:world dummy
+scoreboard players add watchdog capi:world 1
+execute if score watchdog capi:world matches 100.. run tellraw @a {"rawtext":[{"text":"§r\n\n\n§cCommander API が動作していません！以下の問題が原因である可能性があります。§r\n- ベータAPI (Beta APIs) が有効になっていない。\n  ワールド設定の 実験的機能 から有効にしてください。\n\n- Commander API 最新バージョンを使用していない。\n  Commander API の最新バージョンを配布サイトまたは GitHub から再ダウンロードしてください。マインクラフトをアップデートした後に発生する可能性があります。\n\n- その他予期しないエラー\n  Commander API で致命的なエラーが発生した可能性があります。サポートにお問い合わせください。\n\n§7Github: https://github.com/Unknown-Creators-Team/Commander-API\nコミュニティDiscord: https://discord.gg/uTqyqtHWG4\n開発元Discord: https://discord.gg/QF3n85dr4P\n公式ドキュメント: https://capi.un-known.xyz\n§r"}]}
+execute if score watchdog capi:world matches 100.. run scoreboard players set watchdog capi:world 0
+tellraw @s { "rawtext": [ { "text": "§cこの function は Commander API の内部処理用です。直接実行しないでください。§r\nサポートが必要ですか？ Discord に参加してください。\n\n§7Github: https://github.com/Unknown-Creators-Team/Commander-API\nコミュニティDiscord: https://discord.gg/uTqyqtHWG4\n開発元Discord: https://discord.gg/QF3n85dr4P\n公式ドキュメント: https://capi.un-known.xyz" } ] }

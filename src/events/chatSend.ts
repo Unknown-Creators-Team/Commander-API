@@ -21,6 +21,7 @@ world.beforeEvents.chatSend.subscribe((chat) => {
         player.addTagWillRemove(`${config.events.chatSend.name}:${message}`);
         ScoreboardUtils.setScore(player, `capi:${config.events.chatSend.name}_len`, message.length);
         ScoreboardUtils.addScore(player, `capi:${config.events.chatSend.name}_cnt`, 1);
+        console.log(`Player ${player.name} sent chat: ${message}`);
     });
 
     return;
