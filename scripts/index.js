@@ -1,3 +1,4 @@
+// @ts-check
 /**
  *
  * ░█████╗░░█████╗░███╗░░░███╗███╗░░░███╗░█████╗░███╗░░██╗██████╗░███████╗██████╗░  ░█████╗░██████╗░██╗
@@ -14,18 +15,15 @@
 
 import * as Minecraft from "@minecraft/server";
 import * as MinecraftUI from "@minecraft/server-ui";
-// import * as MinecraftVanilla from "@minecraft/vanilla-data";
 import Config from "./config.js";
 import ESON from "./lib/ESON.js";
 import tickEvent from "./lib/TickEvent.js";
+import Vector from "./lib/Vector.js";
 import "./NativeCode.js";
 import { UI } from "./ui.js";
 import { easySafeParse, getScore, parsePos, passingPrivilegeError, safeParse, setVariable } from "./util.js";
-import Vector from "./lib/Vector.js";
 
 const { world, system } = Minecraft;
-
-system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => (beforeWatchdogTerminate.cancel = true));
 
 tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
     try {
@@ -81,6 +79,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                 }
             });
 
+            /** @type { Minecraft.Entity | Minecraft.Block | undefined } */
             let view = player.getEntitiesFromViewDirection()[0]?.entity;
             try {
                 view ??= player.getBlockFromViewDirection()?.block;
@@ -183,7 +182,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             // Set slot
             try {
                 const setSlot = getScore(player, "Capi:setSlot");
-                if (setSlot >= 0) {
+                if (setSlot && setSlot >= 0) {
                     player.selectedSlotIndex = setSlot;
                     player.score.reset("Capi:setSlot");
                 }
@@ -192,14 +191,14 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             // Set item
             const container = player.getComponent("inventory").container;
             if (player.setItemJson)
-                player.setItemJson.forEach((setItemJson) => {
+                player.setItemJson.forEach((/** @type { any } */ setItemJson) => {
                     try {
                         const Data = easySafeParse(setItemJson);
                         if (!Data.item) return;
                         const amount = Data.amount ? Number(Data.amount) : 1;
                         const slot = Data.slot ? Number(Data.slot) : false;
                         const itemName = Data.item.replace("minecraft:", "");
-                        const item = new Minecraft.ItemStack(Minecraft.ItemTypes.get(itemName), amount);
+                        const item = new Minecraft.ItemStack(itemName, amount);
                         if (Data.name) item.nameTag = setVariable(player, Data.name);
                         if (Data.lore) {
                             for (let v in Data.lore) Data.lore[v] = setVariable(player, Data.lore[v]);
@@ -212,7 +211,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
                                 let enchantsName = Data.enchants[i].name;
                                 let enchantsLevel = 1;
                                 if (Data.enchants[i].level) enchantsLevel = Number(Data.enchants[i].level);
-                                enchantments.addEnchantment({ type: new Minecraft.EnchantmentType(enchantsName), level: enchantsLevel });
+                                enchantments?.addEnchantment({ type: new Minecraft.EnchantmentType(enchantsName), level: enchantsLevel });
                             }
                         }
                         if (Data.can_place_on) item.setCanPlaceOn(Data.can_place_on);
@@ -277,8 +276,7 @@ tickEvent.subscribe("main", ({ currentTick, deltaTime, tps }) => {
             // Kick
             if (player.kick) {
                 player
-                    .runCommand(`kick "${player.name}" ${setVariable(player, player.kick)}`)
-                    .catch((e) => world.sendMessage(`[${player.name}] §c${e}`));
+                    .runCommand(`kick "${player.name}" ${setVariable(player, player.kick)}`);
                 player.kick = false;
             }
 
@@ -401,7 +399,7 @@ world.afterEvents.entityHurt.subscribe((entityHurt) => {
     if (entity && entity.isPlayer()) {
         entity.score.set("Capi:hurt", Math.round(damage));
         entity.addTagWillRemove(`Capi:hurt`);
-        player.removeTags(player.getTags().filter((t) => t.startsWith("cause:")));
+        if(player) player.removeTags(player.getTags().filter((t) => t.startsWith("cause:")));
         entity.addTagWillRemove(`cause:${cause}`);
     }
     if (player && player.isPlayer()) {
@@ -427,55 +425,55 @@ world.afterEvents.entityDie.subscribe((entityDie) => {
     }
 
     if (entity.isPlayer()) {
-        if (!player.isPlayer()) {
+        if (player && !player.isPlayer()) {
             entity.score.add("Capi:death", 1);
             entity.addTagWillRemove("Capi:death");
         }
     }
 });
 
-world.beforeEvents.chatSend.subscribe((chat) => {
-    const player = chat.sender;
+// world.beforeEvents.chatSend.subscribe((chat) => {
+//     const player = chat.sender;
 
-    let msg = chat.message;
-    /** @type { string } */
-    let mute = false;
+//     let msg = chat.message;
+//     /** @type { string } */
+//     let mute = false;
 
-    player.getTags().forEach((t) => {
-        t = t.replace(/"/g, "");
-        if (t.startsWith("chat:")) system.run(() => player.removeTag(t));
-        if (t.startsWith("mute:")) mute = t.slice(5);
-    });
-    player.addTagWillRemove(`Capi:chat`);
-    player.addTagWillRemove(`chat:${msg.replace(/"/g, "")}`);
-    player.score.set("Capi:chatLength", msg.length);
-    player.score.add("Capi:chatCount", 1);
-    if (Config.get("CancelSendMsgEnabled")) {
-        const CancelSendMsg = Config.get("CancelSendMsg");
-        const start = CancelSendMsg?.start.some((v) => v.length && msg.startsWith(v));
-        const end = CancelSendMsg?.end.some((v) => v.length && msg.endsWith(v));
-        const include = CancelSendMsg?.include.some((v) => v.length && msg.includes(v));
-        if (start || end || include) return (chat.cancel = true);
-    }
-    if (mute || player.hasTag("mute")) {
-        player.sendMessage(mute.length ? mute : "§cYou have been muted.");
-        return (chat.cancel = true);
-    }
-    if (player.score.get("Capi:privatechat")) {
-        const resident = world.getPlayers().filter((p) => p.score.get("Capi:privatechat") === player.score.get("Capi:privatechat"));
+//     player.getTags().forEach((t) => {
+//         t = t.replace(/"/g, "");
+//         if (t.startsWith("chat:")) system.run(() => player.removeTag(t));
+//         if (t.startsWith("mute:")) mute = t.slice(5);
+//     });
+//     player.addTagWillRemove(`Capi:chat`);
+//     player.addTagWillRemove(`chat:${msg.replace(/"/g, "")}`);
+//     player.score.set("Capi:chatLength", msg.length);
+//     player.score.add("Capi:chatCount", 1);
+//     if (Config.get("CancelSendMsgEnabled")) {
+//         const CancelSendMsg = Config.get("CancelSendMsg");
+//         const start = CancelSendMsg?.start.some((v) => v.length && msg.startsWith(v));
+//         const end = CancelSendMsg?.end.some((v) => v.length && msg.endsWith(v));
+//         const include = CancelSendMsg?.include.some((v) => v.length && msg.includes(v));
+//         if (start || end || include) return (chat.cancel = true);
+//     }
+//     if (mute || player.hasTag("mute")) {
+//         player.sendMessage(mute.length ? mute : "§cYou have been muted.");
+//         return (chat.cancel = true);
+//     }
+//     if (player.score.get("Capi:privatechat")) {
+//         const resident = world.getPlayers().filter((p) => p.score.get("Capi:privatechat") === player.score.get("Capi:privatechat"));
 
-        resident.forEach((p) => {
-            p.sendMessage(`§i【プライベート】§r §l${player.name}§r §7>>§r ${msg}`);
-        });
+//         resident.forEach((p) => {
+//             p.sendMessage(`§i【プライベート】§r §l${player.name}§r §7>>§r ${msg}`);
+//         });
 
-        return (chat.cancel = true);
-    }
-    if (Config.get("ChatUIEnabled")) {
-        const text = setVariable(player, String(Config.get("ChatUI")));
-        world.sendMessage(text.replace(/({message}|{msg})/gi, msg));
-        return (chat.cancel = true);
-    }
-});
+//         return (chat.cancel = true);
+//     }
+//     if (Config.get("ChatUIEnabled")) {
+//         const text = setVariable(player, String(Config.get("ChatUI")));
+//         world.sendMessage(text.replace(/({message}|{msg})/gi, msg));
+//         return (chat.cancel = true);
+//     }
+// });
 
 world.afterEvents.itemUse.subscribe((itemUse) => {
     const { source: player, itemStack: item } = itemUse;
@@ -532,7 +530,7 @@ world.afterEvents.playerSpawn.subscribe(async (playerSpawn) => {
 
 world.afterEvents.projectileHitBlock.subscribe((projectileHit) => {
     const { projectile, source: player } = projectileHit;
-    if (!player.isPlayer()) return;
+    if (!player || !player.isPlayer()) return;
 
     const hit = projectileHit.getBlockHit().block;
 
@@ -551,7 +549,7 @@ world.afterEvents.projectileHitBlock.subscribe((projectileHit) => {
 
 world.afterEvents.projectileHitEntity.subscribe((projectileHit) => {
     const { projectile, source: player } = projectileHit;
-    if (!player.isPlayer()) return;
+    if (!player || !player.isPlayer()) return;
 
     const hit = projectileHit.getEntityHit().entity;
 
@@ -565,7 +563,7 @@ world.afterEvents.projectileHitEntity.subscribe((projectileHit) => {
 
     player.addTagWillRemove(`Capi:hit`);
     player.addTagWillRemove(`hitWith:${projectile.typeId}`);
-    player.addTagWillRemove(`hitTo:${hit.typeId}`);
+    if(hit) player.addTagWillRemove(`hitTo:${hit.typeId}`);
 });
 
 world.afterEvents.playerBreakBlock.subscribe(async (blockBreak) => {
@@ -610,9 +608,10 @@ world.afterEvents.pressurePlatePush.subscribe((pressurePlatePush) => {
 });
 
 world.afterEvents.pressurePlatePop.subscribe((pressurePlatePop) => {
-    const { block, dimension } = pressurePlatePop;
+    const { block } = pressurePlatePop;
     const { x, y, z } = block;
 
+    /** @param { import("@minecraft/server").Vector3 } location */
     const distance = (location) => Math.sqrt((location.x - x) ** 2 + (location.y - y) ** 2 + (location.z - z) ** 2);
 
     const player = world.getPlayers().reduce((a, b) => (distance(a.location) < distance(b.location) ? a : b), world.getPlayers()[0]);

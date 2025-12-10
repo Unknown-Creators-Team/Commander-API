@@ -1,11 +1,11 @@
 {
     "format_version": 2,
     "header": {
-        "name": "Commander API",
+        "name": "Commander API Legacy",
         "description": "マインクラフト統合版のコマンドを拡張します。",
-        "uuid": "ebac7142-c210-4d32-87ba-5650be52f456",
-        "version": [1, 25, 0],
-        "min_engine_version": [1, 21, 120]
+        "uuid": "7162d884-876f-451d-a9c6-5d945e6a5d45",
+        "version": [1, 0, 0],
+        "min_engine_version": [1, 21, 130]
     },
     "metadata": {
         "authors": ["Nano191225", "arutaka1220"],
@@ -14,12 +14,12 @@
     "modules": [
         {
             "type": "data",
-            "uuid": "36f425e9-10c9-466d-a620-0362a30c9b6f",
+            "uuid": "ecdd50e5-c09e-4c87-9a28-4df8d122515b",
             "version": [1, 0, 0]
         },
         {
             "type": "script",
-            "uuid": "0d1f29e1-417f-48fb-b5fe-5a980830885a",
+            "uuid": "cc71e853-75e4-4b49-baba-a4c8517e7a54",
             "version": [1, 0, 0],
             "language": "javascript",
             "entry": "scripts/index.js"
@@ -28,11 +28,11 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "2.4.0-beta"
+            "version": "2.4.0"
         },
         {
             "module_name": "@minecraft/server-ui",
-            "version": "2.1.0-beta"
+            "version": "2.0.0"
         }
     ]
 }

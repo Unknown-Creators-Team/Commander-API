@@ -16,7 +16,7 @@
 import * as Minecraft from "@minecraft/server";
 import ESON from "./lib/ESON.js";
 
-const { world, system } = Minecraft;
+const { world } = Minecraft;
 
 /**
  *
