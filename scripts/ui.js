@@ -31,17 +31,17 @@ export class UI {
         .title("§lCommander API")
         .body("設定の変更後は §7/reload§r を実行して設定を反映させてください。")
         .button("§lプレイヤー退出メッセージ")
-        .button("§lチャットUI")
-        .button("§l送信キャンセル")
+        // .button("§lチャットUI")
+        // .button("§l送信キャンセル")
         .button("§lタグ削除までのTick")
         .button("§l§4リセット")
         .button("§l§c閉じる")
         .show(this.player).then(response => {
             if (response.selection === 0) this.LeaveMsg();
-            if (response.selection === 1) this.ChatUI();
-            if (response.selection === 2) this.CancelSendMsg();
-            if (response.selection === 3) this.TagWillRemoveTick();
-            if (response.selection === 4) Config.clear();
+            // if (response.selection === 1) this.ChatUI();
+            // if (response.selection === 2) this.CancelSendMsg();
+            if (response.selection === 1) this.TagWillRemoveTick();
+            if (response.selection === 2) Config.clear();
         });
     } catch (e) {console.error(e)}}
 
@@ -77,79 +77,79 @@ export class UI {
         });
     }
 
-    ChatUI() {
-        const Form = new MinecraftUI.ActionFormData()
-        .title("§lCommander API")
-        .body(`ステータス: ${Config.get("ChatUIEnabled") ? "有効" : "無効"}\nUI: "${Config.get("ChatUI")}"`)
-        .button("§l設定する");
-        if (Config.get("ChatUIEnabled")) Form.button("§l§c無効にする");
-            else Form.button("§l§2有効にする");
+    // ChatUI() {
+    //     const Form = new MinecraftUI.ActionFormData()
+    //     .title("§lCommander API")
+    //     .body(`ステータス: ${Config.get("ChatUIEnabled") ? "有効" : "無効"}\nUI: "${Config.get("ChatUI")}"`)
+    //     .button("§l設定する");
+    //     if (Config.get("ChatUIEnabled")) Form.button("§l§c無効にする");
+    //         else Form.button("§l§2有効にする");
     
-        Form.button("§l戻る")
-        .button("§l§c閉じる")
-        .show(this.player).then(response => {
-            if (response.selection === 0) this.ChatUIConfig();
-            if (response.selection === 1) {
-                if (Config.get("ChatUIEnabled")) Config.set("ChatUIEnabled", false);
-                    else Config.set("ChatUIEnabled", true);
-                    this.ChatUI();
-            }
-            if (response.selection === 2) this.Menu();
-        });
-    }
+    //     Form.button("§l戻る")
+    //     .button("§l§c閉じる")
+    //     .show(this.player).then(response => {
+    //         if (response.selection === 0) this.ChatUIConfig();
+    //         if (response.selection === 1) {
+    //             if (Config.get("ChatUIEnabled")) Config.set("ChatUIEnabled", false);
+    //                 else Config.set("ChatUIEnabled", true);
+    //                 this.ChatUI();
+    //         }
+    //         if (response.selection === 2) this.Menu();
+    //     });
+    // }
 
-    ChatUIConfig() {
+    // ChatUIConfig() {
     
-        const Form = new MinecraftUI.ModalFormData()
-        .title("§lCommander API")
-        .textField("UI", "(例) {name} >> {message}", { defaultValue: Config.get("ChatUI") || undefined })
-        .show(this.player).then(response => {
-            if (response.formValues && response.formValues[0]?.length) Config.set("ChatUI", String(response.formValues[0]));
-                else if (!response.canceled) Config.set("ChatUI", null);
-            this.ChatUI();
-        });
-    }
+    //     const Form = new MinecraftUI.ModalFormData()
+    //     .title("§lCommander API")
+    //     .textField("UI", "(例) {name} >> {message}", { defaultValue: Config.get("ChatUI") || undefined })
+    //     .show(this.player).then(response => {
+    //         if (response.formValues && response.formValues[0]?.length) Config.set("ChatUI", String(response.formValues[0]));
+    //             else if (!response.canceled) Config.set("ChatUI", null);
+    //         this.ChatUI();
+    //     });
+    // }
 
-    CancelSendMsg () {
-        const Form = new MinecraftUI.ActionFormData()
-        .title("§lCommander API")
-        .body(`ステータス: ${Config.get("CancelSendMsgEnabled") ? "有効" : "無効"}\nで始まっているか: "§a${Config.get("CancelSendMsg")?.start.join("§r, §a")}§r"\nで終わっているか: "§a${Config.get("CancelSendMsg")?.end.join("§r, §a")}§r"\nが含まれているか: "§a${Config.get("CancelSendMsg")?.include.join("§r, §a")}§r"`)
-        .button("§l設定する");
-        if (Config.get("CancelSendMsgEnabled")) Form.button("§l§c無効にする");
-            else Form.button("§l§2有効にする");
+    // CancelSendMsg () {
+    //     const Form = new MinecraftUI.ActionFormData()
+    //     .title("§lCommander API")
+    //     .body(`ステータス: ${Config.get("CancelSendMsgEnabled") ? "有効" : "無効"}\nで始まっているか: "§a${Config.get("CancelSendMsg")?.start.join("§r, §a")}§r"\nで終わっているか: "§a${Config.get("CancelSendMsg")?.end.join("§r, §a")}§r"\nが含まれているか: "§a${Config.get("CancelSendMsg")?.include.join("§r, §a")}§r"`)
+    //     .button("§l設定する");
+    //     if (Config.get("CancelSendMsgEnabled")) Form.button("§l§c無効にする");
+    //         else Form.button("§l§2有効にする");
     
-        Form.button("§l戻る")
-        .button("§l§c閉じる")
-        .show(this.player).then(response => {
-            if (response.selection === 0) this.CancelSendMsgConfig();
-            if (response.selection === 1) {
-                if (Config.get("CancelSendMsgEnabled")) Config.set("CancelSendMsgEnabled", false);
-                    else Config.set("CancelSendMsgEnabled", true);
-                    this.CancelSendMsg();
-            }
-            if (response.selection === 2) this.Menu();
-        });
-    }
+    //     Form.button("§l戻る")
+    //     .button("§l§c閉じる")
+    //     .show(this.player).then(response => {
+    //         if (response.selection === 0) this.CancelSendMsgConfig();
+    //         if (response.selection === 1) {
+    //             if (Config.get("CancelSendMsgEnabled")) Config.set("CancelSendMsgEnabled", false);
+    //                 else Config.set("CancelSendMsgEnabled", true);
+    //                 this.CancelSendMsg();
+    //         }
+    //         if (response.selection === 2) this.Menu();
+    //     });
+    // }
 
-    CancelSendMsgConfig () {
-        const Form = new MinecraftUI.ModalFormData()
-        .title("§lCommander API")
-        .textField("で始まっているか", "(例) !, ?, #", { defaultValue: Config.get("CancelSendMsg")?.start.join(", ") || undefined })
-        .textField("で終わっているか", "(例) ,, ., :)", { defaultValue: Config.get("CancelSendMsg")?.end.join(", ") || undefined })
-        .textField("が含まれているか", "(例) help, !Form", { defaultValue: Config.get("CancelSendMsg")?.include.join(", ") || undefined })
-        .show(this.player).then(response => {
-            if (response.formValues) {
-                const object = {
-                    start: response.formValues[0]?.split(", "),
-                    end: response.formValues[1]?.split(", "),
-                    include: response.formValues[2]?.split(", ")
-                }
-                Config.set("CancelSendMsg", object);
-            }
+    // CancelSendMsgConfig () {
+    //     const Form = new MinecraftUI.ModalFormData()
+    //     .title("§lCommander API")
+    //     .textField("で始まっているか", "(例) !, ?, #", { defaultValue: Config.get("CancelSendMsg")?.start.join(", ") || undefined })
+    //     .textField("で終わっているか", "(例) ,, ., :)", { defaultValue: Config.get("CancelSendMsg")?.end.join(", ") || undefined })
+    //     .textField("が含まれているか", "(例) help, !Form", { defaultValue: Config.get("CancelSendMsg")?.include.join(", ") || undefined })
+    //     .show(this.player).then(response => {
+    //         if (response.formValues) {
+    //             const object = {
+    //                 start: response.formValues[0]?.split(", "),
+    //                 end: response.formValues[1]?.split(", "),
+    //                 include: response.formValues[2]?.split(", ")
+    //             }
+    //             Config.set("CancelSendMsg", object);
+    //         }
             
-            this.CancelSendMsg();
-        });
-    }
+    //         this.CancelSendMsg();
+    //     });
+    // }
 
     TagWillRemoveTick() {
         const Form = new MinecraftUI.ActionFormData()
