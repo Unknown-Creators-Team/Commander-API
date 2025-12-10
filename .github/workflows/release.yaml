@@ -24,7 +24,7 @@ jobs:
               run: npm run build
 
             - name: Zip the code
-              run: zip -r source_code.zip . -i functions/* scripts/* structures/capi/* LICENSE manifest.json pack_icon.png package.json README.md
+              run: zip -r source_code.zip . -i functions/** scripts/** structures/** LICENSE manifest.json pack_icon.png package.json README.md
 
             - name: Rename the file
               run: |
