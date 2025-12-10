@@ -1,12 +1,11 @@
 {
     "name": "commander-api",
-    "version": "1.14.0",
-    "description": "<div align=\"center\">",
-    "main": "index.js",
+    "version": "2.0.0",
+    "description": "マインクラフト統合版のコマンドを拡張します。",
     "type": "module",
     "scripts": {
         "watch": "npx tsc --watch",
-        "build": "npx tsc --build --clean"
+        "build": "npx tsc --build"
     },
     "repository": {
         "type": "git",
@@ -19,9 +18,9 @@
     },
     "homepage": "https://github.com/Unknown-Creators-Team/Commander-API#readme",
     "devDependencies": {
-        "@minecraft/server": "^2.4.0-beta.1.21.124-stable",
-        "@minecraft/server-gametest": "^1.0.0-beta.1.21.124-stable",
-        "@minecraft/server-ui": "^2.1.0-beta.1.21.124-stable",
+        "@minecraft/server": "^2.5.0-beta.1.21.130-stable",
+        "@minecraft/server-gametest": "^1.0.0-beta.1.21.130-stable",
+        "@minecraft/server-ui": "^2.1.0-beta.1.21.130-stable",
         "typescript": "^5.9.3"
     }
 }

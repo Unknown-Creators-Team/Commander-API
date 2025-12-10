@@ -5,7 +5,7 @@
         "description": "マインクラフト統合版のコマンドを拡張します。",
         "uuid": "d3ed9253-d2e1-4e06-9899-be30754cc44d",
         "version": [2, 0, 0],
-        "min_engine_version": [1, 21, 124]
+        "min_engine_version": [1, 21, 130]
     },
     "metadata": {
         "authors": ["Nano191225", "arutaka1220"],
@@ -28,7 +28,7 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "2.4.0-beta"
+            "version": "2.5.0-beta"
         },
         {
             "module_name": "@minecraft/server-ui",
