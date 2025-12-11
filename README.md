@@ -19,6 +19,7 @@
 1. [Releases](https://github.com/Unknown-Creators-Team/Commander-API/releases/latest)より、最新バージョンのCommander APIをダウンロードします。
 2. ダウンロードしたmcpackを実行しMinecraftにインポートさせます。
 3. **Commander API** を利用したいワールドのビヘイビアパックに **Commander API** を追加します。
+4. ワールドの「ベータAPI」を有効にします。
 
 ## 使い方
 このアドオンでは主に `scriptevent` と `tag` を利用します。  
