@@ -43,7 +43,7 @@ execute as @a[tag=capi:break] at @s run scriptevent capi:actionbar <!tag=break>
 
 ## Commander APIに貢献する
 [こちら](./CONTRIBUTING.md)をお読みください。  
-また、[Commander API Community](https://discord.gg/uTqyqtHWG4)への参加も推奨しています。
+また、[Commander API Community](https://discord.gg/uTqyqtHWG4) への参加も推奨しています。
 
 ## ライセンス
 **Commander API** は **GNU General Public License v3** の下で公開されています。  
