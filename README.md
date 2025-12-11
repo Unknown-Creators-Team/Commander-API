@@ -29,14 +29,14 @@
 ```mcfunction
 /scriptevent capi:explosion {location=[~,~,~-10], radius=5}
 ```
-https://capi.un-known.xyz/img/showcase/scriptevent/explosion.mp4
+<div><video controls src="https://capi.un-known.xyz/img/showcase/scriptevent/explosion.mp4" muted="false"></video></div>
 
 ### イベント
 プレイヤーが **ブロックを破壊したとき** にアクションバーへ破壊したブロックIDを表示するコマンドと、その動画を見てみましょう。
 ```mcfunction
 execute as @a[tag=capi:break] at @s run scriptevent capi:actionbar <!tag=break>
 ```
-https://capi.un-known.xyz/img/showcase/event/break_block.mp4
+<div><video controls src="https://capi.un-known.xyz/img/showcase/event/break_block.mp4" muted="false"></video></div>
 
 ほんのちょびっと、**Commander API**の機能を紹介してみました。  
 [公式サイト](https://capi.un-known.xyz/)では更に多くの内容・ドキュメントがあるので、ぜひ覗いてみてください！
