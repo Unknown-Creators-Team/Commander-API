@@ -1,9 +1,5 @@
 <div align="center">
-
-  <br />
-    <p>
-     <img src="https://user-images.githubusercontent.com/93137582/235931240-477c3429-2f9e-4619-a4c4-4f6692d7dc5c.png" width="300" alt="Commander API"/></a>
-    </p>
+    <img src="./pack_icon.png" width="300" alt="Commander API"/></a>
 
 **統合版のコマンドを大幅に拡張するアドオン**
 # Commander API
@@ -13,7 +9,7 @@
 このアドオンは、他のアドオンとの重複を避ける設計になっており、他のアドオンと併用することができます。また、公式のWikiが用意されており、使い方や機能についての情報を簡単に参照することができます。
 「Commander API」を使用することで、Minecraftのゲームプレイをカスタマイズすることができます。例えば、拡張されたコマンドを使用することで、より複雑なシステムを作成したり、ゲームプレイを改善したりすることができます。また、より効率的に作業することができるようになります。
 
-<br><br><br><br>
+<br>
 
 # 特別な理由がない限り、Stable/Beta版を使用してください。
 
