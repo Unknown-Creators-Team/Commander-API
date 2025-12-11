@@ -22,25 +22,7 @@
 4. ワールドの「ベータAPI」を有効にします。
 
 ## 使い方
-このアドオンでは主に `scriptevent` と `tag` を利用します。  
-プレイヤーが `ブロックを設置した` などの **イベント** が発生した際にはそのプレイヤーに対して `tag` が付与されます。  
-
-### scriptevent
-一例として、爆発を生み出すコマンドとその動画を見てみましょう。
-```mcfunction
-/scriptevent capi:explosion {location=[~,~,~-10], radius=5}
-```
-![Explosion](.github/img/explosion.gif)
-
-### イベント
-プレイヤーが **ブロックを破壊したとき** にアクションバーへ破壊したブロックIDを表示するコマンドと、その動画を見てみましょう。
-```mcfunction
-execute as @a[tag=capi:break] at @s run scriptevent capi:actionbar <!tag=break>
-```
-![Break](.github/img/break_block.gif)
-
-ほんのちょびっと、**Commander API**の機能を紹介してみました。  
-[公式サイト](https://capi.un-known.xyz/)では更に多くの内容・ドキュメントがあるので、ぜひ覗いてみてください！
+[公式サイト](https://dev.un-known.xyz/docs/Getting-Started/)をご覧ください！
 
 ## Commander APIに貢献する
 [こちら](./CONTRIBUTING.md)をお読みください。  
