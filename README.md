@@ -1,73 +1,50 @@
 <div align="center">
     <img src="./pack_icon.png" width="300" alt="Commander API"/></a>
 
-**統合版のコマンドを大幅に拡張するアドオン**
 # Commander API
-<div align="left">
 
-「Commander API」は、Minecraftの統合版用アドオンで、既存のコマンドを大幅に拡張します。
-このアドオンは、他のアドオンとの重複を避ける設計になっており、他のアドオンと併用することができます。また、公式のWikiが用意されており、使い方や機能についての情報を簡単に参照することができます。
-「Commander API」を使用することで、Minecraftのゲームプレイをカスタマイズすることができます。例えば、拡張されたコマンドを使用することで、より複雑なシステムを作成したり、ゲームプレイを改善したりすることができます。また、より効率的に作業することができるようになります。
+<a href="https://discord.gg/uTqyqtHWG4" target="_blank"><img height=20 src="https://img.shields.io/discord/1445364836434186433?style=flat-square" /></a>
+<img src="https://img.shields.io/github/stars/Unknown-Creators-Team/Commander-API?style=flat-square" alt="stars">
+### [ドキュメントを読む](https://capi.un-known.xyz/docs)
+</div>
 
-<br>
+## Commander APIとは？
+**Commander API**はMinecraft: Bedrock Edition向けのコマンド拡張アドオンです。  
+**Commander API**はコマンドをより便利に使ってもらうため開発されました。  
+このアドオンでは **Script API** を利用しているため、他のアドオンとの競合が発生しません。   
 
-# 特別な理由がない限り、Stable/Beta版を使用してください。
+## インストール
+**Commander API**は最新バージョンのMinecraft: Bedrock Editionをサポートしています。  
+> レガシーバージョンについては[こちら](./LEGACY.md)
+1. [Releases](https://github.com/Unknown-Creators-Team/Commander-API/releases/latest)より、最新バージョンのCommander APIをダウンロードします。
+2. ダウンロードしたmcpackを実行しMinecraftにインポートさせます。
+3. Commander APIを利用したいワールドのビヘイビアパックにCommander APIを追加します。
 
-<!-- ## Commander APIの機能
-### Methods
-* プレイヤーにformを表示する
-* プレイヤーを追放する
-* プレイヤーをkillする(クリエイティブモード含む)
-* プレイヤーをノックバックする
-* プレイヤーのネームタグを変更する
-* プレイヤーのネームタグをリセットする
-* 複数のコマンドを実行する
-* カスタムされたアイテムをgiveする
-* プレイヤーにtellする
-* プレイヤーが選択中のスロットを変更する
-### Events
-* 送信されたチャットを受け取る
-* ブロックの破壊を受け取る
-* ブロックの設置を受け取る
-* ボタンを押したことを受け取る
-* エンティティが死んだ/倒したことを受け取る
-* エンティティを攻撃したことを受け取る
-* ダメージを受けた/与えたことを受け取る
-* アイテムの使用を受け取る
-* アイテムの設置を受け取る
-* ワールドに入ったことを受け取る
-* 投げ物が当たったことを受け取る
-* プレイヤーの体力を受け取る
-* X/Y/Z座標を受け取る
-* X/Y視点を受け取る
-* 選択中のスロットを受け取る
-* 現在のUNIXタイムスタンプを受け取る
-* ディメンションを受け取る
-* X/Y/Z/XZ/XYZスピードを受け取る
-* OPを持っているかを受け取る
-* 飛行しているかを受け取る
-* エリトラで飛行しているかを受け取る
-* ジャンプしたかを受け取る
-* はしごを登っているかを受け取る
-* 落下中かを受け取る
-* 水の中にいるかを受け取る
-* 地面の上にいるかを受け取る
-* スニークしているかを受け取る
-* 走っているかを受け取る
-* 泳いでいるかを受け取る
-* 寝ているかを受け取る
-* エモート中かを受け取る
-* ブロックまたはエンティティに対して右クリックしたかを受け取る
-### Script Events
-* 爆発を発生させる
-* エンティティをスポーンする
-* カスタムされたアイテムをスポーンする
-* ワールド全体にメッセージを送信(say)
-* ディメンションを超えてプレイヤーをテレポートさせる
-### Config
-* プレイヤー退出時にメッセージを送信する
-* チャットのUIを変更する
-* 条件がそろったメッセージの送信をキャンセルする
-* 付与されたタグを何ticks後かに削除する（デフォルトで有効）
-### Others
-* プライベートチャットを送信する
+## 使い方
+このアドオンでは主に `scriptevent` と `tag` を利用します。  
+プレイヤーが `ブロックを設置した` などの **イベント** が発生した際にはそのプレイヤーに対して `tag` が付与されます。  
+
+### scriptevent
+一例として、爆発を生み出すコマンドとその動画を見てみましょう。
+```mcfunction
+/scriptevent capi:explosion {location=[~,~,~-10], radius=5}
+```
+<video src="https://capi.un-known.xyz/img/showcase/scriptevent/explosion.mp4" autoplay="" loop=""></video>
+
+### イベント
+プレイヤーが **ブロックを破壊したとき** にアクションバーへ破壊したブロックIDを表示するコマンドと、その動画を見てみましょう。
+```mcfunction
+execute as @a[tag=capi:break] at @s run scriptevent capi:actionbar <!tag=break>
+```
+<video src="https://capi.un-known.xyz/img/showcase/event/break_block.mp4" autoplay="" loop=""></video>
+
+ほんのちょびっと、**Commander API**の機能を紹介してみました。  
+[公式サイト](https://capi.un-known.xyz/)では更に多くの内容・ドキュメントがあるので、ぜひ覗いてみてください！
+
+## Commander APIに貢献する
+[こちら](./CONTRIBUTING.md)をお読みください。  
+また、[Commander API Community](https://discord.gg/uTqyqtHWG4)への参加も推奨しています。
+
+## ライセンス
+**Commander API**は**GPLv3**の下で公開されています。  
+詳細は[LICENSE](./LICENSE.md)をご覧ください。
