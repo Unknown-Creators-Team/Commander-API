@@ -46,5 +46,5 @@ execute as @a[tag=capi:break] at @s run scriptevent capi:actionbar <!tag=break>
 また、[Commander API Community](https://discord.gg/uTqyqtHWG4)への参加も推奨しています。
 
 ## ライセンス
-**Commander API**は**GPLv3**の下で公開されています。  
-詳細は[LICENSE](./LICENSE.md)をご覧ください。
+**Commander API** は **GNU General Public License v3** の下で公開されています。  
+詳細は[LICENSE](./LICENSE)をご覧ください。
