@@ -9,12 +9,12 @@
 </div>
 
 ## Commander API とは？
-**Commander API** はMinecraft: Bedrock Edition向けのコマンド拡張アドオンです。  
+**Commander API** はマイクラ統合版向けのコマンド拡張アドオンです。  
 **Commander API** はコマンドをより便利に使ってもらうため開発されました。  
 このアドオンでは **Script API** を利用しているため、他のアドオンとの競合が発生しません。   
 
 ## インストール & 使い方
-[公式サイト](https://dev.un-known.xyz/docs/Getting-Started/)をご覧ください！
+[公式サイト](https://capi.un-known.xyz/docs/Getting-Started/)をご覧ください！
 
 ## Commander APIに貢献する
 [こちら](./CONTRIBUTING.md)をお読みください。  
