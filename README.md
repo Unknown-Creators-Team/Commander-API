@@ -8,17 +8,17 @@
 ### [ドキュメントを読む](https://capi.un-known.xyz/docs)
 </div>
 
-## Commander APIとは？
-**Commander API**はMinecraft: Bedrock Edition向けのコマンド拡張アドオンです。  
-**Commander API**はコマンドをより便利に使ってもらうため開発されました。  
+## Commander API とは？
+**Commander API** はMinecraft: Bedrock Edition向けのコマンド拡張アドオンです。  
+**Commander API** はコマンドをより便利に使ってもらうため開発されました。  
 このアドオンでは **Script API** を利用しているため、他のアドオンとの競合が発生しません。   
 
 ## インストール
-**Commander API**は最新バージョンのMinecraft: Bedrock Editionをサポートしています。  
+**Commander API** は最新バージョンのMinecraft: Bedrock Editionをサポートしています。  
 > レガシーバージョンについては[こちら](./LEGACY.md)
 1. [Releases](https://github.com/Unknown-Creators-Team/Commander-API/releases/latest)より、最新バージョンのCommander APIをダウンロードします。
 2. ダウンロードしたmcpackを実行しMinecraftにインポートさせます。
-3. Commander APIを利用したいワールドのビヘイビアパックにCommander APIを追加します。
+3. **Commander API** を利用したいワールドのビヘイビアパックに **Commander API** を追加します。
 
 ## 使い方
 このアドオンでは主に `scriptevent` と `tag` を利用します。  
