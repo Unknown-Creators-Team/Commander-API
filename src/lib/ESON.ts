@@ -176,7 +176,7 @@ function stringifyValue(value: any): string {
         return String(value);
     } else if (typeof value === "string") {
         // Use single quotes if string has spaces or special chars
-        if (/\s|["'=]/.test(value)) {
+        if (/\s|["'=]/.test(value) || value === "") {
             return `'${value.replace(/'/g, "\\'")}'`;
         }
         return value;
