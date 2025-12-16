@@ -2,7 +2,7 @@ import { Block, Entity, world } from "@minecraft/server";
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 import { Macro } from "lib/Macro.js";
 import * as v from "lib/valibot.js";
-import { parseFormat } from "util.js";
+import { parseFormat } from "utils.js";
 import { CallSchema } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {

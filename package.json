@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "watch": "npx tsc --watch",
+        "dev": "npx tsc --watch",
         "build": "npx tsc --build"
     },
     "repository": {

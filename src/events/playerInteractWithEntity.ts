@@ -2,7 +2,7 @@ import { world } from "@minecraft/server";
 import config from "data/config.js";
 import { FMath } from "lib/FastMath.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { removeTagsStartsWith } from "util.js";
+import { removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.playerInteractWithEntity.subscribe((playerInteractWithEntity) => {
     const { player, target: entity } = playerInteractWithEntity;

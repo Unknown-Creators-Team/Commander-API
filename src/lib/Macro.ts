@@ -1,5 +1,5 @@
 import { Block, Entity, EntityQueryOptions, world } from "@minecraft/server";
-import { bothParse, calculate } from "util.js";
+import { bothParse, calculate } from "utils.js";
 import ESON from "./ESON.js";
 import { ScoreboardUtils } from "./ScriptBoxMC.js";
 
@@ -151,8 +151,11 @@ export namespace Macro {
                 }
             }
         }
-        
-        return (options.location ? dimension : world).getPlayers(options).map((player) => player.name).join(", ");
+
+        return (options.location ? dimension : world)
+            .getPlayers(options)
+            .map((player) => player.name)
+            .join(", ");
     }
 
     function conditional(value: string): string {
@@ -160,13 +163,13 @@ export namespace Macro {
         if (object.if === undefined) return value;
         const [condition, trueValue, falseValue]: [string, string, string | undefined] = object.if;
         if (!condition || !trueValue) return value;
-        
+
         const parts = condition.match(/(.*?)(=|<|<=|!=)(.*)/);
         if (!parts || parts.length < 4) return value;
         const left = parts[1].trim();
         const operator = parts[2];
         const right = parts[3].trim();
-        
+
         let conditionResult: boolean = false;
         const leftNum = parseFloat(left);
         const rightNum = parseFloat(right);
@@ -201,7 +204,7 @@ export namespace Macro {
                     return value;
             }
         }
-        return conditionResult ? trueValue : (falseValue ?? "");
+        return conditionResult ? trueValue : falseValue ?? "";
     }
 
     function repeat(value: string): string {

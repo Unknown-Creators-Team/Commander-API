@@ -13,7 +13,6 @@
  */
 
 import * as Minecraft from "@minecraft/server";
-import { CallsUI } from "ui/calls.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 const { world, system } = Minecraft;
 
@@ -21,11 +20,11 @@ world.afterEvents.worldLoad.subscribe(async () => {
     const config = await import("./data/config.js");
     import("./native.js");
     if (config.default.basic.debug.enabled) await import("./lib/Logger.js");
-    import("./playground.js");
     import("./events/index.js");
     import("./scriptevents/index.js");
     import("./tests/index.js");
     const { ConfigUI } = await import("./ui/index.js");
+    const { CallsUI } = await import("./ui/calls.js");
 
     system.beforeEvents.watchdogTerminate.subscribe((beforeWatchdogTerminate) => (beforeWatchdogTerminate.cancel = true));
 
@@ -42,8 +41,8 @@ world.afterEvents.worldLoad.subscribe(async () => {
         { namespaces: ["capi"] }
     );
 
-    ScoreboardUtils.setScore("watchdog", "capi:world", 0);
+    ScoreboardUtils.setScore("watchdog", "capi:world", -1);
     system.runInterval(() => {
-        ScoreboardUtils.setScore("watchdog", "capi:world", 0);
+        ScoreboardUtils.setScore("watchdog", "capi:world", -1);
     }, 20);
 });

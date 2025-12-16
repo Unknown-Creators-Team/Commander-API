@@ -2,7 +2,7 @@ import { Block, Entity, ItemLockMode, ItemStack, world } from "@minecraft/server
 import * as v from "lib/valibot.js";
 import Vector from "lib/Vector.js";
 import { SpawnItemSchema } from "../schema.js";
-import { parseFormat, parsePos } from "../util.js";
+import { parseFormat, parsePos } from "../utils.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     // const object: ItemObject = bothParse(message);

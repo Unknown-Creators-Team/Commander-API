@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { promiseDelay } from "../util.js";
+import { promiseDelay } from "../utils.js";
 
 world.beforeEvents.chatSend.subscribe((chat) => {
     const { sender: player, message } = chat;

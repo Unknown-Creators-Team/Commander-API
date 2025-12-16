@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { propertyArray, removeTagsStartsWith } from "util.js";
+import { propertyArray, removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.projectileHitBlock.subscribe((projectileHit) => {
     const { projectile, source: player } = projectileHit;

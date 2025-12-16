@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
-import { flattenObject, removeTagsStartsWith } from "util.js";
+import { flattenObject, removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.itemUse.subscribe((itemUse) => {
     const { source: player, itemStack: item } = itemUse;

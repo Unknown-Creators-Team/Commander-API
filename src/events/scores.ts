@@ -3,7 +3,7 @@ import config from "data/config.js";
 import { FMath } from "lib/FastMath.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import Vector from "lib/Vector.js";
-import { removeTagsStartsWith } from "util.js";
+import { removeTagsStartsWith } from "utils.js";
 import tickEvent from "../lib/TickEvent.js";
 
 tickEvent.subscribe("scores", () => {
@@ -191,6 +191,16 @@ tickEvent.subscribe("scores", () => {
         ScoreboardUtils.setScore(config.events.systemMemoryTier.name, "capi:world", system.serverSystemInfo.memoryTier);
     }
 
+    //? CAPI Extension loaded
+    if (config.events.isCapiExtensionLoaded.enabled) {
+        ScoreboardUtils.setScore(config.events.isCapiExtensionLoaded.name, "capi:world", system.isCapiExtensionLoaded ? 1 : 0);
+    }
+
+    //? CAPI Screen loaded
+    if (config.events.isCapiScreenLoaded.enabled) {
+        ScoreboardUtils.setScore(config.events.isCapiScreenLoaded.name, "capi:world", system.isCapiScreenLoaded ? 1 : 0);
+    }
+
     // const entities = [
     //     ...world.getDimension("overworld").getEntities({ tags: ["capi:trace"] }),
     //     ...world.getDimension("nether").getEntities({ tags: ["capi:trace"] }),
@@ -211,4 +221,3 @@ tickEvent.subscribe("scores", () => {
     //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_z`, FMath.floor(location.z));
     // }
 });
-

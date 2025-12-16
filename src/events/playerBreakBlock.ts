@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { removeTagsStartsWith } from "util.js";
+import { removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.playerBreakBlock.subscribe(async (blockBreak) => {
     const { player, block, brokenBlockPermutation } = blockBreak;

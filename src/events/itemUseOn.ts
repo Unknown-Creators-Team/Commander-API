@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { flattenObject, removeTagsStartsWith } from "util.js";
+import { flattenObject, removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.itemStartUseOn.subscribe(async (itemUseOn) => {
     const { source: player, itemStack: item, block } = itemUseOn;

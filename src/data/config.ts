@@ -1,7 +1,7 @@
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 
 export const original = Object.freeze({
-    format: 9,
+    format: 10,
     basic: {
         tag: {
             enabled: true,
@@ -251,6 +251,16 @@ export const original = Object.freeze({
             inline: true,
             name: "memory_tier",
         },
+        isCapiExtensionLoaded: {
+            enabled: true,
+            inline: true,
+            name: "capi_extension_loaded",
+        },
+        isCapiScreenLoaded: {
+            enabled: true,
+            inline: true,
+            name: "capi_screen_loaded",
+        },
         tags: {
             enabled: true,
             inline: false,
@@ -476,6 +486,14 @@ export const original = Object.freeze({
         }
     },
     others: {
+        extensions: {
+            "Commander-API-Extension": {
+                forceUse: false,
+            },
+            "Commander-API-Screen": {
+                forceUse: false,
+            }
+        },
         leave: {
             enabled: false,
             message: "",

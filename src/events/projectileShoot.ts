@@ -1,7 +1,7 @@
 import { BlockVolume, Entity, Player, world } from "@minecraft/server";
 import config from "data/config.js";
 import Vector from "lib/Vector.js";
-import { propertyArray, removeTagsStartsWith } from "util.js";
+import { propertyArray, removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.itemStopUse.subscribe((itemStopUse) => {
     const { source: player, itemStack: item } = itemStopUse;

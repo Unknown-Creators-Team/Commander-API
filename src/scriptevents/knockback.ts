@@ -1,7 +1,7 @@
 import { Block, Entity } from "@minecraft/server";
 import * as v from "lib/valibot.js";
 import { KnockbackSchema } from "../schema.js";
-import { parseFormat } from "../util.js";
+import { parseFormat } from "../utils.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isEntity()) throw new Error("Source must be an entity");

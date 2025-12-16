@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import { removeTagsStartsWith } from "util.js";
+import { removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.entityHurt.subscribe((entityHurt) => {
     const { damage, damageSource, hurtEntity: entity } = entityHurt;

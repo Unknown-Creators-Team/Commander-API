@@ -2,7 +2,7 @@ import { Block, Entity } from "@minecraft/server";
 import config from "data/config.js";
 import { ItemStackUtils } from "lib/ScriptBoxMC.js";
 import * as v from "lib/valibot.js";
-import { flattenObject, parseFormat, removeTagsStartsWith } from "util.js";
+import { flattenObject, parseFormat, removeTagsStartsWith } from "utils.js";
 import { GetItemSchema } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
