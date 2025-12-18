@@ -15,7 +15,7 @@ export default function main(source: Entity | Block | undefined, message: string
         x: parsePos(object.rotation?.[0]?.toString() ?? "0", source, "rx"),
         y: parsePos(object.rotation?.[1]?.toString() ?? "0", source, "ry"),
     };
-    const dimension = source?.dimension ?? world.getDimension(object.dimension ?? "overworld");
+    const dimension = object.dimension ? world.getDimension(object.dimension) : undefined;
 
     source.teleport(location, { rotation, dimension });
 }
