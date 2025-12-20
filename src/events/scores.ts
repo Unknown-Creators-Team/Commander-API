@@ -47,7 +47,7 @@ tickEvent.subscribe("scores", () => {
         if (config.events.location.enabled) {
             const { location } = player;
             ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_x`, FMath.floor(location.x));
-            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_y`, FMath.floor(location.y));
+            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_y`, FMath.floor(location.y + 1 / 65536)); // prevent flooring y when it's .9999...
             ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_z`, FMath.floor(location.z));
         }
 

@@ -174,7 +174,7 @@ export function calculate(expression: string): number {
 }
 
 export function promiseDelay(callback: (...value: any[]) => any, ...value: any[]): void {
-    Promise.resolve().then(() => callback(...value));
+    Promise.resolve().then(() => callback(...value)).catch((e) => console.error(e, e.stack));
 }
 
 export function removeTagsStartsWith(player: Minecraft.Player, ...tags: string[]): void {

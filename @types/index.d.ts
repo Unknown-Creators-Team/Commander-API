@@ -14,3 +14,8 @@ declare module "@minecraft/server" {
         readonly isCapiScreenLoaded: boolean;
     }
 }
+
+declare global {
+    type SlashCommandCallback = (origin: MC.CustomCommandOrigin, ...args: any[]) => MC.CustomCommandResult | undefined;
+    type SlashCommand = [MC.CustomCommand, SlashCommandCallback];
+}

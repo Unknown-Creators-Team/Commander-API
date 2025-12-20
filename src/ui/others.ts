@@ -18,7 +18,11 @@ export class OthersConfigUI {
         const { isCapiExtensionLoaded, isCapiScreenLoaded } = system;
 
         form.label("拡張アドオン")
-            .label(`Commander API Extension: ${isCapiExtensionLoaded ? "§a読み込み済み" : "§c未読み込み"}§r\nCommander API Screen: ${isCapiScreenLoaded ? "§a読み込み済み" : "§c未読み込み"}`)
+            .label(
+                `Commander API Extension: ${isCapiExtensionLoaded ? "§a読み込み済み" : "§c未読み込み"}§r\nCommander API Screen: ${
+                    isCapiScreenLoaded ? "§a読み込み済み" : "§c未読み込み"
+                }`
+            )
             .toggle({
                 label: "Extension 強制読み込み",
                 defaultValue: config.others.extensions["Commander-API-Extension"].forceUse,
@@ -33,6 +37,10 @@ export class OthersConfigUI {
                     this.config.others.extensions["Commander-API-Screen"].forceUse = value;
                 },
             });
+        
+        if (!config.events.playerLeave.enabled) {
+            form.label("§cプレイヤー退出イベントを有効にしてください。§r\n§eイベント設定 → playerLeave → 有効");
+        }
 
         form.label("退出メッセージ")
             .toggle({
@@ -45,9 +53,81 @@ export class OthersConfigUI {
             .textField({
                 label: "message",
                 placeholder: "ex: {name} is gone...",
-                defaultValue: config.others.leave.message.toString(),
+                defaultValue: config.others.leave.message,
                 callback: (_, value) => {
                     this.config.others.leave.message = value;
+                },
+            });
+        
+        if (!config.events.chatSend.enabled) {
+            form.label("§cチャット関連の設定を使用するには、チャット送信イベントを有効にしてください。§r\n§eイベント設定 → chatSend → 有効");
+        }
+
+        form.label("チャットのキャンセル")
+            .toggle({
+                label: "有効",
+                defaultValue: config.others.cancelChat.enabled,
+                callback: (_, value) => {
+                    this.config.others.cancelChat.enabled = value;
+                },
+            })
+            .textField({
+                label: "正規表現パターン",
+                placeholder: "ex: ^!.*",
+                defaultValue: config.others.cancelChat.pattern,
+                tooltip: "生成AIに書かせるか、「正規表現 チートシート」などで検索して、正規表現パターンを調べてください。",
+                callback: (_, value) => {
+                    this.config.others.cancelChat.pattern = value;
+                },
+            });
+        
+        form.label("カスタムチャット")
+            .toggle({
+                label: "有効",
+                defaultValue: config.others.customChat.enabled,
+                callback: (_, value) => {
+                    this.config.others.customChat.enabled = value;
+                },
+            })
+            .textField({
+                label: "フォーマット",
+                placeholder: "ex: <!name>: {message}",
+                defaultValue: config.others.customChat.format,
+                callback: (_, value) => {
+                    this.config.others.customChat.format = value;
+                },
+            })
+            .toggle({
+                label: "WebSocket",
+                defaultValue: config.others.customChat.websocket,
+                tooltip: "WebSocketで拾えるようにtellrawで送信します。",
+                callback: (_, value) => {
+                    this.config.others.customChat.websocket = value;
+                },
+            });
+        
+        form.label("プライベートチャット")
+            .toggle({
+                label: "有効",
+                defaultValue: config.others.privateChat.enabled,
+                callback: (_, value) => {
+                    this.config.others.privateChat.enabled = value;
+                },
+            })
+            .textField({
+                label: "フォーマット",
+                placeholder: "ex: [Team {id}] <!name>: {message}",
+                defaultValue: config.others.privateChat.format,
+                callback: (_, value) => {
+                    this.config.others.privateChat.format = value;
+                },
+            })
+            .textField({
+                label: "スコアボード名",
+                placeholder: "ex: capi:private_chat",
+                defaultValue: config.others.privateChat.objective,
+                callback: (_, value) => {
+                    this.config.others.privateChat.objective = value;
                 },
             });
 

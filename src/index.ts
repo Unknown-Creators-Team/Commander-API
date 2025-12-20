@@ -14,9 +14,10 @@
 
 import * as Minecraft from "@minecraft/server";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import "slashCommands/index.js";
 const { world, system } = Minecraft;
 
-world.afterEvents.worldLoad.subscribe(async () => {
+world.afterEvents.worldLoad.subscribe(async (ev) => {
     const config = await import("./data/config.js");
     import("./native.js");
     if (config.default.basic.debug.enabled) await import("./lib/Logger.js");

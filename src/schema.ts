@@ -1,3 +1,4 @@
+import { Entity } from "@minecraft/server";
 import * as v from "lib/valibot.js";
 
 // ========================================
@@ -38,7 +39,13 @@ const RunCmdActionSchema = v.object({
     val: v.string(),
 });
 
-export const FormActionsSchema = v.union([AddTagActionSchema, RemoveTagActionSchema, SetScoreActionSchema, AddScoreActionSchema, RunCmdActionSchema]);
+export const FormActionsSchema = v.variant("typ", [
+    AddTagActionSchema,
+    RemoveTagActionSchema,
+    SetScoreActionSchema,
+    AddScoreActionSchema,
+    RunCmdActionSchema,
+]);
 
 // Form Button
 const FormButtonSchema = v.object({
@@ -104,7 +111,7 @@ const ToggleContentSchema = v.object({
     act: v.optional(v.string()),
 });
 
-const ModalContentSchema = v.union([DropdownContentSchema, SliderContentSchema, TextFieldContentSchema, ToggleContentSchema]);
+const ModalContentSchema = v.variant("typ", [DropdownContentSchema, SliderContentSchema, TextFieldContentSchema, ToggleContentSchema]);
 
 // Form Modal
 const ModalFormSchema = v.object({
@@ -113,7 +120,7 @@ const ModalFormSchema = v.object({
     cnt: v.array(ModalContentSchema),
 });
 
-export const FormSchema = v.union([ActionFormSchema, MessageFormSchema, ModalFormSchema]);
+export const FormSchema = v.variant("typ", [ActionFormSchema, MessageFormSchema, ModalFormSchema]);
 
 // ========================================
 // Script Event Schemas
@@ -227,6 +234,103 @@ export const DelaySchema = v.object({
 });
 
 // ========================================
+// Macro Schemas
+// ========================================
+
+// Tag Macro
+export const TagMacroSchema = v.object({
+    tag: v.string(),
+});
+
+// Score Macro
+export const ScoreMacroSchema = v.object({
+    score: v.string(),
+});
+
+// Velocity Macro
+export const VelocityMacroSchema = v.object({
+    velocity: v.union([v.literal("x"), v.literal("y"), v.literal("z"), v.literal("xy"), v.literal("xz"), v.literal("yz"), v.literal("xyz")]),
+});
+
+// Calc Macro
+export const CalcMacroSchema = v.object({
+    calc: v.string(),
+});
+
+// Selector Macro
+export const SelectorMacroSchema = v.object({
+    selector: v.object({
+        c: v.optional(v.number()),
+        r: v.optional(v.number()),
+        rm: v.optional(v.number()),
+        x: v.optional(v.number()),
+        y: v.optional(v.number()),
+        z: v.optional(v.number()),
+        dx: v.optional(v.number()),
+        dy: v.optional(v.number()),
+        dz: v.optional(v.number()),
+        tag: v.optional(v.string()),
+        tags: v.optional(v.array(v.string())),
+    }),
+});
+
+// If (Conditional) Macro
+export const IfMacroSchema = v.object({
+    if: v.tuple([
+        v.pipe(v.string(), v.regex(/(.*?)(=|<|<=|!=)(.*)/, "Invalid condition format: =, <, <=, !=")), // condition
+        v.union([v.string(), v.number(), v.boolean()]), // true value
+        v.optional(v.union([v.string(), v.number(), v.boolean()])), // false value
+    ]),
+});
+
+// Repeat Macro
+export const RepeatMacroSchema = v.object({
+    repeat: v.tuple([
+        v.string(), // text
+        v.number(), // count
+    ]),
+});
+
+// Match Macro
+export const MatchMacroSchema = v.object({
+    match: v.tupleWithRest([v.number()], v.union([v.string(), v.number(), v.boolean()])),
+});
+
+// Pos Macro
+export const PosMacroSchema = v.object({
+    pos: v.union([v.string(), v.tuple([v.string(), v.number(), v.number(), v.number()]), v.tuple([v.string(), v.number()])]),
+});
+
+// Void Macro
+export const VoidMacroSchema = v.object({
+    void: v.string(),
+});
+
+// Fallback Macro
+export const FallbackMacroSchema = v.object({
+    fallback: v.tuple([
+        v.string(), // macro to expand
+        v.union([v.string(), v.number(), v.boolean()]), // fallback value
+    ]),
+});
+
+// ========================================
+// Slash Command Schemas
+// ========================================
+
+// se Command
+export const ScriptEventCommandSchema = v.tupleWithRest(
+    [v.string()], // id
+    v.string() // args
+);
+
+// exec Command
+export const ExecCommandSchema = v.tupleWithRest(
+    [v.custom<Entity[]>((e) => ((e as Entity[]).length > 0 ? (e as Entity[])[0] instanceof Entity : true)), v.string()], // target, id
+    v.string() // args
+);
+
+// ========================================
 // Type Exports
 // ========================================
 
@@ -244,3 +348,15 @@ export type SetItem = v.InferOutput<typeof SetItemSchema>;
 export type GetItem = v.InferOutput<typeof GetItemSchema>;
 export type Call = v.InferOutput<typeof CallSchema>;
 export type Delay = v.InferOutput<typeof DelaySchema>;
+export type TagMacro = v.InferOutput<typeof TagMacroSchema>;
+export type ScoreMacro = v.InferOutput<typeof ScoreMacroSchema>;
+export type VelocityMacro = v.InferOutput<typeof VelocityMacroSchema>;
+export type CalcMacro = v.InferOutput<typeof CalcMacroSchema>;
+export type SelectorMacro = v.InferOutput<typeof SelectorMacroSchema>;
+export type IfMacro = v.InferOutput<typeof IfMacroSchema>;
+export type RepeatMacro = v.InferOutput<typeof RepeatMacroSchema>;
+export type MatchMacro = v.InferOutput<typeof MatchMacroSchema>;
+export type PosMacro = v.InferOutput<typeof PosMacroSchema>;
+export type FallbackMacro = v.InferOutput<typeof FallbackMacroSchema>;
+export type ScriptEventCommand = v.InferOutput<typeof ScriptEventCommandSchema>;
+export type ExecCommand = v.InferOutput<typeof ExecCommandSchema>;

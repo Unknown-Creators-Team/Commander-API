@@ -17,8 +17,8 @@ export const original = Object.freeze({
         tests: {
             enabled: false,
             events: false,
-            scriptevents: false
-        }
+            scriptevents: false,
+        },
     },
     events: {
         buttonPush: {
@@ -483,7 +483,15 @@ export const original = Object.freeze({
         test: {
             enabled: true,
             name: "test",
-        }
+        },
+    },
+    slashCommands: {
+        exec: {
+            enabled: true,
+        },
+        se: {
+            enabled: true,
+        },
     },
     others: {
         extensions: {
@@ -492,11 +500,25 @@ export const original = Object.freeze({
             },
             "Commander-API-Screen": {
                 forceUse: false,
-            }
+            },
         },
         leave: {
             enabled: false,
             message: "",
+        },
+        cancelChat: {
+            enabled: false,
+            pattern: "",
+        },
+        customChat: {
+            enabled: false,
+            format: "[<!fallback=[<!tag=rank>,'Member']>] <!name>: {msg}",
+            websocket: false,
+        },
+        privateChat: {
+            enabled: false,
+            format: "[Team {id}] <!name>: {msg}",
+            objective: "capi:private_chat",
         },
     },
 });
@@ -507,8 +529,9 @@ class Config {
     private static dynamic: typeof original;
     public readonly format: typeof original.format;
     public readonly basic: typeof original.basic;
-    public readonly scriptevents: typeof original.scriptevents;
     public readonly events: typeof original.events;
+    public readonly scriptevents: typeof original.scriptevents;
+    public readonly slashCommands: typeof original.slashCommands;
     public readonly others: typeof original.others;
     public updated = false;
 
@@ -520,8 +543,9 @@ class Config {
 
         this.format = Config.dynamic.format;
         this.basic = Config.dynamic.basic;
-        this.scriptevents = Config.dynamic.scriptevents;
         this.events = Config.dynamic.events;
+        this.scriptevents = Config.dynamic.scriptevents;
+        this.slashCommands = Config.dynamic.slashCommands;
         this.others = Config.dynamic.others;
     }
 

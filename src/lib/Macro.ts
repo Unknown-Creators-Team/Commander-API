@@ -2,6 +2,21 @@ import { Block, Entity, EntityQueryOptions, world } from "@minecraft/server";
 import { bothParse, calculate } from "utils.js";
 import ESON from "./ESON.js";
 import { ScoreboardUtils } from "./ScriptBoxMC.js";
+import * as v from "lib/valibot.js";
+import {
+    TagMacroSchema,
+    ScoreMacroSchema,
+    VelocityMacroSchema,
+    CalcMacroSchema,
+    SelectorMacroSchema,
+    IfMacroSchema,
+    RepeatMacroSchema,
+    MatchMacroSchema,
+    PosMacroSchema,
+    VoidMacroSchema,
+    FallbackMacroSchema,
+} from "schema.js";
+import Vector from "./Vector.js";
 
 export namespace Macro {
     export type Source = Entity | Block | undefined;
@@ -16,10 +31,12 @@ export namespace Macro {
                 value = replace(value, inner, name(source, inner));
             } else if (inner === "nametag") {
                 value = replace(value, inner, nametag(source, inner));
-            } else if (inner === "nl") {
+            } else if (["nl", "n"].includes(inner)) {
                 value = replace(value, inner, newline());
-            } else if (inner === "at") {
+            } else if (["at", "a"].includes(inner)) {
                 value = replace(value, inner, at());
+            } else if (["caret", "c"].includes(inner)) {
+                value = replace(value, inner, caret());
             } else if (inner.startsWith("tag=")) {
                 value = replace(value, inner, tag(source, inner));
             } else if (inner.startsWith("score=")) {
@@ -36,6 +53,12 @@ export namespace Macro {
                 value = replace(value, inner, repeat(inner));
             } else if (inner.startsWith("match=")) {
                 value = replace(value, inner, match(inner));
+            } else if (inner.startsWith("pos=")) {
+                value = replace(value, inner, pos(source, inner));
+            } else if (inner.startsWith("void=")) {
+                value = replace(value, inner, voidMacro(inner));
+            } else if (inner.startsWith("fallback=")) {
+                value = replace(value, inner, fallback(source, inner));
             }
         }
         return restoreMarkers(value);
@@ -72,21 +95,25 @@ export namespace Macro {
         return "@";
     }
 
+    function caret(): string {
+        return "^";
+    }
+
     function tag(source: Source, value: string): string {
         if (!source?.isEntity()) return value;
         const object = ESON.parse(value);
-        if (object.tag === undefined) return value;
-        const tag = source.getTags().find((tag) => tag.startsWith(object.tag + ":"));
+        const result = v.parse(TagMacroSchema, object);
+        const tag = source.getTags().find((tag) => tag.startsWith(result.tag + ":"));
         if (!tag) return value;
-        const tagValue = tag.slice(object.tag.length + 1);
+        const tagValue = tag.slice(result.tag.length + 1);
         return tagValue;
     }
 
     function score(source: Source, value: string): string {
         if (!source?.isEntity()) return value;
         const object = ESON.parse(value);
-        if (object.score === undefined) return value;
-        const score = ScoreboardUtils.getScore(source, object.score);
+        const result = v.parse(ScoreMacroSchema, object);
+        const score = ScoreboardUtils.getScore(source, result.score);
         if (score === undefined) return value;
         return score.toString();
     }
@@ -94,8 +121,7 @@ export namespace Macro {
     function velocity(source: Source, value: string): string {
         if (!source?.isEntity()) return value;
         const object = ESON.parse(value);
-        if (object.velocity === undefined) return value;
-        const type = [...(object.velocity as string)].sort((a, b) => a.localeCompare(b)).join("");
+        const result = v.parse(VelocityMacroSchema, object);
         const vel = source.getVelocity();
         const velocity = {
             ...vel,
@@ -104,24 +130,19 @@ export namespace Macro {
             yz: Math.hypot(vel.y, vel.z),
             xyz: Math.hypot(vel.x, vel.y, vel.z),
         };
-        return velocity[type as keyof typeof velocity].toString();
+        return velocity[result.velocity].toString();
     }
 
     function calc(value: string): string {
         const object = ESON.parse(value);
-        if (object.calc === undefined) return value;
-        try {
-            return calculate(object.calc).toString();
-        } catch (e) {
-            console.error("calc error: ", e);
-            return value;
-        }
+        const result = v.parse(CalcMacroSchema, object);
+        return calculate(result.calc).toString();
     }
 
     function selector(source: Source, value: string): string {
         const object = ESON.parse(value);
-        if (object.selector === undefined) return value;
-        const selector = object.selector;
+        const result = v.parse(SelectorMacroSchema, object);
+        const selector = result.selector;
         const options: EntityQueryOptions = {};
         const dimension = source?.dimension ?? world.getDimension("overworld");
         if (selector.c) options.closest = selector.c;
@@ -160,12 +181,11 @@ export namespace Macro {
 
     function conditional(value: string): string {
         const object = ESON.parse(value);
-        if (object.if === undefined) return value;
-        const [condition, trueValue, falseValue]: [string, string, string | undefined] = object.if;
-        if (!condition || !trueValue) return value;
+        const result = v.parse(IfMacroSchema, object);
+        const [condition, trueValue, falseValue] = result.if;
 
-        const parts = condition.match(/(.*?)(=|<|<=|!=)(.*)/);
-        if (!parts || parts.length < 4) return value;
+        const parts = condition.match(/(.+)\s*(=|<|<=|!=)\s*(.+)/);
+        if (!parts || parts.length < 4) throw new Error("Invalid condition format");
         const left = parts[1].trim();
         const operator = parts[2];
         const right = parts[3].trim();
@@ -174,6 +194,11 @@ export namespace Macro {
         const leftNum = parseFloat(left);
         const rightNum = parseFloat(right);
         const bothNumbers = !isNaN(leftNum) && !isNaN(rightNum);
+
+        console.log("condition:", condition);
+        console.log("left:", left);
+        console.log("operator:", operator);
+        console.log("right:", right);
 
         if (bothNumbers) {
             switch (operator) {
@@ -204,29 +229,72 @@ export namespace Macro {
                     return value;
             }
         }
-        return conditionResult ? trueValue : falseValue ?? "";
+        return (conditionResult ? trueValue : falseValue ?? "").toString();
     }
 
     function repeat(value: string): string {
         const object = ESON.parse(value);
-        if (object.repeat === undefined) return value;
-        const [text, count]: [string, number] = object.repeat;
-        if (!count || !text) return value;
-        let result = "";
-        for (let i = 0; i < count; i++) {
-            result += text;
-        }
-        return result;
+        const result = v.parse(RepeatMacroSchema, object);
+        const [text, count] = result.repeat;
+        return text.repeat(count);
     }
 
     function match(value: string): string {
         const object = ESON.parse(value);
-        if (object.match === undefined) return value;
-        const [i, ...rest]: [number, string, string, string] = object.match;
-        if (i === undefined) return value;
-        const result = rest[i];
-        if (result === undefined) return value;
-        return result;
+        const result = v.parse(MatchMacroSchema, object);
+        const [index, ...options] = result.match;
+        if (index < 0 || index >= options.length) throw new Error("Index out of bounds in match macro");
+        return options[index].toString();
+    }
+
+    function pos(source: Source, value: string): string {
+        if (!source?.isEntity()) throw new Error("This macro can only be used by an entity");
+        const object = ESON.parse(value);
+        const { pos } = v.parse(PosMacroSchema, object);
+        const axis = ["x", "y", "z"] as const;
+        let location = new Vector(0, 0, 0);
+
+        for (const ax of axis) {
+            const name = Array.isArray(pos) ? `${pos[0]}_${ax}` : `${pos}_${ax}`;
+            const score = ScoreboardUtils.getScore(source, name);
+            if (score === undefined) return "";
+            location[ax] = score;
+        }
+
+        if (Array.isArray(pos)) {
+            if (pos.length === 2) {
+                location = location.add(pos[1]);
+            } else if (pos.length === 4) {
+                location = location.add(pos.slice(1, 4) as [number, number, number]);
+            }
+        }
+
+        return location.toString();
+    }
+
+    function voidMacro(value: string): string {
+        const object = ESON.parse(value);
+        const result = v.parse(VoidMacroSchema, object);
+        const regex = /<:(.*?)\:>/g;
+        if (regex.test(result.void)) {
+            return "";
+        }
+        return result.void;
+    }
+
+    function fallback(source: Source, value: string): string {
+        const object = ESON.parse(value);
+        const result = v.parse(FallbackMacroSchema, object);
+        const [macroValue, fallbackValue] = result.fallback;
+
+        // 展開できなかったマクロ（<:...:>の形式）の場合、fallbackValueを返す
+        const regex = /<:(.*?)\:>/g;
+        if (regex.test(macroValue)) {
+            return fallbackValue.toString();
+        }
+
+        // 正常に展開されたマクロの場合、その値を返す
+        return macroValue;
     }
 
     function getInner(value: string): string {
@@ -245,6 +313,17 @@ export namespace Macro {
                 stack.push({ index: i, depth });
                 i++; // Skip the '!' character as it's part of the marker.
             } else if (value[i] === ">") {
+                // Check if this is part of an operator (>=, !=, <=) or a marker (:>)
+                const prevChar = value[i - 1];
+                const nextChar = value[i + 1];
+
+                const allowedPrevChars = [":"];
+                const allowedNextChars: string[] = [];
+
+                if (allowedPrevChars.includes(prevChar) || allowedNextChars.includes(nextChar)) {
+                    continue;
+                }
+
                 if (stack.length > 0) {
                     const { index: start, depth: pairDepth } = stack.pop()!;
                     pairs.push({ start, end: i, depth: pairDepth });

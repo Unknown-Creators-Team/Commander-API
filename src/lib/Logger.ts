@@ -28,6 +28,8 @@ export function warn(...messages: unknown[]) {
     }
 }
 
+const originalError = console.error;
+
 export function error(...messages: unknown[]) {
     if (!config.basic.debug.error) return;
     for (const player of world.getAllPlayers()) {
@@ -35,6 +37,7 @@ export function error(...messages: unknown[]) {
             player.sendMessage(`§c[CAPI][error]-${messages.join(" ")}`);
         }
     }
+    originalError(...messages);
 }
 
 console.log = log;

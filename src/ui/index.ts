@@ -33,7 +33,7 @@ export class ConfigUI {
                 if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
                 else OthersConfigUI.Open(this.player);
             });
-        
+
         if (config.format !== original.format) {
             form.button("§l§p最新バージョンの設定に移行§r\n§7正しく移行できない可能性があります。", undefined, () => {
                 if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
