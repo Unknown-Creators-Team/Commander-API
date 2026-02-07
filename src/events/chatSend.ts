@@ -17,17 +17,19 @@ world.beforeEvents.chatSend.subscribe((chat) => {
         }
     }
 
-    promiseDelay(() => {
-        player.addTagWillRemove(`capi:${config.events.chatSend.name}`);
-        player.addTagWillRemove(`${config.events.chatSend.name}:${message}`);
-        ScoreboardUtils.setScore(player, `capi:${config.events.chatSend.name}_len`, message.length);
-        ScoreboardUtils.addScore(player, `capi:${config.events.chatSend.name}_cnt`, 1);
-        console.log(`Player ${player.name} sent chat: ${message}`);
-    });
+    //? cancel chat
+    if (config.others.cancelChat.enabled && !chat.cancel) {
+        const regex = new RegExp(config.others.cancelChat.pattern);
+        if (regex.test(message)) {
+            chat.cancel = true;
+        }
+    }
 
     //? private chat
+    console.log(config.others.privateChat.enabled, chat.cancel);
     if (config.others.privateChat.enabled && !chat.cancel) {
         const id = ScoreboardUtils.getScore(player, config.others.privateChat.objective);
+        console.log("Private chat id:", id, undefined);
         if (id) {
             const content = Macro.format(
                 player,
@@ -36,14 +38,6 @@ world.beforeEvents.chatSend.subscribe((chat) => {
 
             const residents = world.getPlayers({ scoreOptions: [{ objective: config.others.privateChat.objective, minScore: id, maxScore: id }] });
             residents.forEach((p) => p.sendMessage(content));
-            chat.cancel = true;
-        }
-    }
-
-    //? cancel chat
-    if (config.others.cancelChat.enabled && !chat.cancel) {
-        const regex = new RegExp(config.others.cancelChat.pattern);
-        if (regex.test(message)) {
             chat.cancel = true;
         }
     }
@@ -57,4 +51,12 @@ world.beforeEvents.chatSend.subscribe((chat) => {
         } else world.sendMessage(content);
         chat.cancel = true;
     }
+
+    promiseDelay(() => {
+        player.addTagWillRemove(`capi:${config.events.chatSend.name}`);
+        player.addTagWillRemove(`${config.events.chatSend.name}:${message}`);
+        ScoreboardUtils.setScore(player, `capi:${config.events.chatSend.name}_len`, message.length);
+        ScoreboardUtils.addScore(player, `capi:${config.events.chatSend.name}_cnt`, 1);
+        console.log(`Player ${player.name} sent chat: ${message}`);
+    });
 });

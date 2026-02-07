@@ -13,7 +13,7 @@ new Test("player_interact_with_entity", "empty")
             z: player.location.z + 1,
         };
 
-        const entity = dimension.spawnEntity("minecraft:cow", spawnLocation);
+        const entity = dimension.spawnEntity("minecraft:villager", spawnLocation);
 
         let timeout: number;
         await new Promise((resolve, reject) => {

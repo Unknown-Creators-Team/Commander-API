@@ -193,7 +193,7 @@ export const ShootSchema = v.object({
     dimension: v.optional(v.string()),
 });
 
-export const ScreenSchema = v.object({
+export const TitleSchema = v.object({
     title: v.string(),
     subtitle: v.optional(v.string()),
     options: v.optional(
@@ -232,6 +232,21 @@ export const DelaySchema = v.object({
     command: v.string(),
     ticks: v.number(),
 });
+
+export const ScreenSchema = v.variant("type", [
+    v.object({
+        type: v.union([v.literal("r"), v.literal("l")]),
+        text: v.optional(v.string()),
+    }),
+    v.object({
+        type: v.union([v.literal("tl"), v.literal("t"), v.literal("tr"), v.literal("bl"), v.literal("br")]),
+        index: v.pipe(v.number(), v.minValue(1), v.maxValue(5)),
+        text: v.optional(v.string()),
+    }),
+    v.object({
+        type: v.literal("ca")
+    })
+]);
 
 // ========================================
 // Macro Schemas
@@ -343,11 +358,12 @@ export type Teleport = v.InferOutput<typeof TeleportSchema>;
 export type SpawnEntity = v.InferOutput<typeof SpawnEntitySchema>;
 export type SpawnItem = v.InferOutput<typeof SpawnItemSchema>;
 export type Shoot = v.InferOutput<typeof ShootSchema>;
-export type Screen = v.InferOutput<typeof ScreenSchema>;
+export type Title = v.InferOutput<typeof TitleSchema>;
 export type SetItem = v.InferOutput<typeof SetItemSchema>;
 export type GetItem = v.InferOutput<typeof GetItemSchema>;
 export type Call = v.InferOutput<typeof CallSchema>;
 export type Delay = v.InferOutput<typeof DelaySchema>;
+export type Screen = v.InferOutput<typeof ScreenSchema>;
 export type TagMacro = v.InferOutput<typeof TagMacroSchema>;
 export type ScoreMacro = v.InferOutput<typeof ScoreMacroSchema>;
 export type VelocityMacro = v.InferOutput<typeof VelocityMacroSchema>;

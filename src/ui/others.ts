@@ -63,7 +63,7 @@ export class OthersConfigUI {
             form.label("§cチャット関連の設定を使用するには、チャット送信イベントを有効にしてください。§r\n§eイベント設定 → chatSend → 有効");
         }
 
-        form.label("チャットのキャンセル")
+        form.label("チャットのキャンセル (実験的)")
             .toggle({
                 label: "有効",
                 defaultValue: config.others.cancelChat.enabled,

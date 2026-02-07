@@ -456,9 +456,9 @@ export const original = Object.freeze({
             enabled: true,
             name: "shoot",
         },
-        screen: {
+        title: {
             enabled: true,
-            name: "screen",
+            name: "title",
         },
         actionbar: {
             enabled: true,
@@ -472,10 +472,6 @@ export const original = Object.freeze({
             enabled: true,
             name: "call",
         },
-        team: {
-            enabled: true,
-            name: "team",
-        },
         delay: {
             enabled: true,
             name: "delay",
@@ -484,6 +480,26 @@ export const original = Object.freeze({
             enabled: true,
             name: "test",
         },
+        team: {
+            enabled: true,
+            name: "team",
+        },
+        size: {
+            enabled: true,
+            name: "size",
+        },
+        attack: {
+            enabled: true,
+            name: "attack",
+        },
+        health: {
+            enabled: true,
+            name: "health",
+        },
+        screen: {
+            enabled: true,
+            name: "screen",
+        }
     },
     slashCommands: {
         exec: {

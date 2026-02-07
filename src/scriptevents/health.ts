@@ -9,13 +9,17 @@ export default function main(source: Entity | Block | undefined, message: string
 
     if (!source?.isPlayer()) throw new Error("This event can only be called by a player");
 
-    const team = Macro.format(source, message);
+    const healthString = Macro.format(source, message);
 
-    if (team) {
-        v.parse(v.pipe(v.string(), v.regex(/^-?\d+$/)), team, { message: "team must be a valid integer string" });
-        v.parse(v.pipe(v.number(), v.minValue(0), v.maxValue(40)), parseInt(team));
-        source.setProperty("capi:team", parseInt(team));
+    if (healthString) {
+        v.parse(v.pipe(v.string(), v.regex(/^-?(\d|\.)+$/)), healthString, { message: "health must be a valid number" });
+        let health = parseFloat(healthString);
+
+        health = Math.max(Math.min(health, 200), 0);
+        health = Math.floor(health);
+
+        source.runCommand(`event entity @s capi:health_${health}`);
     } else {
-        source.resetProperty("capi:team");
+        source.runCommand(`event entity @s capi:health_1`);
     }
 }

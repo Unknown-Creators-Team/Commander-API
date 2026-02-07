@@ -47,7 +47,7 @@ Object.defineProperties(Minecraft.system, {
     },
     isCapiScreenLoaded: {
         value: (() => {
-            const result = world.getDimension("overworld").runCommand("function capi/0fd91de9-51ac-4f61-a6d8-4cf4fdbb528c");
+            const result = world.getDimension("overworld").runCommand("function capi/73e8fa11-4503-43ed-af27-c009b42aa9fd");
             if (result.successCount) return true;
             return false;
         })(),

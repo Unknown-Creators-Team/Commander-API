@@ -28,11 +28,11 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "2.6.0-beta"
+            "version": "beta"
         },
         {
             "module_name": "@minecraft/server-ui",
-            "version": "2.1.0-beta"
+            "version": "beta"
         },
         {
             "module_name": "@minecraft/server-gametest",
