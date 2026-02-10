@@ -3,6 +3,7 @@ import config from "data/config.js";
 import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
 import { promiseDelay } from "../utils.js";
 import { Macro } from "../lib/Macro.js";
+import Vector from "lib/Vector.js";
 
 world.beforeEvents.chatSend.subscribe((chat) => {
     const { sender: player, message } = chat;
@@ -33,7 +34,7 @@ world.beforeEvents.chatSend.subscribe((chat) => {
         if (id) {
             const content = Macro.format(
                 player,
-                config.others.privateChat.format.replace(/{message}|{msg}/gi, message).replace(/{team}|{group}|{id}/gi, id.toString())
+                config.others.privateChat.format.replace(/{message}|{msg}/gi, message).replace(/{team}|{group}|{id}/gi, id.toString()),
             );
 
             const residents = world.getPlayers({ scoreOptions: [{ objective: config.others.privateChat.objective, minScore: id, maxScore: id }] });
@@ -46,8 +47,13 @@ world.beforeEvents.chatSend.subscribe((chat) => {
     if (config.others.customChat.enabled && !chat.cancel) {
         const content = Macro.format(player, config.others.customChat.format.replace(/{message}|{msg}/gi, message));
         if (config.others.customChat.websocket) {
-            const rawtext: RawText = { rawtext: [{ text: content }] };
-            player.runCommand(`tellraw @a ${JSON.stringify(rawtext)}`);
+            const [name, message] = content.split("::");
+            promiseDelay(() => {
+                const entity = player.dimension.spawnEntity("minecraft:armor_stand", player.location);
+                entity.nameTag = name;
+                entity.runCommand(`say ${message}`);
+                entity.remove();
+            });
         } else world.sendMessage(content);
         chat.cancel = true;
     }

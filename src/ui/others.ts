@@ -100,7 +100,7 @@ export class OthersConfigUI {
             .toggle({
                 label: "WebSocket",
                 defaultValue: config.others.customChat.websocket,
-                tooltip: "WebSocketで拾えるようにtellrawで送信します。",
+                tooltip: "WebSocketで拾えるようにsayで送信します。必ずメッセージ内に '::' を入れて、'名前::メッセージ' の形式で送信してください。",
                 callback: (_, value) => {
                     this.config.others.customChat.websocket = value;
                 },

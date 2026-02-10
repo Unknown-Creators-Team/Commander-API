@@ -1,7 +1,7 @@
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 
 export const original = Object.freeze({
-    format: 10,
+    format: 11,
     basic: {
         tag: {
             enabled: true,
@@ -492,13 +492,17 @@ export const original = Object.freeze({
             enabled: true,
             name: "attack",
         },
-        health: {
+        max_health: {
             enabled: true,
-            name: "health",
+            name: "max_health",
         },
         screen: {
             enabled: true,
             name: "screen",
+        },
+        health: {
+            enabled: true,
+            name: "health",
         }
     },
     slashCommands: {
