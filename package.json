@@ -19,7 +19,7 @@
     },
     "homepage": "https://github.com/Unknown-Creators-Team/Commander-API#readme",
     "devDependencies": {
-        "@minecraft/server": "^2.7.0-beta.1.26.10-preview.22",
+        "@minecraft/server": "2.6.0-rc.1.26.10-preview.22",
         "@minecraft/server-gametest": "1.0.0-beta.1.26.10-preview.22",
         "@minecraft/server-ui": "2.1.0-beta.1.26.10-preview.22",
         "typescript": "^5.9.3"
