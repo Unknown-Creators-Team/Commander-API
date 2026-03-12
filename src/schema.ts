@@ -258,7 +258,7 @@ export const ParticleSchema = v.object({
     location: v.optional(LocationTuple),
     rgba: v.optional(v.tuple([v.number(), v.number(), v.number(), v.number()])),
     variables: v.optional(v.record(v.string(), v.number())),
-})
+});
 
 // ========================================
 // Macro Schemas
