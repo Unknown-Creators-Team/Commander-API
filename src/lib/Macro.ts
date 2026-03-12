@@ -184,7 +184,7 @@ export namespace Macro {
         const result = v.parse(IfMacroSchema, object);
         const [condition, trueValue, falseValue] = result.if;
 
-        const parts = condition.match(/(.+)\s*(=|<|<=|!=)\s*(.+)/);
+        const parts = condition.match(/^\s*(.+?)\s*(!=|<=|<|=)\s*(.+)\s*$/);
         if (!parts || parts.length < 4) throw new Error("Invalid condition format");
         const left = parts[1].trim();
         const operator = parts[2];
@@ -229,7 +229,7 @@ export namespace Macro {
                     return value;
             }
         }
-        return (conditionResult ? trueValue : falseValue ?? "").toString();
+        return (conditionResult ? trueValue : (falseValue ?? "")).toString();
     }
 
     function repeat(value: string): string {
@@ -289,12 +289,12 @@ export namespace Macro {
 
         // 展開できなかったマクロ（<:...:>の形式）の場合、fallbackValueを返す
         const regex = /<:(.*?)\:>/g;
-        if (regex.test(macroValue)) {
+        if (regex.test(macroValue.toString())) {
             return fallbackValue.toString();
         }
 
         // 正常に展開されたマクロの場合、その値を返す
-        return macroValue;
+        return macroValue.toString();
     }
 
     function getInner(value: string): string {

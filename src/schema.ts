@@ -2,6 +2,11 @@ import { Entity } from "@minecraft/server";
 import * as v from "lib/valibot.js";
 
 // ========================================
+// Utility Schemas
+// ========================================
+const LocationTuple = v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]);
+
+// ========================================
 // Form Schemas
 // ========================================
 
@@ -248,6 +253,13 @@ export const ScreenSchema = v.variant("type", [
     })
 ]);
 
+export const ParticleSchema = v.object({
+    id: v.string(),
+    location: v.optional(LocationTuple),
+    rgba: v.optional(v.tuple([v.number(), v.number(), v.number(), v.number()])),
+    variables: v.optional(v.record(v.string(), v.number())),
+})
+
 // ========================================
 // Macro Schemas
 // ========================================
@@ -324,7 +336,7 @@ export const VoidMacroSchema = v.object({
 // Fallback Macro
 export const FallbackMacroSchema = v.object({
     fallback: v.tuple([
-        v.string(), // macro to expand
+        v.union([v.string(), v.number(), v.boolean()]), // macro to expand
         v.union([v.string(), v.number(), v.boolean()]), // fallback value
     ]),
 });

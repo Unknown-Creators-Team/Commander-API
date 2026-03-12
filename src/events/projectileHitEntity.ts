@@ -20,6 +20,20 @@ world.afterEvents.projectileHitEntity.subscribe((projectileHit) => {
             ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_x`, FMath.floor(entity.location.x));
             ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_y`, FMath.floor(entity.location.y));
             ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_z`, FMath.floor(entity.location.z));
+
+            removeTagsStartsWith(player, `${config.events.projectileHitEntity.name}.`);
+
+            const data = {
+                with: projectile.typeId,
+                to: entity.typeId,
+                from: player.name,
+            };
+
+            entity.addTagWillRemove(`capi:${config.events.projectileHitEntity.name}.victim`);
+
+            for (const value of propertyArray(data)) {
+                entity.addTagWillRemove(`${config.events.projectileHitEntity.name}.victim.${value}`);
+            }
         }
 
         removeTagsStartsWith(player, `${config.events.projectileHitEntity.name}.`);
