@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
-import { MessageFormBox, ModalFormBox } from "lib/ScriptBoxMC.js";
-import { ActionFormBox } from "lib/ScriptBoxMC.js";
+import { MessageFormBox, ModalFormBox } from "script-box-mc";
+import { ActionFormBox } from "script-box-mc";
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 import { uiManager, UIManager } from "@minecraft/server-ui";
 
@@ -16,18 +16,18 @@ export class CallsUI {
     private async Main() {
         const form = new ActionFormBox().title("§lCommander API Calls");
 
-        form.button("§lコールを追加", undefined, () => {
+        form.button("§lコールを追加", () => {
             this.AddCall();
         });
 
         this.calls.forEach((commands, name) => {
-            form.button(`${name}\n${commands.length}つのコマンド`, undefined, () => {
+            form.button(`${name}\n${commands.length}つのコマンド`, () => {
                 this.call = { name, commands };
                 this.EditCall(name);
             });
         });
 
-        form.button("§l§cコールを全て削除", undefined, () => {
+        form.button("§l§cコールを全て削除", () => {
             this.DeleteAllCalls();
         });
 
@@ -42,8 +42,8 @@ export class CallsUI {
             label: "コール名",
             placeholder: "ex: my_call",
             defaultValue: this.call.name,
-            callback: (_, value) => {
-                this.call.name = value;
+            callback: ({ response: res }) => {
+                this.call.name = res;
             },
         });
 
@@ -52,8 +52,8 @@ export class CallsUI {
                 label: `コマンド (${Number(i) + 1})`,
                 placeholder: "ex: say hello",
                 defaultValue: this.call.commands[i],
-                callback: (_, value) => {
-                    this.call.commands[i] = value;
+                callback: ({ response: res }) => {
+                    this.call.commands[i] = res;
                 },
             });
         }
@@ -61,8 +61,8 @@ export class CallsUI {
         form.toggle({
             label: "コマンドを追加",
             defaultValue: false,
-            callback: (_, value) => {
-                if (value) {
+            callback: ({ response: res }) => {
+                if (res) {
                     this.call.commands.push("");
                     this.AddCall();
                 } else {
@@ -88,8 +88,8 @@ export class CallsUI {
             label: "コール名",
             placeholder: "ex: my_call",
             defaultValue: this.call.name,
-            callback: (_, value) => {
-                this.call.name = value;
+            callback: ({ response: res }) => {
+                this.call.name = res;
             },
         });
 
@@ -98,8 +98,8 @@ export class CallsUI {
                 label: `コマンド (${Number(i) + 1})`,
                 placeholder: "ex: say hello",
                 defaultValue: this.call.commands[i],
-                callback: (_, value) => {
-                    this.call.commands[i] = value;
+                callback: ({ response: res }) => {
+                    this.call.commands[i] = res;
                 },
             });
         }
@@ -107,11 +107,11 @@ export class CallsUI {
         form.toggle({
             label: "コマンドを追加",
             defaultValue: false,
-            callback: (_, value, values) => {
-                console.log(values[values.length - 1]);
-                if (values[values.length - 1] === true) return;
+            callback: ({ response: res, responses }) => {
+                console.log(responses[responses.length - 1]);
+                if (responses[responses.length - 1] === true) return;
 
-                if (value) {
+                if (res) {
                     this.call.commands.push("");
                     this.EditCall(oldName);
                 } else {
@@ -128,8 +128,8 @@ export class CallsUI {
         form.toggle({
             label: "コールを削除",
             defaultValue: false,
-            callback: (_, value) => {
-                if (value) {
+            callback: ({ response: res }) => {
+                if (res) {
                     this.calls.delete(this.call.name);
                     uiManager.closeAllForms(this.player);
                     CallsUI.Open(this.player);

@@ -1,5 +1,5 @@
 import { Block, Entity, ExplosionOptions, system, world } from "@minecraft/server";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import { parsePos, parseFormat } from "../utils.js";
 import Vector from "lib/Vector.js";
 import { DelaySchema } from "../schema.js";

@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { ScoreboardUtils } from "script-box-mc";
 
 world.afterEvents.entityDie.subscribe((entityDie) => {
     const { damageSource, deadEntity: entity } = entityDie;

@@ -1,11 +1,3 @@
 {
-    "cSpell.words": [
-        "nametag",
-        "resetname",
-        "scriptevents",
-        "setitem",
-        "spawnentity",
-        "spawnitem",
-        "spawnparticle"
-    ]
+    "cSpell.words": ["gametests", "nametag", "resetname", "scriptevents", "setitem", "spawnentity", "spawnitem", "spawnparticle"]
 }

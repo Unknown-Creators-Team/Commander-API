@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import config, { original } from "data/config.js";
-import { ModalFormBox } from "lib/ScriptBoxMC.js";
+import { ModalFormBox } from "script-box-mc";
 import { ConfigUI } from "./index.js";
 
 export class BasicConfigUI {
@@ -19,16 +19,16 @@ export class BasicConfigUI {
             .toggle({
                 label: "有効",
                 defaultValue: config.basic.tag.enabled,
-                callback: (_, value, all) => {
-                    this.config.basic.tag.enabled = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.tag.enabled = res;
                 },
             })
             .textField({
                 label: "ticks",
                 placeholder: "ex: 10",
                 defaultValue: config.basic.tag.ticks.toString(),
-                callback: (_, value) => {
-                    this.config.basic.tag.ticks = parseInt(value);
+                callback: ({ response: res }) => {
+                    this.config.basic.tag.ticks = parseInt(res);
                 },
             });
 
@@ -36,64 +36,64 @@ export class BasicConfigUI {
             .toggle({
                 label: "有効",
                 defaultValue: config.basic.debug.enabled,
-                callback: (_, value) => {
-                    this.config.basic.debug.enabled = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.debug.enabled = res;
                 },
             })
             .toggle({
                 label: "ログを表示",
                 defaultValue: config.basic.debug.log,
-                callback: (_, value) => {
-                    this.config.basic.debug.log = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.debug.log = res;
                 },
             })
             .toggle({
                 label: "情報を表示",
                 defaultValue: config.basic.debug.info,
-                callback: (_, value) => {
-                    this.config.basic.debug.info = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.debug.info = res;
                 },
             })
             .toggle({
                 label: "警告を表示",
                 defaultValue: config.basic.debug.warn,
-                callback: (_, value) => {
-                    this.config.basic.debug.warn = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.debug.warn = res;
                 },
             })
             .toggle({
                 label: "エラーを表示",
                 defaultValue: config.basic.debug.error,
-                callback: (_, value) => {
-                    this.config.basic.debug.error = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.debug.error = res;
                 },
             });
-        
+
         form.label("テスト")
             .toggle({
                 label: "有効",
                 defaultValue: config.basic.tests.enabled,
                 tooltip: "テストはデバッグやトラブルシューティングに使用します。必ずドキュメントに従って使用してください。",
-                callback: (_, value) => {
-                    this.config.basic.tests.enabled = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.tests.enabled = res;
                 },
             })
             .toggle({
                 label: "events",
                 defaultValue: config.basic.tests.events,
-                callback: (_, value) => {
-                    this.config.basic.tests.events = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.tests.events = res;
                 },
             })
             .toggle({
                 label: "scriptevents",
                 defaultValue: config.basic.tests.scriptevents,
-                callback: (_, value) => {
-                    this.config.basic.tests.scriptevents = value;
+                callback: ({ response: res }) => {
+                    this.config.basic.tests.scriptevents = res;
                 },
             });
 
-        const res = await form.show(this.player);
+        await form.show(this.player);
         if (JSON.stringify(config) === JSON.stringify(this.config)) {
             ConfigUI.Open(this.player, "§7設定は変更されませんでした。");
         } else {

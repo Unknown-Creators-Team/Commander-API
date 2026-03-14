@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import config, { original } from "data/config.js";
-import { ModalFormBox } from "lib/ScriptBoxMC.js";
+import { ModalFormBox } from "script-box-mc";
 import { ConfigUI } from "./index.js";
 
 export class EventsConfigUI {
@@ -19,8 +19,8 @@ export class EventsConfigUI {
             form.label(`${key}${value.inline ? " (インライン)" : ""}`).toggle({
                 label: "有効化",
                 defaultValue: value.enabled,
-                callback: (_, enabled) => {
-                    this.config.events[key as keyof typeof config.events].enabled = enabled;
+                callback: ({ response: res }) => {
+                    this.config.events[key as keyof typeof config.events].enabled = res;
                 },
             });
             if ("name" in value) {
@@ -28,8 +28,36 @@ export class EventsConfigUI {
                     label: "イベント名",
                     placeholder: "ex: itemUse",
                     defaultValue: value.name,
-                    callback: (_, name) => {
-                        (this.config.events[key as keyof typeof config.events] as any).name = name;
+                    callback: ({ response: res }) => {
+                        (this.config.events[key as keyof typeof config.events] as any).name = res;
+                    },
+                });
+            }
+            if ("options" in value) {
+                form.slider({
+                    label: "最大距離",
+                    minimumValue: 5,
+                    maximumValue: 150,
+                    defaultValue: value.options.maxDistance,
+                    valueStep: 5,
+                    callback: ({ response: res }) => {
+                        (this.config.events[key as keyof typeof config.events] as any).options.maxDistance = res;
+                    },
+                });
+
+                form.toggle({
+                    label: "液体ブロック(水や溶岩)の検知",
+                    defaultValue: value.options.includeLiquidBlocks,
+                    callback: ({ response: res }) => {
+                        (this.config.events[key as keyof typeof config.events] as any).options.includeLiquidBlocks = res;
+                    },
+                });
+
+                form.toggle({
+                    label: "通過可能ブロック(つるや花)の検知",
+                    defaultValue: value.options.includePassableBlocks,
+                    callback: ({ response: res }) => {
+                        (this.config.events[key as keyof typeof config.events] as any).options.includePassableBlocks = res;
                     },
                 });
             }

@@ -13,7 +13,7 @@
  */
 
 import * as Minecraft from "@minecraft/server";
-import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { ScoreboardUtils } from "script-box-mc";
 import "slashCommands/index.js";
 const { world, system } = Minecraft;
 
@@ -23,7 +23,7 @@ world.afterEvents.worldLoad.subscribe(async (ev) => {
     if (config.default.basic.debug.enabled) await import("./lib/Logger.js");
     import("./events/index.js");
     import("./scriptevents/index.js");
-    import("./tests/index.js");
+    import("./gametests/index.js");
     const { ConfigUI } = await import("./ui/index.js");
     const { CallsUI } = await import("./ui/calls.js");
 
@@ -39,7 +39,7 @@ world.afterEvents.worldLoad.subscribe(async (ev) => {
                 CallsUI.Open(sourceEntity);
             }
         },
-        { namespaces: ["capi"] }
+        { namespaces: ["capi"] },
     );
 
     ScoreboardUtils.setScore("watchdog", "capi:world", -1);
@@ -47,3 +47,11 @@ world.afterEvents.worldLoad.subscribe(async (ev) => {
         ScoreboardUtils.setScore("watchdog", "capi:world", -1);
     }, 20);
 });
+
+declare module "@minecraft/server" {
+    interface Entity {
+        addTags(tags: string[]): void;
+        removeTags(tags: string[]): void;
+        addTagWillRemove(tag: string): void;
+    }
+}

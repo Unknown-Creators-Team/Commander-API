@@ -20,6 +20,19 @@ import { promiseDelay } from "utils.js";
 
 const { world, system } = Minecraft;
 
+declare module "@minecraft/server" {
+    export interface Entity {
+        addTagWillRemove(tag: string): void;
+        removeTags(tags: string[]): void;
+        addTags(tags: string[]): void;
+    }
+
+    export interface System {
+        isCapiExtensionLoaded: boolean;
+        isCapiScreenLoaded: boolean;
+    }
+}
+
 Object.assign(Minecraft.Entity.prototype, {
     addTagWillRemove(tag: string) {
         promiseDelay(() => {

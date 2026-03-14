@@ -1,7 +1,7 @@
 import { Block, Entity } from "@minecraft/server";
 import config from "data/config.js";
-import { ItemStackUtils } from "lib/ScriptBoxMC.js";
-import * as v from "lib/valibot.js";
+import { ItemStackUtils } from "script-box-mc";
+import * as v from "valibot";
 import { flattenObject, parseFormat, removeTagsStartsWith } from "utils.js";
 import { GetItemSchema } from "../schema.js";
 

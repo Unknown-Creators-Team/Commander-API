@@ -1,8 +1,8 @@
 import { Block, Entity, EntityQueryOptions, world } from "@minecraft/server";
 import { bothParse, calculate } from "utils.js";
-import ESON from "./ESON.js";
-import { ScoreboardUtils } from "./ScriptBoxMC.js";
-import * as v from "lib/valibot.js";
+import ESON from "bedrock-eson";
+import { ScoreboardUtils } from "script-box-mc";
+import * as v from "valibot";
 import {
     TagMacroSchema,
     ScoreMacroSchema,
@@ -15,6 +15,8 @@ import {
     PosMacroSchema,
     VoidMacroSchema,
     FallbackMacroSchema,
+    StrMacroSchema,
+    StrMacroAtSchema,
 } from "schema.js";
 import Vector from "./Vector.js";
 
@@ -59,6 +61,8 @@ export namespace Macro {
                 value = replace(value, inner, voidMacro(inner));
             } else if (inner.startsWith("fallback=")) {
                 value = replace(value, inner, fallback(source, inner));
+            } else if (inner.startsWith("str=")) {
+                value = replace(value, inner, str(inner));
             }
         }
         return restoreMarkers(value);
@@ -295,6 +299,44 @@ export namespace Macro {
 
         // 正常に展開されたマクロの場合、その値を返す
         return macroValue.toString();
+    }
+
+    function str(value: string): string {
+        const object = ESON.parse(value);
+        const result = v.parse(StrMacroSchema, object);
+        const [input, type, ...args] = result.str;
+
+        if (["concat", "starts_with", "ends_with", "includes"].includes(type)) {
+            const compare = args[0];
+            const trueValue = args[1] ?? "yes";
+            const falseValue = args[2] ?? "no";
+            let condition = false;
+
+            if (type === "concat") return input.concat(...(args as string[]));
+            if (type === "starts_with") condition = input.startsWith(compare as string);
+            if (type === "ends_with") condition = input.endsWith(compare as string);
+            if (type === "includes") condition = input.includes(compare as string);
+
+            return (condition ? trueValue : falseValue).toString();
+        } else {
+            if (type === "at") return input.charAt(args[0] as number) ?? "";
+            if (type === "index_of") return input.indexOf(`${args[0]}`).toString();
+            if (type === "replace") return input.replace(`${args[0]}`, `${args[1]}`);
+            if (type === "replace_all") return input.replaceAll(`${args[0]}`, `${args[1]}`);
+            if (type === "slice") return input.slice(args[0] as number, args[1] as number).toString();
+            if (type === "length") return input.length.toString();
+
+            if (type === "repeat") return input.repeat(args[0] as number);
+            if (type === "lower_case") return input.toLowerCase();
+            if (type === "upper_case") return input.toUpperCase();
+            if (type === "trim") return input.trim();
+            if (type === "trim_end") return input.trimEnd();
+            if (type === "trim_start") return input.trimStart();
+            if (type === "pad_start") return input.padStart(args[0] as number, args[1] as string);
+            if (type === "pad_end") return input.padEnd(args[0] as number, args[1] as string);
+        }
+
+        return value;
     }
 
     function getInner(value: string): string {

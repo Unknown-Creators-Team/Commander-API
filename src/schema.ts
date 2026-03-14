@@ -1,5 +1,5 @@
 import { Entity } from "@minecraft/server";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 
 // ========================================
 // Utility Schemas
@@ -140,7 +140,7 @@ export const ExplosionSchema = v.object({
             allow_under_water: v.optional(v.boolean()),
             breaks_blocks: v.optional(v.boolean()),
             causes_fire: v.optional(v.boolean()),
-        })
+        }),
     ),
 });
 
@@ -206,7 +206,7 @@ export const TitleSchema = v.object({
             in: v.number(),
             out: v.number(),
             stay: v.number(),
-        })
+        }),
     ),
 });
 
@@ -249,15 +249,27 @@ export const ScreenSchema = v.variant("type", [
         text: v.optional(v.string()),
     }),
     v.object({
-        type: v.literal("ca")
-    })
+        type: v.literal("ca"),
+    }),
 ]);
+
+export const ParticleVector3Schema = v.object({
+    x: v.number(),
+    y: v.number(),
+    z: v.number(),
+});
+
+export const ParticleRgbaSchema = v.object({
+    r: v.number(),
+    g: v.number(),
+    b: v.number(),
+    a: v.optional(v.number()),
+});
 
 export const ParticleSchema = v.object({
     id: v.string(),
     location: v.optional(LocationTuple),
-    rgba: v.optional(v.tuple([v.number(), v.number(), v.number(), v.number()])),
-    variables: v.optional(v.record(v.string(), v.number())),
+    variables: v.optional(v.record(v.string(), v.union([v.number(), ParticleRgbaSchema, ParticleVector3Schema]))),
 });
 
 // ========================================
@@ -341,6 +353,68 @@ export const FallbackMacroSchema = v.object({
     ]),
 });
 
+/**
+ * - at
+ * - concat
+ * - starts_with
+ * - ends_with
+ * - includes
+ * - index_of
+ * - repeat
+ * - replace
+ * - replace_all
+ * - slice
+ * - lower_case
+ * - upper_case
+ * - trim
+ * - trim_end
+ * - trim_start
+ * - pad_start
+ * - pad_end
+ * - length
+ */
+export const StrMacroAtSchema = v.strictTuple([v.string(), v.literal("at"), v.number()]);
+export const StrMacroConcatSchema = v.tupleWithRest([v.string(), v.literal("concat")], v.string());
+export const StrMacroStartsWithSchema = v.strictTuple([v.string(), v.literal("starts_with"), v.string(), v.optional(v.string()), v.optional(v.string())]);
+export const StrMacroEndsWithSchema = v.strictTuple([v.string(), v.literal("ends_with"), v.string(), v.optional(v.string()), v.optional(v.string())]);
+export const StrMacroIncludesSchema = v.strictTuple([v.string(), v.literal("includes"), v.string(), v.optional(v.string()), v.optional(v.string())]);
+export const StrMacroIndexOfSchema = v.strictTuple([v.string(), v.literal("index_of"), v.string()]);
+export const StrMacroRepeatSchema = v.strictTuple([v.string(), v.literal("repeat"), v.number()]);
+export const StrMacroReplaceSchema = v.strictTuple([v.string(), v.literal("replace"), v.string(), v.string()]);
+export const StrMacroReplaceAllSchema = v.strictTuple([v.string(), v.literal("replace_all"), v.string(), v.string()]);
+export const StrMacroSliceSchema = v.strictTuple([v.string(), v.literal("slice"), v.number(), v.optional(v.number())]);
+export const StrMacroLowerCaseSchema = v.strictTuple([v.string(), v.literal("lower_case")]);
+export const StrMacroUpperCaseSchema = v.strictTuple([v.string(), v.literal("upper_case")]);
+export const StrMacroTrimSchema = v.strictTuple([v.string(), v.literal("trim")]);
+export const StrMacroTrimEndSchema = v.strictTuple([v.string(), v.literal("trim_end")]);
+export const StrMacroTrimStartSchema = v.strictTuple([v.string(), v.literal("trim_start")]);
+export const StrMacroPadStartSchema = v.strictTuple([v.string(), v.literal("pad_start"), v.number(), v.optional(v.string())]);
+export const StrMacroPadEndSchema = v.strictTuple([v.string(), v.literal("pad_end"), v.number(), v.optional(v.string())]);
+export const StrMacroLengthSchema = v.strictTuple([v.string(), v.literal("length")]);
+
+export const StrMacroSchema = v.object({
+    str: v.union([
+        StrMacroAtSchema,
+        StrMacroConcatSchema,
+        StrMacroStartsWithSchema,
+        StrMacroEndsWithSchema,
+        StrMacroIncludesSchema,
+        StrMacroIndexOfSchema,
+        StrMacroRepeatSchema,
+        StrMacroReplaceSchema,
+        StrMacroReplaceAllSchema,
+        StrMacroSliceSchema,
+        StrMacroLowerCaseSchema,
+        StrMacroUpperCaseSchema,
+        StrMacroTrimSchema,
+        StrMacroTrimEndSchema,
+        StrMacroTrimStartSchema,
+        StrMacroPadStartSchema,
+        StrMacroPadEndSchema,
+        StrMacroLengthSchema,
+    ]),
+});
+
 // ========================================
 // Slash Command Schemas
 // ========================================
@@ -348,13 +422,13 @@ export const FallbackMacroSchema = v.object({
 // se Command
 export const ScriptEventCommandSchema = v.tupleWithRest(
     [v.string()], // id
-    v.string() // args
+    v.string(), // args
 );
 
 // exec Command
 export const ExecCommandSchema = v.tupleWithRest(
     [v.custom<Entity[]>((e) => ((e as Entity[]).length > 0 ? (e as Entity[])[0] instanceof Entity : true)), v.string()], // target, id
-    v.string() // args
+    v.string(), // args
 );
 
 // ========================================

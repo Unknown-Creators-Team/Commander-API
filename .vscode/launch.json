@@ -1,21 +1,16 @@
 {
-    // IntelliSense を使用して利用可能な属性を学べます。
-    // 既存の属性の説明をホバーして表示します。
-    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "minecraft-js",
-            "request": "attach",
-            "name": "listen 19144",
-            "mode": "listen",
-            "host": "localhost",
-            "port": 19144,
-
-            "localRoot": "${workspaceFolder}/scripts/",
-            "generatedSourceRoot": "${workspaceFolder}/scripts/",
-            "sourceMapRoot": "${workspaceFolder}/scripts/",
-            "targetModuleUuid": "21e93e66-928c-4f5b-a552-9b3709fd58f7"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "minecraft-js",
+      "request": "attach",
+      "name": "Attach to Minecraft",
+      "mode": "listen",
+      "localRoot": "${workspaceFolder}/src",
+      "sourceMapRoot": "${workspaceFolder}/scripts",
+      "targetModuleUuid": "21e93e66-928c-4f5b-a552-9b3709fd58f7",
+      "host": "localhost",
+      "port": 19144
+    }
+  ]
 }

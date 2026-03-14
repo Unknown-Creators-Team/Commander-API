@@ -31,7 +31,8 @@ export class FMath {
      * @returns number
      */
     static ceil(x: number): number {
-        return (x | 0) + 1;
+        const truncated = x | 0;
+        return x > 0 && x !== truncated ? truncated + 1 : truncated;
     }
 
     /**
@@ -40,7 +41,7 @@ export class FMath {
      * @returns number
      */
     static round(x: number): number {
-        return (x + 0.5) | 0;
+        return x < 0 ? -((-x + 0.5) | 0) : (x + 0.5) | 0;
     }
 
     /**
@@ -56,7 +57,7 @@ export class FMath {
         }
         return result;
     }
-    
+
     /**
      * Fast hypotenuse
      * @param ...v number

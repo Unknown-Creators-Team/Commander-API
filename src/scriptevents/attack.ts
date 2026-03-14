@@ -1,7 +1,7 @@
 import { Block, Entity, system } from "@minecraft/server";
 import config from "data/config.js";
 import { Macro } from "lib/Macro.js";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!config.others.extensions["Commander-API-Extension"].forceUse && !system.isCapiExtensionLoaded)

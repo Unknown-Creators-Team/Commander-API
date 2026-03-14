@@ -381,6 +381,16 @@ export const original = Object.freeze({
             inline: true,
             name: "graphics_ray_traced",
         },
+        view: {
+            enabled: true,
+            inline: true,
+            name: "view",
+            options: {
+                includeLiquidBlocks: true,
+                includePassableBlocks: true,
+                maxDistance: 100,
+            },
+        },
         tripWireTrip: {
             enabled: true,
             inline: false,
@@ -503,7 +513,11 @@ export const original = Object.freeze({
         health: {
             enabled: true,
             name: "health",
-        }
+        },
+        particle: {
+            enabled: true,
+            name: "particle",
+        },
     },
     slashCommands: {
         exec: {

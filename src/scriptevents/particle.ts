@@ -1,7 +1,7 @@
-import { Block, Entity, MolangVariableMap } from "@minecraft/server";
-import * as v from "lib/valibot.js";
+import { Block, Entity, MolangVariableMap, RGBA, Vector3 } from "@minecraft/server";
+import * as v from "valibot";
 import Vector from "lib/Vector.js";
-import { ParticleSchema } from "../schema.js";
+import { ParticleRgbaSchema, ParticleSchema, ParticleVector3Schema } from "../schema.js";
 import { parseFormat, parsePos } from "../utils.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {
@@ -10,16 +10,32 @@ export default function main(source: Entity | Block | undefined, message: string
     const parsed = parseFormat(message, source);
     const object = v.parse(ParticleSchema, parsed);
     const location = Vector.fromArray(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
-    const rgba = object.rgba || [];
-
+    const variables = object.variables || {};
     const molang = new MolangVariableMap();
-    molang.setColorRGBA("variable.color", {
-        red: rgba[0] ?? 0,
-        green: rgba[1] ?? 0,
-        blue: rgba[2] ?? 0,
-        alpha: rgba[3] ?? 1,
-    });
-    // molang.setFloat()
+
+    for (const [key, value] of Object.entries(variables)) {
+        if (typeof value === "number") {
+            molang.setFloat(key, value);
+            continue;
+        }
+
+        const vec = v.safeParse(ParticleVector3Schema, value);
+        if (vec.success) {
+            molang.setVector3(key, vec.output);
+            continue;
+        }
+
+        const rgba = v.safeParse(ParticleRgbaSchema, value);
+        if (rgba.success) {
+            const { r, g, b, a } = rgba.output;
+            molang.setColorRGBA(key, {
+                red: r,
+                green: g,
+                blue: b,
+                alpha: a ?? 1,
+            });
+        }
+    }
 
     source.spawnParticle(object.id, location, molang);
 }

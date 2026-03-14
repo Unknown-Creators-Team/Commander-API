@@ -1,5 +1,5 @@
 import { Block, Entity } from "@minecraft/server";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import Vector from "lib/Vector.js";
 import { ImpulseSchema } from "../schema.js";
 import { parseFormat } from "../utils.js";

@@ -1,5 +1,5 @@
 import { Block, Entity, world } from "@minecraft/server";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import Vector from "lib/Vector.js";
 import { SpawnEntitySchema } from "../schema.js";
 import { parseFormat, parsePos } from "../utils.js";

@@ -1,11 +1,13 @@
 import { Player } from "@minecraft/server";
-import { ActionFormBox } from "lib/ScriptBoxMC.js";
+import { ActionFormBox } from "script-box-mc";
 import { BasicConfigUI } from "./basic.js";
 import { EventsConfigUI } from "./events.js";
 import { ScriptEventsConfigUI } from "./scriptevents.js";
 import config, { original } from "data/config.js";
 import { OthersConfigUI } from "./others.js";
-import { MessageFormBox } from "lib/ScriptBoxMC.js";
+import { MessageFormBox } from "script-box-mc";
+
+ActionFormBox.config.close.text = "§l§c閉じる";
 
 export class ConfigUI {
     private player: Player;
@@ -17,25 +19,25 @@ export class ConfigUI {
     private async Main(status?: string) {
         const form = new ActionFormBox().title("§lCommander API 設定");
         if (status) form.body(status);
-        form.button("§l基本設定", undefined, () => {
+        form.button("§l基本設定", () => {
             if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
             else BasicConfigUI.Open(this.player);
         })
-            .button("§lイベント設定", undefined, () => {
+            .button("§lイベント設定", () => {
                 if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
                 else EventsConfigUI.Open(this.player);
             })
-            .button("§lスクリプトイベント設定", undefined, () => {
+            .button("§lスクリプトイベント設定", () => {
                 if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
                 else ScriptEventsConfigUI.Open(this.player);
             })
-            .button("§lその他各種設定", undefined, () => {
+            .button("§lその他各種設定", () => {
                 if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
                 else OthersConfigUI.Open(this.player);
             });
 
         if (config.format !== original.format) {
-            form.button("§l§p最新バージョンの設定に移行§r\n§7正しく移行できない可能性があります。", undefined, () => {
+            form.button("§l§p最新バージョンの設定に移行§r\n§7正しく移行できない可能性があります。", () => {
                 if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
                 else {
                     config.Migrate(config);
@@ -44,7 +46,7 @@ export class ConfigUI {
             });
         }
 
-        form.button("§l§c設定を初期化", undefined, () => {
+        form.button("§l§c設定を初期化", () => {
             new MessageFormBox()
                 .title("§l§c【警告】設定を初期化")
                 .body("設定を初期化しますか？\nこの操作は元に戻せません。")

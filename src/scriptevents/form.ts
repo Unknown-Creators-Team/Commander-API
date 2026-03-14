@@ -1,6 +1,6 @@
 import { Block, Entity, Player, world } from "@minecraft/server";
-import { ActionFormBox, MessageFormBox, ModalFormBox, ScoreboardUtils } from "lib/ScriptBoxMC.js";
-import * as v from "lib/valibot.js";
+import { ActionFormBox, MessageFormBox, ModalFormBox, ScoreboardUtils } from "script-box-mc";
+import * as v from "valibot";
 import { FormSchema, type Form, type FormActions } from "../schema.js";
 import { parseFormat } from "../utils.js";
 
@@ -125,7 +125,7 @@ export default function main(source: Entity | Block | undefined, message: string
                         label: content.lbl,
                         options: options,
                         defaultValueIndex: content.def,
-                        callback: (_, res) => {
+                        callback: ({ response: res }) => {
                             if (content.act === undefined) throw new Error("Action is required for dropdown.");
                             ScoreboardUtils.setScore(source, content.act, res);
                         },
@@ -138,7 +138,7 @@ export default function main(source: Entity | Block | undefined, message: string
                         maximumValue: content.max,
                         valueStep: content.stp,
                         defaultValue: content.def,
-                        callback: (_, res) => {
+                        callback: ({ response: res }) => {
                             if (content.act === undefined) throw new Error("Action is required for slider.");
                             ScoreboardUtils.setScore(source, content.act, res);
                         },
@@ -149,7 +149,7 @@ export default function main(source: Entity | Block | undefined, message: string
                         label: content.lbl,
                         placeholder: content.plh,
                         defaultValue: content.def,
-                        callback: (_, res) => {
+                        callback: ({ response: res }) => {
                             if (content.act === undefined) throw new Error("Action is required for textField.");
                             source.addTagWillRemove(`${content.act}:${res}`);
                         },
@@ -159,7 +159,7 @@ export default function main(source: Entity | Block | undefined, message: string
                     form.toggle({
                         label: content.lbl,
                         defaultValue: content.def,
-                        callback: (_, res) => {
+                        callback: ({ response: res }) => {
                             if (content.act === undefined) throw new Error("Action is required for toggle.");
                             ScoreboardUtils.setScore(source, content.act, res ? 1 : 0);
                         },

@@ -1,5 +1,5 @@
 import { CommandPermissionLevel, CustomCommandParamType, CustomCommandResult, CustomCommandStatus, system, world } from "@minecraft/server";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import { ScriptEventCommandSchema } from "schema.js";
 import { promiseDelay } from "utils.js";
 

@@ -1,7 +1,7 @@
 import { Block, Entity, Player, system, world } from "@minecraft/server";
 import { Macro } from "lib/Macro.js";
 import { parseFormat } from "utils.js";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import { ScreenSchema } from "schema.js";
 import config from "data/config.js";
 

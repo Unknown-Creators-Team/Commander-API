@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
-import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { ScoreboardUtils } from "script-box-mc";
 
 world.afterEvents.playerSpawn.subscribe(async (playerSpawn) => {
     const { player, initialSpawn } = playerSpawn;
@@ -16,6 +16,6 @@ world.afterEvents.playerSpawn.subscribe(async (playerSpawn) => {
     }
 
     console.log(
-        `Player ${player.name} spawned at (${player.location.x}, ${player.location.y}, ${player.location.z})${initialSpawn ? " (initial)" : ""}`
+        `Player ${player.name} spawned at (${player.location.x}, ${player.location.y}, ${player.location.z})${initialSpawn ? " (initial)" : ""}`,
     );
 });

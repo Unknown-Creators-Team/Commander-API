@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import config, { original } from "data/config.js";
-import { ModalFormBox } from "lib/ScriptBoxMC.js";
+import { ModalFormBox } from "script-box-mc";
 import { ConfigUI } from "./index.js";
 
 export class ScriptEventsConfigUI {
@@ -20,16 +20,16 @@ export class ScriptEventsConfigUI {
                 .toggle({
                     label: "有効化",
                     defaultValue: value.enabled,
-                    callback: (_, enabled) => {
-                        this.config.scriptevents[key as keyof typeof config.scriptevents].enabled = enabled;
+                    callback: ({ response: res }) => {
+                        this.config.scriptevents[key as keyof typeof config.scriptevents].enabled = res;
                     },
                 })
                 .textField({
                     label: "イベント名",
                     placeholder: "ex: itemUse",
                     defaultValue: value.name,
-                    callback: (_, name) => {
-                        this.config.scriptevents[key as keyof typeof config.scriptevents].name = name;
+                    callback: ({ response: res }) => {
+                        this.config.scriptevents[key as keyof typeof config.scriptevents].name = res;
                     },
                 });
         }

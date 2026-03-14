@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { ScoreboardUtils } from "script-box-mc";
 import { removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.entityHurt.subscribe((entityHurt) => {

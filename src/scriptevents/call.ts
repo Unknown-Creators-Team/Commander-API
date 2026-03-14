@@ -1,7 +1,7 @@
 import { Block, Entity, world } from "@minecraft/server";
 import { ScoreboardDatabase } from "lib/DatabaseMC.js";
 import { Macro } from "lib/Macro.js";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import { parseFormat } from "utils.js";
 import { CallSchema } from "../schema.js";
 

@@ -14,8 +14,8 @@
  */
 
 import * as Minecraft from "@minecraft/server";
-import { Macro } from "lib/Macro.js";
-import ESON from "./lib/ESON.js";
+import { Macro } from "./lib/Macro.js";
+import ESON from "bedrock-eson";
 
 export function bothParse(object: string): any {
     try {

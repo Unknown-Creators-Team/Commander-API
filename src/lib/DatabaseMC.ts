@@ -221,35 +221,35 @@ abstract class Database<K extends string | number | symbol, V> implements Map<K,
 
     /**
      * Returns an iterator over all keys in the map.
-     * @returns {IterableIterator<K>} An iterator that yields all keys in the map.
+     * @returns {MapIterator<K>} An iterator that yields all keys in the map.
      */
-    public keys(): IterableIterator<K> {
+    public keys(): MapIterator<K> {
         const keys = Object.keys(this.metaKeys);
-        return keys[Symbol.iterator]() as IterableIterator<K>;
+        return keys[Symbol.iterator]() as MapIterator<K>;
     }
 
     /**
      * Returns an iterator over all values in the map.
-     * @returns {IterableIterator<V>} An iterator that yields all values in the map.
+     * @returns {MapIterator<V>} An iterator that yields all values in the map.
      */
-    public values(): IterableIterator<V> {
+    public values(): MapIterator<V> {
         const values: V[] = [];
         for (const key of this.keys()) {
             values.push(this.get(key) as V);
         }
-        return values[Symbol.iterator]();
+        return values[Symbol.iterator]() as MapIterator<V>;
     }
 
     /**
      * Returns an iterator over all entries in the map.
-     * @returns {IterableIterator<[K, V]>} An iterator that yields all entries in the map.
+     * @returns {MapIterator<[K, V]>} An iterator that yields all entries in the map.
      */
-    public entries(): IterableIterator<[K, V]> {
+    public entries(): MapIterator<[K, V]> {
         const entries: [K, V][] = [];
         for (const key of this.keys()) {
             entries.push([key, this.get(key) as V]);
         }
-        return entries[Symbol.iterator]();
+        return entries[Symbol.iterator]() as MapIterator<[K, V]>;
     }
 
     /**
@@ -274,7 +274,7 @@ abstract class Database<K extends string | number | symbol, V> implements Map<K,
     /**
      * Removes all key-value pairs from the map.
      */
-    public [Symbol.iterator](): IterableIterator<[K, V]> {
+    public [Symbol.iterator](): MapIterator<[K, V]> {
         return this.entries();
     }
 

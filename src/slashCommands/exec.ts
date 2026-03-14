@@ -1,6 +1,6 @@
 import { CommandPermissionLevel, CustomCommandParamType, CustomCommandResult, CustomCommandStatus, world } from "@minecraft/server";
 import { ExecCommandSchema, ScriptEventCommandSchema } from "schema.js";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import { promiseDelay } from "utils.js";
 
 let config: typeof import("../data/config.js").original | undefined;
@@ -24,7 +24,7 @@ const main: SlashCommand = [
             {
                 name: "eventName",
                 type: CustomCommandParamType.String,
-            }
+            },
         ],
         optionalParameters: Array(6)
             .fill({})

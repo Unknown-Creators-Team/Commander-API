@@ -1,7 +1,7 @@
 import { Difficulty, system, world } from "@minecraft/server";
 import config from "data/config.js";
 import { FMath } from "lib/FastMath.js";
-import { ScoreboardUtils } from "lib/ScriptBoxMC.js";
+import { ScoreboardUtils } from "script-box-mc";
 import Vector from "lib/Vector.js";
 import { removeTagsStartsWith } from "utils.js";
 import tickEvent from "../lib/TickEvent.js";

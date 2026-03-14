@@ -1,5 +1,5 @@
 import { Block, Entity, TitleDisplayOptions } from "@minecraft/server";
-import * as v from "lib/valibot.js";
+import * as v from "valibot";
 import { TitleSchema } from "../schema.js";
 import { parseFormat } from "../utils.js";
 
