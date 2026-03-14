@@ -64,7 +64,7 @@ const main: SlashCommand = [
                     }
                 })
                 .catch((e) => {
-                    console.error(e, "\n" + e.stack);
+                    console.error(`${e}\n${e instanceof Error && e.stack}`);
                 });
             return success();
         }

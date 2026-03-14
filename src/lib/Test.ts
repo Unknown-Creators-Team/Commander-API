@@ -44,9 +44,9 @@ export default class Test {
                 console.log(`Initializing test "${this.name}"...`);
                 try {
                     this.initializeCallback(player, test);
-                } catch (error) {
-                    console.error(error);
-                    test.fail(`Initialization failed: ${error}`);
+                } catch (e) {
+                    console.error(`${e}\n${e instanceof Error && e.stack}`);
+                    test.fail(`Initialization failed: ${e}`);
                     return;
                 }
             }
@@ -57,9 +57,9 @@ export default class Test {
             if (!this.runCallback) throw new Error("Run callback is not defined.");
             try {
                 await this.runCallback(player, test);
-            } catch (error) {
-                console.error(error, (error as Error).stack);
-                test.fail(`Run failed: ${error}`);
+            } catch (e) {
+                console.error(`${e}\n${e instanceof Error && e.stack}`);
+                test.fail(`Run failed: ${e}`);
                 return;
             }
             // await waitOp(player, test);

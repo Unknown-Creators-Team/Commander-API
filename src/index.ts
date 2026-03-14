@@ -20,7 +20,7 @@ const { world, system } = Minecraft;
 world.afterEvents.worldLoad.subscribe(async (ev) => {
     const config = await import("./data/config.js");
     import("./native.js");
-    if (config.default.basic.debug.enabled) await import("./lib/Logger.js");
+    if (config.default.basic.debug.enabled) await import("./utils/logger.js");
     import("./events/index.js");
     import("./scriptevents/index.js");
     import("./gametests/index.js");

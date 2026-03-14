@@ -7,7 +7,7 @@ for (const [event, data] of Object.entries(config.events)) {
 
     if (data.enabled && !data.inline) {
         await import(`./${event}`).catch((e) => {
-            console.error(e + e.stack);
+            console.error(`${e}\n${e instanceof Error && e.stack}`);
         });
         console.log(`loaded ${event} in ${Date.now() - start}ms`);
     }

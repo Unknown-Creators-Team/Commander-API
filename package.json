@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "bedrock-eson": "^0.1.0",
+    "mc-chalk": "^1.0.2",
     "script-box-mc": "^0.1.0",
     "valibot": "^1.2.0"
   },

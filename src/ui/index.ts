@@ -6,8 +6,9 @@ import { ScriptEventsConfigUI } from "./scriptevents.js";
 import config, { original } from "data/config.js";
 import { OthersConfigUI } from "./others.js";
 import { MessageFormBox } from "script-box-mc";
+import { chalk } from "mc-chalk";
 
-ActionFormBox.config.close.text = "§l§c閉じる";
+ActionFormBox.config.close.text = chalk.red.bold("閉じる");
 
 export class ConfigUI {
     private player: Player;
@@ -17,44 +18,44 @@ export class ConfigUI {
     }
 
     private async Main(status?: string) {
-        const form = new ActionFormBox().title("§lCommander API 設定");
+        const form = new ActionFormBox().title(chalk.bold("Commander API 設定"));
         if (status) form.body(status);
-        form.button("§l基本設定", () => {
-            if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
+        form.button(chalk.bold("基本設定"), () => {
+            if (config.updated) this.Main(chalk.red("設定が変更されています。") + chalk.netherite(" /reload ") + chalk.red("で再読み込みしてください。"));
             else BasicConfigUI.Open(this.player);
         })
-            .button("§lイベント設定", () => {
-                if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
+            .button(chalk.bold("イベント設定"), () => {
+                if (config.updated) this.Main(chalk.red("設定が変更されています。") + chalk.netherite(" /reload ") + chalk.red("で再読み込みしてください。"));
                 else EventsConfigUI.Open(this.player);
             })
-            .button("§lスクリプトイベント設定", () => {
-                if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
+            .button(chalk.bold("§lスクリプトイベント設定"), () => {
+                if (config.updated) this.Main(chalk.red("設定が変更されています。") + chalk.netherite(" /reload ") + chalk.red("で再読み込みしてください。"));
                 else ScriptEventsConfigUI.Open(this.player);
             })
-            .button("§lその他各種設定", () => {
-                if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
+            .button(chalk.bold("§lその他各種設定"), () => {
+                if (config.updated) this.Main(chalk.red("設定が変更されています。") + chalk.netherite(" /reload ") + chalk.red("で再読み込みしてください。"));
                 else OthersConfigUI.Open(this.player);
             });
 
         if (config.format !== original.format) {
-            form.button("§l§p最新バージョンの設定に移行§r\n§7正しく移行できない可能性があります。", () => {
-                if (config.updated) this.Main("§c設定が変更されています。§m/reload §cで再読み込みしてください。");
+            form.button(chalk.bold.emerald("最新バージョンの設定に移行§r\n§7正しく移行できない可能性があります。"), () => {
+                if (config.updated) this.Main(chalk.red("設定が変更されています。") + chalk.netherite(" /reload ") + chalk.red("で再読み込みしてください。"));
                 else {
                     config.Migrate(config);
-                    this.Main("§e設定を移行しました。§g/reload §eで再読み込みしてください。");
+                    this.Main(chalk.yellow("設定を移行しました。") + chalk.gold(" /reload ") + chalk.yellow("で再読み込みしてください。"));
                 }
             });
         }
 
-        form.button("§l§c設定を初期化", () => {
+        form.button(chalk.bold.red("設定を初期化"), () => {
             new MessageFormBox()
-                .title("§l§c【警告】設定を初期化")
+                .title(chalk.red.bold("【警告】設定を初期化"))
                 .body("設定を初期化しますか？\nこの操作は元に戻せません。")
-                .upperButton("§l§c初期化", () => {
+                .upperButton(chalk.red.bold("初期化"), () => {
                     config.Reset();
-                    this.Main("§e設定を初期化しました。§g/reload §eで再読み込みしてください。");
+                    this.Main(chalk.yellow("設定を初期化しました。") + chalk.gold(" /reload ") + chalk.yellow("で再読み込みしてください。"));
                 })
-                .lowerButton("§l§8キャンセル", () => this.Main("§cキャンセルされました。"))
+                .lowerButton(chalk.gray.bold("キャンセル"), () => this.Main(chalk.red("キャンセルされました。")))
                 .show(this.player);
         });
 

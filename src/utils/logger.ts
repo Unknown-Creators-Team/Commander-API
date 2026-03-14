@@ -1,5 +1,6 @@
 import { PlayerPermissionLevel, world } from "@minecraft/server";
 import config from "data/config.js";
+import { chalk } from "mc-chalk";
 
 export function log(...messages: unknown[]) {
     if (!config.basic.debug.log) return;
@@ -14,7 +15,7 @@ export function info(...messages: unknown[]) {
     if (!config.basic.debug.info) return;
     for (const player of world.getAllPlayers()) {
         if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
-            player.sendMessage(`§b[CAPI][info]-${messages.join(" ")}`);
+            player.sendMessage(chalk.blue(`[CAPI][info]-${messages.join(" ")}`));
         }
     }
 }
@@ -23,7 +24,7 @@ export function warn(...messages: unknown[]) {
     if (!config.basic.debug.warn) return;
     for (const player of world.getAllPlayers()) {
         if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
-            player.sendMessage(`§e[CAPI][warning]-${messages.join(" ")}`);
+            player.sendMessage(chalk.yellow(`[CAPI][warning]-${messages.join(" ")}`));
         }
     }
 }
@@ -34,7 +35,7 @@ export function error(...messages: unknown[]) {
     if (!config.basic.debug.error) return;
     for (const player of world.getAllPlayers()) {
         if (player.playerPermissionLevel === PlayerPermissionLevel.Operator) {
-            player.sendMessage(`§c[CAPI][error]-${messages.join(" ")}`);
+            player.sendMessage(chalk.red(`[CAPI][error]-${messages.join(" ")}`));
         }
     }
     originalError(...messages);

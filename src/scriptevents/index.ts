@@ -22,7 +22,7 @@ system.afterEvents.scriptEventReceive.subscribe(
             try {
                 cache.get(path)!(source, message);
             } catch (e) {
-                console.error(e, (e as Error).stack);
+                console.error(`${e}\n${e instanceof Error && e.stack}`);
             }
         } else {
             import(path)
@@ -36,7 +36,7 @@ system.afterEvents.scriptEventReceive.subscribe(
                     }
                 })
                 .catch((e) => {
-                    console.error(e, e.stack);
+                    console.error(`${e}\n${e instanceof Error && e.stack}`);
                 });
         }
     },
