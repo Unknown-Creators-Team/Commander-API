@@ -321,9 +321,17 @@ export namespace Macro {
         } else if (str[1] === "lower_case") {
             return str[0].toLowerCase();
         } else if (str[1] === "pad_end") {
-            return str[0].padEnd(str[2], str[3] ?? "");
+            if (typeof str[0] === "number") {
+                return str[0].toString().padEnd(str[2], str[3]?.toString());
+            } else {
+                return str[0].padEnd(str[2], str[3]?.toString());
+            }
         } else if (str[1] === "pad_start") {
-            return str[0].padStart(str[2], str[3] ?? "");
+            if (typeof str[0] === "number") {
+                return str[0].toString().padStart(str[2], str[3]?.toString());
+            } else {
+                return str[0].padStart(str[2], str[3]?.toString());
+            }
         } else if (str[1] === "repeat") {
             return str[0].repeat(str[2]);
         } else if (str[1] === "replace") {

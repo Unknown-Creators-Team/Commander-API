@@ -395,8 +395,8 @@ export const StrMacroUpperCaseSchema = v.strictTuple([v.string(), v.literal("upp
 export const StrMacroTrimSchema = v.strictTuple([v.string(), v.literal("trim")]);
 export const StrMacroTrimEndSchema = v.strictTuple([v.string(), v.literal("trim_end")]);
 export const StrMacroTrimStartSchema = v.strictTuple([v.string(), v.literal("trim_start")]);
-export const StrMacroPadStartSchema = v.strictTuple([v.string(), v.literal("pad_start"), v.number(), v.optional(v.string())]);
-export const StrMacroPadEndSchema = v.strictTuple([v.string(), v.literal("pad_end"), v.number(), v.optional(v.string())]);
+export const StrMacroPadStartSchema = v.strictTuple([v.union([v.string(), v.number()]), v.literal("pad_start"), v.number(), v.optional(v.union([v.string(), v.number()]))]);
+export const StrMacroPadEndSchema = v.strictTuple([v.union([v.string(), v.number()]), v.literal("pad_end"), v.number(), v.optional(v.union([v.string(), v.number()]))]);
 export const StrMacroLengthSchema = v.strictTuple([v.string(), v.literal("length")]);
 
 export const StrMacroSchema = v.object({
