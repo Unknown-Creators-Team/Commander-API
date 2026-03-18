@@ -1,8 +1,8 @@
 import { Block, Entity, ExplosionOptions, world } from "@minecraft/server";
 import * as v from "valibot";
-import Vector from "lib/Vector.js";
 import { ExplosionSchema } from "../schema.js";
 import { parseFormat, parsePos } from "../utils.js";
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     const parsed = parseFormat(message, source);
@@ -11,7 +11,7 @@ export default function main(source: Entity | Block | undefined, message: string
     object.location ??= source ? (Object.values(source.location) as any) : [0, 0, 0];
 
     const radius = object.radius;
-    const location = Vector.fromArray(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
+    const location = Vec3.from(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
     const dimension = world.getDimension(object.dimension ?? source?.dimension.id ?? "overworld");
     const options: ExplosionOptions = {
         allowUnderwater: object.options?.allow_under_water,

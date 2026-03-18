@@ -1,6 +1,6 @@
 import { Block, Entity } from "@minecraft/server";
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 import * as v from "valibot";
-import Vector from "lib/Vector.js";
 import { ImpulseSchema } from "../schema.js";
 import { parseFormat } from "../utils.js";
 
@@ -12,7 +12,7 @@ export default function main(source: Entity | Block | undefined, message: string
     const object = v.parse(ImpulseSchema, parsed);
 
     const isClearVelocity = object.clear_velocity;
-    const vector = Vector.fromArray(object.vector);
+    const vector = Vec3.from(object.vector);
 
     if (isClearVelocity) source.clearVelocity();
     source.applyImpulse(vector);

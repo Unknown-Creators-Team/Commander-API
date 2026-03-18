@@ -1,7 +1,7 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import Vector from "lib/Vector.js";
 import shootEvent from "../../scriptevents/shoot.js";
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 
 new Test("scriptevent_shoot", "empty")
     .initialize((player) => {})
@@ -9,10 +9,10 @@ new Test("scriptevent_shoot", "empty")
         const originalLocation = { ...player.location };
         const shootData = {
             id: "minecraft:arrow",
-            location: Vector.from(originalLocation).add([0, 10, 0]).toArray(),
+            location: Vec3.from(originalLocation).add([0, 10, 0]).toArray(),
             vector: [0, -1, 0]
         };
-        player.teleport(Vector.from(originalLocation).add([0, 1000, 0]));
+        player.teleport(Vec3.from(originalLocation).add([0, 1000, 0]));
 
         const beforeCount = player.dimension.getEntities({ type: "minecraft:arrow", location: originalLocation, maxDistance: 10 }).length;
 

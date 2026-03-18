@@ -1,6 +1,6 @@
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 import { BlockVolume, Entity, Player, world } from "@minecraft/server";
 import config from "data/config.js";
-import Vector from "lib/Vector.js";
 import { propertyArray, removeTagsStartsWith } from "utils.js";
 
 world.afterEvents.itemStopUse.subscribe((itemStopUse) => {
@@ -31,8 +31,8 @@ function getNearbyArrow(player: Player) {
 }
 
 function isInAir(entity: Entity) {
-    const start = Vector.add(entity.location, new Vector(0, 0.1, 0));
-    const end = Vector.add(entity.location, new Vector(0, -0.1, 0));
+    const start = Vec3.from(entity.location).add(0, 0.1, 0);
+    const end = Vec3.from(entity.location).add(0, -0.1, 0);
     const volume = new BlockVolume(start, end);
 
     return !entity.dimension.containsBlock(volume, { excludeTypes: ["air"] });

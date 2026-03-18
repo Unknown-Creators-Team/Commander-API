@@ -14,7 +14,7 @@ export default function main(source: Entity | Block | undefined, message: string
     object.minimize ??= true;
 
     const item = source.container?.getItem(object.slot);
-    if (!item) throw new Error("Item not found in the specified slot.");
+    if (!item) return;
 
     const json = object.minimize ? ItemStackUtils.minimizeJSON(ItemStackUtils.toJSON(item)) : ItemStackUtils.toJSON(item);
     if (!json) throw new Error("Failed to convert item stack to JSON.");

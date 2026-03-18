@@ -1,1 +1,1 @@
-tellraw @s {"rawtext":[{"text":"Commander API V2 (Alpha Official Release)"}]}
+scriptevent capi:version

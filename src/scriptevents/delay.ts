@@ -1,7 +1,6 @@
-import { Block, Entity, ExplosionOptions, system, world } from "@minecraft/server";
+import { Block, Entity, system, world } from "@minecraft/server";
 import * as v from "valibot";
-import { parsePos, parseFormat } from "../utils.js";
-import Vector from "lib/Vector.js";
+import { parseFormat } from "../utils.js";
 import { DelaySchema } from "../schema.js";
 
 export default function main(source: Entity | Block | undefined, message: string) {

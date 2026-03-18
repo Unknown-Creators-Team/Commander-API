@@ -18,7 +18,7 @@ import {
     StrMacroSchema,
     StrMacroAtSchema,
 } from "schema.js";
-import Vector from "./Vector.js";
+import { MutVec3 } from "@bedrock-oss/bedrock-boost";
 
 export namespace Macro {
     export type Source = Entity | Block | undefined;
@@ -256,7 +256,7 @@ export namespace Macro {
         const object = ESON.parse(value);
         const { pos } = v.parse(PosMacroSchema, object);
         const axis = ["x", "y", "z"] as const;
-        let location = new Vector(0, 0, 0);
+        let location = new MutVec3(0, 0, 0);
 
         for (const ax of axis) {
             const name = Array.isArray(pos) ? `${pos[0]}_${ax}` : `${pos}_${ax}`;
@@ -267,7 +267,7 @@ export namespace Macro {
 
         if (Array.isArray(pos)) {
             if (pos.length === 2) {
-                location = location.add(pos[1]);
+                location = location.add(pos[1], pos[1], pos[1]);
             } else if (pos.length === 4) {
                 location = location.add(pos.slice(1, 4) as [number, number, number]);
             }
@@ -303,40 +303,48 @@ export namespace Macro {
 
     function str(value: string): string {
         const object = ESON.parse(value);
-        const result = v.parse(StrMacroSchema, object);
-        const [input, type, ...args] = result.str;
+        const { str } = v.parse(StrMacroSchema, object);
 
-        if (["concat", "starts_with", "ends_with", "includes"].includes(type)) {
-            const compare = args[0];
-            const trueValue = args[1] ?? "yes";
-            const falseValue = args[2] ?? "no";
-            let condition = false;
-
-            if (type === "concat") return input.concat(...(args as string[]));
-            if (type === "starts_with") condition = input.startsWith(compare as string);
-            if (type === "ends_with") condition = input.endsWith(compare as string);
-            if (type === "includes") condition = input.includes(compare as string);
-
-            return (condition ? trueValue : falseValue).toString();
-        } else {
-            if (type === "at") return input.charAt(args[0] as number) ?? "";
-            if (type === "index_of") return input.indexOf(`${args[0]}`).toString();
-            if (type === "replace") return input.replace(`${args[0]}`, `${args[1]}`);
-            if (type === "replace_all") return input.replaceAll(`${args[0]}`, `${args[1]}`);
-            if (type === "slice") return input.slice(args[0] as number, args[1] as number).toString();
-            if (type === "length") return input.length.toString();
-
-            if (type === "repeat") return input.repeat(args[0] as number);
-            if (type === "lower_case") return input.toLowerCase();
-            if (type === "upper_case") return input.toUpperCase();
-            if (type === "trim") return input.trim();
-            if (type === "trim_end") return input.trimEnd();
-            if (type === "trim_start") return input.trimStart();
-            if (type === "pad_start") return input.padStart(args[0] as number, args[1] as string);
-            if (type === "pad_end") return input.padEnd(args[0] as number, args[1] as string);
+        if (str[1] === "at") {
+            // @ts-expect-error - at is defined
+            return str[0].at(str[2]);
+        } else if (str[1] === "concat") {
+            return str[0].concat(...str.slice(2));
+        } else if (str[1] === "ends_with") {
+            return str[0].endsWith(str[2]) ? (str[3] ?? "") : (str[4] ?? "");
+        } else if (str[1] === "includes") {
+            return str[0].includes(str[2]) ? (str[3] ?? "") : (str[4] ?? "");
+        } else if (str[1] === "index_of") {
+            return str[0].indexOf(str[2]).toString();
+        } else if (str[1] === "length") {
+            return str[0].length.toString();
+        } else if (str[1] === "lower_case") {
+            return str[0].toLowerCase();
+        } else if (str[1] === "pad_end") {
+            return str[0].padEnd(str[2], str[3] ?? "");
+        } else if (str[1] === "pad_start") {
+            return str[0].padStart(str[2], str[3] ?? "");
+        } else if (str[1] === "repeat") {
+            return str[0].repeat(str[2]);
+        } else if (str[1] === "replace") {
+            return str[0].replace(str[2], str[3] ?? "");
+        } else if (str[1] === "replace_all") {
+            return str[0].replaceAll(str[2], str[3] ?? "");
+        } else if (str[1] === "slice") {
+            return str[0].slice(str[2], str[3]).toString();
+        } else if (str[1] === "starts_with") {
+            return str[0].startsWith(str[2]) ? (str[3] ?? "") : (str[4] ?? "");
+        } else if (str[1] === "trim") {
+            return str[0].trim();
+        } else if (str[1] === "trim_end") {
+            return str[0].trimEnd();
+        } else if (str[1] === "trim_start") {
+            return str[0].trimStart();
+        } else if (str[1] === "upper_case") {
+            return str[0].toUpperCase();
         }
 
-        return value;
+        throw new Error(`Invalid string macro operation: ${str[1]}`);
     }
 
     function getInner(value: string): string {

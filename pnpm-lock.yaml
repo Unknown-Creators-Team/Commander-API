@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@bedrock-oss/bedrock-boost':
+        specifier: ^2.0.1
+        version: 2.0.1(@minecraft/vanilla-data@1.26.2)
       bedrock-eson:
         specifier: ^0.1.0
         version: 0.1.0
@@ -240,6 +243,9 @@ packages:
   '@bedrock-apis/env-types@1.0.0-beta.6':
     resolution: {integrity: sha512-eB9QQcnS3zbZU2xkS6h5tOHYgbUQ4LOZsyyaxQL4tBzfGNo7pmMW2Hk+SUsFpkGMZ75eVU4MkNEvrNsk38Cj9w==}
 
+  '@bedrock-oss/bedrock-boost@2.0.1':
+    resolution: {integrity: sha512-npcAtPoPZxM66xb33D47xajruRFLB2c3MaDHZ6ecqDFY7p3Vbo5IbIb7hu+ncZV9oCNBLjgyqwDbcPTwmrv2Mg==}
+
   '@emnapi/core@1.9.0':
     resolution: {integrity: sha512-0DQ98G9ZQZOxfUcQn1waV2yS8aWdZ6kJMbYCJB3oUBecjWYO1fqJ+a1DRfPF3O5JEkwqwP1A9QEN/9mYm2Yd0w==}
 
@@ -373,6 +379,12 @@ packages:
     peerDependencies:
       '@minecraft/common': ^1.0.0
       '@minecraft/server': ^2.0.0 || ^2.6.0-beta.1.26.3-stable
+
+  '@minecraft/server@2.5.0':
+    resolution: {integrity: sha512-fh+1lByNo5tav75Xz0StOjBLUnWEQabg4K+RV7B7acGjdO5YkPnpXa2vw1ABuppgLuiBb2+E5letoCAj89bUBQ==}
+    peerDependencies:
+      '@minecraft/common': ^1.2.0
+      '@minecraft/vanilla-data': '>=1.20.70'
 
   '@minecraft/server@2.6.0-beta.1.26.3-stable':
     resolution: {integrity: sha512-cnGSWlSCF8X8nBPUt2sFzkwkNXgb/owLGKtxPEzwVPoV6olTvo8uR5OpqiDSx3sAn0ZzZj48Ju+XtoXbBa4JpQ==}
@@ -1884,6 +1896,13 @@ snapshots:
 
   '@bedrock-apis/env-types@1.0.0-beta.6': {}
 
+  '@bedrock-oss/bedrock-boost@2.0.1(@minecraft/vanilla-data@1.26.2)':
+    dependencies:
+      '@minecraft/common': 1.2.0
+      '@minecraft/server': 2.5.0(@minecraft/common@1.2.0)(@minecraft/vanilla-data@1.26.2)
+    transitivePeerDependencies:
+      - '@minecraft/vanilla-data'
+
   '@emnapi/core@1.9.0':
     dependencies:
       '@emnapi/wasi-threads': 1.2.0
@@ -2126,6 +2145,11 @@ snapshots:
     dependencies:
       '@minecraft/common': 1.2.0
       '@minecraft/server': 2.6.0-beta.1.26.3-stable(@minecraft/common@1.2.0)(@minecraft/vanilla-data@1.26.2)
+
+  '@minecraft/server@2.5.0(@minecraft/common@1.2.0)(@minecraft/vanilla-data@1.26.2)':
+    dependencies:
+      '@minecraft/common': 1.2.0
+      '@minecraft/vanilla-data': 1.26.2
 
   '@minecraft/server@2.6.0-beta.1.26.3-stable(@minecraft/common@1.2.0)(@minecraft/vanilla-data@1.26.2)':
     dependencies:

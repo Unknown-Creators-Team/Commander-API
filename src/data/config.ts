@@ -126,11 +126,6 @@ export const original = Object.freeze({
             inline: true,
             name: "velocity",
         },
-        viewDirection: {
-            enabled: true,
-            inline: true,
-            name: "direction",
-        },
         movementVector: {
             enabled: true,
             inline: true,
@@ -150,16 +145,6 @@ export const original = Object.freeze({
             enabled: true,
             inline: true,
             name: "rotation",
-        },
-        blockFromViewDirection: {
-            enabled: true,
-            inline: true,
-            name: "view",
-        },
-        entityFromViewDirection: {
-            enabled: true,
-            inline: true,
-            name: "view",
         },
         selectedSlotIndex: {
             enabled: true,
@@ -381,15 +366,20 @@ export const original = Object.freeze({
             inline: true,
             name: "graphics_ray_traced",
         },
-        view: {
+        viewDirection: {
+            enabled: true,
+            inline: false,
+            name: "direction",
+        },
+        blockFromViewDirection: {
             enabled: true,
             inline: true,
-            name: "view",
-            options: {
-                includeLiquidBlocks: true,
-                includePassableBlocks: true,
-                maxDistance: 100,
-            },
+            name: "view.block",
+        },
+        entityFromViewDirection: {
+            enabled: true,
+            inline: true,
+            name: "view.entity",
         },
         tripWireTrip: {
             enabled: true,

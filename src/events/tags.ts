@@ -1,9 +1,9 @@
-import { GraphicsMode, PlatformType, PlayerPermissionLevel, world } from "@minecraft/server";
+import { Timings } from "@bedrock-oss/bedrock-boost";
+import { GraphicsMode, PlatformType, PlayerPermissionLevel, system, world } from "@minecraft/server";
 import config from "data/config.js";
-import tickEvent from "../lib/TickEvent.js";
 import { removeTagsStartsWith } from "utils.js";
 
-tickEvent.subscribe("tags", () => {
+system.runInterval(() => {
     for (const player of world.getAllPlayers()) {
         //? is op
         if (config.events.isOp.enabled) {
@@ -141,44 +141,6 @@ tickEvent.subscribe("tags", () => {
         if (config.events.isGraphicsRayTraced.enabled) {
             if (player.graphicsMode === GraphicsMode.RayTraced) player.addTag(`capi:${config.events.isGraphicsRayTraced.name}`);
             else player.removeTag(`capi:${config.events.isGraphicsRayTraced.name}`);
-        }
-
-        if (config.events.view.enabled) {
-            const blockIdCache = player.getDynamicProperty("capi:view_block_id") as string;
-            const entityIdCache = player.getDynamicProperty("capi:view_entity_id") as string;
-            const playerNameCache = player.getDynamicProperty("capi:view_player_name") as string;
-            const viewEntity = player.getEntitiesFromViewDirection({ ...config.events.view.options })[0];
-            const viewBlock = player.getBlockFromViewDirection({ ...config.events.view.options });
-
-            if (viewBlock?.block) {
-                const blockId = viewBlock.block.typeId;
-                if (blockIdCache !== blockId) {
-                    player.setDynamicProperty("capi:view_block_id", blockId);
-                    removeTagsStartsWith(player, `${config.events.view.name}.block:`);
-                    player.addTag(`${config.events.view.name}.block:${blockId}`);
-                }
-            } else {
-                player.setDynamicProperty("capi:view_block_id");
-                removeTagsStartsWith(player, `${config.events.view.name}.block:`);
-            }
-
-            if (viewEntity) {
-                const entity = viewEntity.entity;
-                if (entity.isPlayer() && entity.name !== playerNameCache) {
-                    player.setDynamicProperty("capi:view_player_name", entity.name);
-                    removeTagsStartsWith(player, `${config.events.view.name}.player`);
-                    player.addTag(`${config.events.view.name}.player:${entity.name}`);
-                } else if (entity.typeId !== entityIdCache) {
-                    player.setDynamicProperty("capi:view_entity_id", entity.typeId);
-                    removeTagsStartsWith(player, `${config.events.view.name}.entity`);
-                    player.addTag(`${config.events.view.name}.entity:${entity.typeId}`);
-                }
-            } else {
-                player.setDynamicProperty("capi:view_entity_id");
-                player.setDynamicProperty("capi:view_player_name");
-                removeTagsStartsWith(player, `${config.events.view.name}.entity`);
-                removeTagsStartsWith(player, `${config.events.view.name}.player`);
-            }
         }
     }
 });

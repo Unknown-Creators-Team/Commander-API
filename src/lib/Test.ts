@@ -1,6 +1,6 @@
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 import { GameMode, system, world } from "@minecraft/server";
 import * as Gametest from "@minecraft/server-gametest";
-import Vector from "./Vector.js";
 
 type StructureTypes = "empty" | "button_push" | "break_block" | "trip_wire_trip";
 
@@ -78,13 +78,13 @@ export default class Test {
         Test.tests.push(this.name);
     }
 
-    public static runTest(name: string, location: Vector): void {
+    public static runTest(name: string, location: Vec3): void {
         if (!this.tests.includes(name)) throw new Error(`Test "${name}" is not registered.`);
         // /execute positioned 0 0 0 run gametest run testName
         world.getDimension("overworld").runCommand(`execute positioned ${location.add([0, 0, 1]).floor().toString()} run gametest run capi:${name}`);
     }
 
-    public static runAll(location: Vector): void {
+    public static runAll(location: Vec3): void {
         // 平面に広げる感じでテストを実行 (テストコンテナは10ブロック離す)
         const distance = 10;
         let xMax = Math.floor(Math.sqrt(this.tests.length));

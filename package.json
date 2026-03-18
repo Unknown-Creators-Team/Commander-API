@@ -1,6 +1,6 @@
 {
   "name": "commander-api",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "type": "module",
   "author": "Nano191225, arutaka1220",
   "license": "MIT",
@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@bedrock-oss/bedrock-boost": "^2.0.1",
     "bedrock-eson": "^0.1.0",
     "mc-chalk": "^1.0.2",
     "script-box-mc": "^0.1.0",
@@ -30,7 +31,7 @@
     "minecraft",
     "minecraft-bedrock",
     "minecraft-script-api",
-    "scriptapi"
+    "script-api"
   ],
   "files": [
     "pack_icon.png",

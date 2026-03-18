@@ -3,7 +3,6 @@ import config from "data/config.js";
 import { ScoreboardUtils } from "script-box-mc";
 import { promiseDelay } from "../utils.js";
 import { Macro } from "../lib/Macro.js";
-import Vector from "lib/Vector.js";
 
 world.beforeEvents.chatSend.subscribe((chat) => {
     const { sender: player, message } = chat;

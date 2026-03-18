@@ -1,96 +1,51 @@
 import { Difficulty, system, world } from "@minecraft/server";
 import config from "data/config.js";
-import { FMath } from "lib/FastMath.js";
 import { ScoreboardUtils } from "script-box-mc";
-import Vector from "lib/Vector.js";
 import { removeTagsStartsWith } from "utils.js";
-import tickEvent from "../lib/TickEvent.js";
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 
-tickEvent.subscribe("scores", () => {
+system.runInterval(() => {
     for (const player of world.getAllPlayers()) {
-        removeTagsStartsWith(player, "view:");
+        // removeTagsStartsWith(player, "view:");
 
         //? velocity
         if (config.events.velocity.enabled) {
             const velocity = player.getVelocity();
-            const xz = FMath.hypot(velocity.x, velocity.z);
-            const xyz = FMath.hypot(velocity.x, velocity.y, velocity.z);
-            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_x`, FMath.floor(velocity.x * 200));
-            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_y`, FMath.floor(velocity.y * 200));
-            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_z`, FMath.floor(velocity.z * 200));
-            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_xz`, FMath.floor(xz * 200));
-            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_xyz`, FMath.floor(xyz * 200));
-        }
-
-        //? vector
-        if (config.events.viewDirection.enabled) {
-            const direction = player.getViewDirection();
-            ScoreboardUtils.setScore(player, `capi:${config.events.viewDirection.name}_x`, FMath.floor(direction.x * 100));
-            ScoreboardUtils.setScore(player, `capi:${config.events.viewDirection.name}_y`, FMath.floor(direction.y * 100));
-            ScoreboardUtils.setScore(player, `capi:${config.events.viewDirection.name}_z`, FMath.floor(direction.z * 100));
+            const xz = Math.hypot(velocity.x, velocity.z);
+            const xyz = Math.hypot(velocity.x, velocity.y, velocity.z);
+            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_x`, Math.floor(velocity.x * 200));
+            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_y`, Math.floor(velocity.y * 200));
+            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_z`, Math.floor(velocity.z * 200));
+            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_xz`, Math.floor(xz * 200));
+            ScoreboardUtils.setScore(player, `capi:${config.events.velocity.name}_xyz`, Math.floor(xyz * 200));
         }
 
         //? input
         if (config.events.movementVector.enabled) {
             const input = player.inputInfo.getMovementVector();
-            ScoreboardUtils.setScore(player, `capi:${config.events.movementVector.name}_x`, FMath.floor(input.x * 100));
-            ScoreboardUtils.setScore(player, `capi:${config.events.movementVector.name}_y`, FMath.floor(input.y * 100));
+            ScoreboardUtils.setScore(player, `capi:${config.events.movementVector.name}_x`, Math.floor(input.x * 100));
+            ScoreboardUtils.setScore(player, `capi:${config.events.movementVector.name}_y`, Math.floor(input.y * 100));
         }
 
         //? health
         if (config.events.health.enabled) {
             const health = player.health ?? -1;
-            ScoreboardUtils.setScore(player, `capi:${config.events.health.name}`, FMath.floor(health));
+            ScoreboardUtils.setScore(player, `capi:${config.events.health.name}`, Math.floor(health));
         }
 
         //? location
         if (config.events.location.enabled) {
             const { location } = player;
-            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_x`, FMath.floor(location.x));
-            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_y`, FMath.floor(location.y + 1 / 65536)); // prevent flooring y when it's .9999...
-            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_z`, FMath.floor(location.z));
+            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_x`, Math.floor(location.x));
+            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_y`, Math.floor(location.y + 1 / 65536)); // prevent flooring y when it's .9999...
+            ScoreboardUtils.setScore(player, `capi:${config.events.location.name}_z`, Math.floor(location.z));
         }
 
         //? rotation
         if (config.events.rotation.enabled) {
             const rotation = player.getRotation();
-            ScoreboardUtils.setScore(player, `capi:${config.events.rotation.name}_x`, FMath.floor(rotation.x));
-            ScoreboardUtils.setScore(player, `capi:${config.events.rotation.name}_y`, FMath.floor(rotation.y));
-        }
-
-        //? block from view direction
-        if (config.events.blockFromViewDirection.enabled) {
-            const raycast = player.getBlockFromViewDirection()!;
-            if (raycast) {
-                const { block } = raycast;
-                const distance = Vector.distance(player.location, block.location);
-                ScoreboardUtils.setScore(player, `capi:${config.events.blockFromViewDirection.name}_distance`, FMath.floor(distance));
-                ScoreboardUtils.setScore(player, `capi:${config.events.blockFromViewDirection.name}_x`, FMath.floor(block.location.x));
-                ScoreboardUtils.setScore(player, `capi:${config.events.blockFromViewDirection.name}_y`, FMath.floor(block.location.y));
-                ScoreboardUtils.setScore(player, `capi:${config.events.blockFromViewDirection.name}_z`, FMath.floor(block.location.z));
-            } else {
-                ScoreboardUtils.resetScore(player, `capi:${config.events.blockFromViewDirection.name}_distance`);
-                ScoreboardUtils.resetScore(player, `capi:${config.events.blockFromViewDirection.name}_x`);
-                ScoreboardUtils.resetScore(player, `capi:${config.events.blockFromViewDirection.name}_y`);
-                ScoreboardUtils.resetScore(player, `capi:${config.events.blockFromViewDirection.name}_z`);
-            }
-        }
-
-        //? entity from view direction
-        if (config.events.entityFromViewDirection.enabled) {
-            const raycast = player.getEntitiesFromViewDirection()[0];
-            if (raycast) {
-                const { entity, distance } = raycast;
-                ScoreboardUtils.setScore(player, `capi:${config.events.entityFromViewDirection.name}_distance`, FMath.floor(distance));
-                ScoreboardUtils.setScore(player, `capi:${config.events.entityFromViewDirection.name}_x`, FMath.floor(entity.location.x));
-                ScoreboardUtils.setScore(player, `capi:${config.events.entityFromViewDirection.name}_y`, FMath.floor(entity.location.y));
-                ScoreboardUtils.setScore(player, `capi:${config.events.entityFromViewDirection.name}_z`, FMath.floor(entity.location.z));
-            } else if (!config.events.blockFromViewDirection.enabled) {
-                ScoreboardUtils.resetScore(player, `capi:${config.events.entityFromViewDirection.name}_distance`);
-                ScoreboardUtils.resetScore(player, `capi:${config.events.entityFromViewDirection.name}_x`);
-                ScoreboardUtils.resetScore(player, `capi:${config.events.entityFromViewDirection.name}_y`);
-                ScoreboardUtils.resetScore(player, `capi:${config.events.entityFromViewDirection.name}_z`);
-            }
+            ScoreboardUtils.setScore(player, `capi:${config.events.rotation.name}_x`, Math.floor(rotation.x));
+            ScoreboardUtils.setScore(player, `capi:${config.events.rotation.name}_y`, Math.floor(rotation.y));
         }
 
         //? selected slot
@@ -100,7 +55,7 @@ tickEvent.subscribe("scores", () => {
 
         //? timestamp
         if (config.events.timestamp.enabled) {
-            ScoreboardUtils.setScore(player, `capi:${config.events.timestamp.name}`, FMath.floor(Date.now() / 1000));
+            ScoreboardUtils.setScore(player, `capi:${config.events.timestamp.name}`, Math.floor(Date.now() / 1000));
         }
 
         //? dimension
@@ -210,14 +165,14 @@ tickEvent.subscribe("scores", () => {
     // for (const entity of entities) {
     //     //? velocity
     //     const velocity = entity.getVelocity();
-    //     ScoreboardUtils.setScore(entity, `capi:${config.events.velocity.name}_x", FMath.floor(velocity.x * 200));
-    //     ScoreboardUtils.setScore(entity, `capi:${config.events.velocity.name}_y", FMath.floor(velocity.y * 200));
-    //     ScoreboardUtils.setScore(entity, `capi:${config.events.velocity.name}_z", FMath.floor(velocity.z * 200));
+    //     ScoreboardUtils.setScore(entity, `capi:${config.events.velocity.name}_x", floor(velocity.x * 200));
+    //     ScoreboardUtils.setScore(entity, `capi:${config.events.velocity.name}_y", floor(velocity.y * 200));
+    //     ScoreboardUtils.setScore(entity, `capi:${config.events.velocity.name}_z", floor(velocity.z * 200));
 
     //     //? location
     //     const { location } = entity;
-    //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_x`, FMath.floor(location.x));
-    //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_y`, FMath.floor(location.y));
-    //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_z`, FMath.floor(location.z));
+    //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_x`, floor(location.x));
+    //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_y`, floor(location.y));
+    //     ScoreboardUtils.setScore(entity, `capi:${config.events.location.name}_z`, floor(location.z));
     // }
 });

@@ -1,7 +1,8 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/**/*.ts"],
+  entry: ["src/**/*.ts"],
   unbundle: true,
   hash: false,
+  platform: "node",
 });

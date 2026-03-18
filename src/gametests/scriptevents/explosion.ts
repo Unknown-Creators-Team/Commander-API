@@ -1,12 +1,12 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
-import Vector from "lib/Vector.js";
 import explosion from "../../scriptevents/explosion.js";
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 
 new Test("scriptevent_explosion", "empty")
     .initialize((player) => {})
     .run(async (player) => {
-        const explosionLocation = Vector.from({
+        const explosionLocation = Vec3.from({
             x: Math.floor(player.location.x),
             y: Math.floor(player.location.y + 1),
             z: Math.floor(player.location.z),

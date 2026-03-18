@@ -4,7 +4,8 @@ import * as v from "valibot";
 // ========================================
 // Utility Schemas
 // ========================================
-const LocationTuple = v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]);
+
+const LocationSchema = v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]);
 
 // ========================================
 // Form Schemas
@@ -133,7 +134,7 @@ export const FormSchema = v.variant("typ", [ActionFormSchema, MessageFormSchema,
 
 export const ExplosionSchema = v.object({
     radius: v.number(),
-    location: v.optional(v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])])),
+    location: v.optional(LocationSchema),
     dimension: v.optional(v.string()),
     options: v.optional(
         v.object({
@@ -155,7 +156,7 @@ export const KnockbackSchema = v.object({
 });
 
 export const TeleportSchema = v.object({
-    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
+    location: LocationSchema,
     rotation: v.optional(v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()])])),
     dimension: v.optional(v.string()),
 });
@@ -163,7 +164,7 @@ export const TeleportSchema = v.object({
 export const SpawnEntitySchema = v.object({
     id: v.string(),
     name: v.optional(v.string()),
-    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
+    location: LocationSchema,
     dimension: v.optional(v.string()),
     fire: v.optional(v.number()),
 });
@@ -183,7 +184,7 @@ export const SpawnItemSchema = v.object({
     can_destroy: v.optional(v.array(v.string())),
     lock: v.optional(v.string()),
     keep_on_death: v.optional(v.boolean()),
-    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
+    location: LocationSchema,
     dimension: v.optional(v.string()),
     clear_velocity: v.optional(v.boolean()),
 });
@@ -192,7 +193,7 @@ export const ShootSchema = v.object({
     id: v.string(),
     nameTag: v.optional(v.string()),
     fire: v.optional(v.number()),
-    location: v.tuple([v.union([v.number(), v.string()]), v.union([v.number(), v.string()]), v.union([v.number(), v.string()])]),
+    location: LocationSchema,
     vector: v.tuple([v.number(), v.number(), v.number()]),
     speed: v.optional(v.number()),
     dimension: v.optional(v.string()),
@@ -268,7 +269,7 @@ export const ParticleRgbaSchema = v.object({
 
 export const ParticleSchema = v.object({
     id: v.string(),
-    location: v.optional(LocationTuple),
+    location: v.optional(LocationSchema),
     variables: v.optional(v.record(v.string(), v.union([v.number(), ParticleRgbaSchema, ParticleVector3Schema]))),
 });
 
@@ -375,9 +376,15 @@ export const FallbackMacroSchema = v.object({
  */
 export const StrMacroAtSchema = v.strictTuple([v.string(), v.literal("at"), v.number()]);
 export const StrMacroConcatSchema = v.tupleWithRest([v.string(), v.literal("concat")], v.string());
-export const StrMacroStartsWithSchema = v.strictTuple([v.string(), v.literal("starts_with"), v.string(), v.optional(v.string()), v.optional(v.string())]);
-export const StrMacroEndsWithSchema = v.strictTuple([v.string(), v.literal("ends_with"), v.string(), v.optional(v.string()), v.optional(v.string())]);
-export const StrMacroIncludesSchema = v.strictTuple([v.string(), v.literal("includes"), v.string(), v.optional(v.string()), v.optional(v.string())]);
+export const StrMacroStartsWithSchema = v.strictTuple([
+    v.string(),
+    v.literal("starts_with"),
+    v.string(),
+    v.string(),
+    v.optional(v.string()),
+]);
+export const StrMacroEndsWithSchema = v.strictTuple([v.string(), v.literal("ends_with"), v.string(), v.string(), v.optional(v.string())]);
+export const StrMacroIncludesSchema = v.strictTuple([v.string(), v.literal("includes"), v.string(), v.string(), v.optional(v.string())]);
 export const StrMacroIndexOfSchema = v.strictTuple([v.string(), v.literal("index_of"), v.string()]);
 export const StrMacroRepeatSchema = v.strictTuple([v.string(), v.literal("repeat"), v.number()]);
 export const StrMacroReplaceSchema = v.strictTuple([v.string(), v.literal("replace"), v.string(), v.string()]);

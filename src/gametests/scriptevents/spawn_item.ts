@@ -1,13 +1,13 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
 import spawnItemEvent from "../../scriptevents/spawn_item.js";
-import Vector from "lib/Vector.js";
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 
 new Test("scriptevent_spawn_item", "empty")
     .initialize((player) => {})
     .run(async (player) => {
         const dimension = player.dimension;
-        const spawnLocation = Vector.from({
+        const spawnLocation = Vec3.from({
             x: Math.floor(player.location.x),
             y: Math.floor(player.location.y + 1),
             z: Math.floor(player.location.z),

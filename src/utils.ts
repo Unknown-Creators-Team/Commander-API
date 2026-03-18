@@ -7,7 +7,7 @@
  * ╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░╚═╝░██║██║░░██║██║░╚███║██████╔╝███████╗██║░░██║  ██║░░██║██║░░░░░██║
  * ░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝  ╚═╝░░╚═╝╚═╝░░░░░╚═╝
  *
- * @LICENSE GNU General Public License v3.0
+ * @LICENSE MIT
  * @AUTHOR Nano
  * @AUTHOR arutaka1220
  * @LINK https://github.com/191225/Commander-API
@@ -174,7 +174,9 @@ export function calculate(expression: string): number {
 }
 
 export function promiseDelay(callback: (...value: any[]) => any, ...value: any[]): void {
-    Promise.resolve().then(() => callback(...value)).catch((e) => console.error(`${e}\n${e instanceof Error && e.stack}`));
+    Promise.resolve()
+        .then(() => callback(...value))
+        .catch((e) => console.error(`${e}\n${e instanceof Error && e.stack}`));
 }
 
 export function removeTagsStartsWith(player: Minecraft.Player, ...tags: string[]): void {
@@ -188,7 +190,6 @@ export function removeTagsStartsWith(player: Minecraft.Player, ...tags: string[]
 export function propertyArray(object: Record<string, string | undefined>): string[] {
     return Object.entries(object).map(([key, value]) => `${key}:${value ?? "NULL"}`);
 }
-
 
 export function flattenObject<T extends string | number | boolean | symbol | undefined>(obj: any, parent = ""): Record<string, T> {
     return Object.keys(obj).reduce((acc, key) => {

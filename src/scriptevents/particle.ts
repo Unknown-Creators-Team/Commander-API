@@ -1,15 +1,15 @@
 import { Block, Entity, MolangVariableMap, RGBA, Vector3 } from "@minecraft/server";
 import * as v from "valibot";
-import Vector from "lib/Vector.js";
 import { ParticleRgbaSchema, ParticleSchema, ParticleVector3Schema } from "../schema.js";
 import { parseFormat, parsePos } from "../utils.js";
+import { Vec3 } from "@bedrock-oss/bedrock-boost";
 
 export default function main(source: Entity | Block | undefined, message: string) {
     if (!source?.isPlayer()) throw new Error("Cannot use this script event in non-player entity.");
 
     const parsed = parseFormat(message, source);
     const object = v.parse(ParticleSchema, parsed);
-    const location = Vector.fromArray(object.location?.map((v, i) => parsePos(v.toString(), source, ["x", "y", "z"][i] as "x")) ?? [0, 0, 0]);
+    const location = Vec3.from(object.location?.map((v, i) => parsePos(v.toString(), source, (["x", "y", "z"] as const)[i])) ?? [0, 0, 0]);
     const variables = object.variables || {};
     const molang = new MolangVariableMap();
 

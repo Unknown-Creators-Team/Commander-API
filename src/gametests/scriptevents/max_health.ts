@@ -1,7 +1,6 @@
 import { system } from "@minecraft/server";
 import Test from "lib/Test.js";
 import healthEvent from "../../scriptevents/max_health.js";
-import Vector from "lib/Vector.js";
 
 new Test("scriptevent_health", "empty")
     .initialize((player) => {

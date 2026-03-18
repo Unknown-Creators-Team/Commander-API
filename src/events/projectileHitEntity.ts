@@ -1,6 +1,5 @@
 import { world } from "@minecraft/server";
 import config from "data/config.js";
-import { FMath } from "lib/FastMath.js";
 import { ScoreboardUtils } from "script-box-mc";
 import { propertyArray, removeTagsStartsWith } from "utils.js";
 
@@ -17,9 +16,9 @@ world.afterEvents.projectileHitEntity.subscribe((projectileHit) => {
         };
 
         if (entity) {
-            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_x`, FMath.floor(entity.location.x));
-            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_y`, FMath.floor(entity.location.y));
-            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_z`, FMath.floor(entity.location.z));
+            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_x`, Math.floor(entity.location.x));
+            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_y`, Math.floor(entity.location.y));
+            ScoreboardUtils.setScore(player, `capi:${config.events.projectileHitEntity.name}_z`, Math.floor(entity.location.z));
 
             removeTagsStartsWith(player, `${config.events.projectileHitEntity.name}.`);
 
