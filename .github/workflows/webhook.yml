@@ -19,9 +19,9 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
         run: |
           if [[ "$TAG" == *canary* ]]; then
-            echo "role=<@1481870465416040471>" >> "$GITHUB_OUTPUT"
+            echo "role=<@&1481870465416040471>" >> "$GITHUB_OUTPUT"
           else
-            echo "role=<@1481870405156212756>" >> "$GITHUB_OUTPUT"
+            echo "role=<@&1481870405156212756>" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Post release message to Discord
@@ -32,7 +32,7 @@ jobs:
           RELEASE_URL: ${{ github.event.release.html_url }}
           MENTION_ROLE: ${{ steps.mention.outputs.role }}
         run: |
-          payload=$(jq -n --arg name "$RELEASE_NAME" --arg body "$RELEASE_BODY" --arg url "$RELEASE_URL" --arg role "$MENTION_ROLE" '{content: ($role + "\n## " + $name + "\n" + $body + "\n\n-# " + $url)}')
+          payload=$(jq -n --arg name "$RELEASE_NAME" --arg body "$RELEASE_BODY" --arg url "$RELEASE_URL" --arg role "$MENTION_ROLE" '{content: ($role + "\n# " + $name + "\n" + $body + "\n\n-# " + $url)}')
           curl -sS -X POST \
             -H "Content-Type: application/json" \
             -d "$payload" \

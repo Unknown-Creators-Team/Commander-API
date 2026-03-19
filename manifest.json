@@ -4,7 +4,7 @@
 		"name": "Commander API V2",
 		"description": "マインクラフト統合版のコマンドを拡張します。",
 		"uuid": "d3ed9253-d2e1-4e06-9899-be30754cc44d",
-		"version": "2.1.1",
+		"version": "2.2.0",
 		"min_engine_version": "1.26.3"
 	},
 	"metadata": {
