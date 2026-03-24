@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "@bedrock-apis/env-types": "1.0.0-beta.6",
-    "@minecraft/server": "2.6.0-beta.1.26.3-stable",
-    "@minecraft/server-gametest": "1.0.0-beta.1.26.3-stable",
-    "@minecraft/server-ui": "2.1.0-beta.1.26.3-stable",
+    "@minecraft/server": "2.7.0-beta.1.26.10-stable",
+    "@minecraft/server-gametest": "1.0.0-beta.1.26.10-stable",
+    "@minecraft/server-ui": "2.1.0-beta.1.26.10-stable",
     "@nano191225/scriptup": "^1.5.0",
     "@types/jest": "^30.0.0",
     "jest": "^30.3.0",
