@@ -33,34 +33,6 @@ export class EventsConfigUI {
                     },
                 });
             }
-            if ("options" in value) {
-                form.slider({
-                    label: "最大距離",
-                    minimumValue: 5,
-                    maximumValue: 150,
-                    defaultValue: value.options.maxDistance,
-                    valueStep: 5,
-                    callback: ({ response: res }) => {
-                        (this.config.events[key as keyof typeof config.events] as any).options.maxDistance = res;
-                    },
-                });
-
-                form.toggle({
-                    label: "液体ブロック(水や溶岩)の検知",
-                    defaultValue: value.options.includeLiquidBlocks,
-                    callback: ({ response: res }) => {
-                        (this.config.events[key as keyof typeof config.events] as any).options.includeLiquidBlocks = res;
-                    },
-                });
-
-                form.toggle({
-                    label: "通過可能ブロック(つるや花)の検知",
-                    defaultValue: value.options.includePassableBlocks,
-                    callback: ({ response: res }) => {
-                        (this.config.events[key as keyof typeof config.events] as any).options.includePassableBlocks = res;
-                    },
-                });
-            }
         }
 
         const res = await form.show(this.player);

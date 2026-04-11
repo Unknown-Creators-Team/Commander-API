@@ -74,12 +74,19 @@ export default function main(source: Entity | Block | undefined, message: string
             if (object.ttl) form.title(object.ttl);
             if (object.bdy) form.body(object.bdy);
 
-            object.btn.forEach((btn: any, i: number) => {
+            object.btn.forEach((btn, i: number) => {
                 if (!btn.txt) throw TypeError("Button text is required.");
-                form.button(btn.txt, btn.img, () => {
-                    if (btn.act) runAction(source, btn.act);
-                    ScoreboardUtils.setScore(source, "capi:act_form", i + 1);
-                });
+                if (btn.img) {
+                    form.button(btn.txt, btn.img, () => {
+                        if (btn.act) runAction(source, btn.act);
+                        ScoreboardUtils.setScore(source, "capi:act_form", i + 1);
+                    });
+                } else {
+                    form.button(btn.txt, () => {
+                        if (btn.act) runAction(source, btn.act);
+                        ScoreboardUtils.setScore(source, "capi:act_form", i + 1);
+                    });
+                }
             });
 
             form.show(source).then((response) => {
@@ -177,6 +184,7 @@ export default function main(source: Entity | Block | undefined, message: string
 }
 
 function runAction(source: Player, action: FormActions) {
+    console.log(`Running action: ${action.typ} with value: ${JSON.stringify(action.val)}`);
     switch (action.typ) {
         case "at":
         case "add_t":

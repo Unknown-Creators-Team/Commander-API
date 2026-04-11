@@ -4,7 +4,7 @@
 		"name": "Commander API V2",
 		"description": "マインクラフト統合版のコマンドを拡張します。",
 		"uuid": "d3ed9253-d2e1-4e06-9899-be30754cc44d",
-		"version": "2.2.0",
+		"version": "2.3.0-canary",
 		"min_engine_version": "1.26.3"
 	},
 	"metadata": {
@@ -36,11 +36,11 @@
 	"dependencies": [
 		{
 			"module_name": "@minecraft/server",
-			"version": "2.7.0-beta"
+			"version": "beta"
 		},
 		{
 			"module_name": "@minecraft/server-ui",
-			"version": "2.1.0-beta"
+			"version": "beta"
 		},
 		{
 			"module_name": "@minecraft/server-gametest",
